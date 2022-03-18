@@ -1,5 +1,4 @@
 """
-TEST TEST TEST
 T1-SPR4-CS2450-601
 Developed by Team 1 in CS 2450-601, Spring 2022.
 
