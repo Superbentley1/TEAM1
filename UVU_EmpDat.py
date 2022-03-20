@@ -257,17 +257,15 @@ def open_admin():
     #Create Employee Tree Frame
     emp_frame = Frame(admin_window)
     
-    """
-    #Don't know if this works yet, need a populated tree
     def tree_column_sort(tree, the_column, other_way):
+        #Get the values to sort
         information = [(tree.set(k, the_column), k) for k in tree.get_children('')]
-        information.sort(reverse=other_way)
         #Rearrange to sorted positions
-        for index, (val, k) in enumerate(1):
-            tree.move(k, '', index)
+        information.sort(reverse=other_way)
+        for index, data in enumerate(information):
+            tree.move(data[1], '', index)
         #Reverse the sort on next click
-        tree.heading(the_column, command = lambda: tree_column_sort(tree, the_column, not other_way))
-    """
+        tree.heading(the_column, command=lambda c=columns_list[the_column]: tree_column_sort(tree, the_column, not other_way))
     
     #Define columns
     columns_list = ("employee_id", "first_name", "last_name", \
@@ -278,20 +276,19 @@ def open_admin():
         show="headings")
 
     #Define headings
-    #employee_list.heading("employee_id", text="Employee ID", command=lambda: tree_column_sort(employee_list, 0, False))
-    employee_list.heading("employee_id", text="Employee ID")
-    employee_list.heading("first_name", text="First Name")
-    employee_list.heading("last_name", text="Last Name")
+    employee_list.heading("employee_id", text="Employee ID", command=lambda c=columns_list[0] : tree_column_sort(employee_list, 0, False))
+    employee_list.heading("first_name", text="First Name", command=lambda c=columns_list[1] : tree_column_sort(employee_list, 1, False))
+    employee_list.heading("last_name", text="Last Name", command=lambda c=columns_list[2] : tree_column_sort(employee_list, 2, False))
     employee_list.heading("social_security_number", \
-        text="Social Security Number")
+        text="Social Security Number", command=lambda c=columns_list[3] : tree_column_sort(employee_list, 3, False))
 
-    employee_list.heading("phone_number", text="Phone Number")
-    employee_list.heading("email", text="Email")
-    employee_list.heading("start_date", text="Starting Date")
-    employee_list.heading("end_date", text="Ending Date")
-    employee_list.heading("classification", text="Classification")
-    employee_list.heading("title", text="Title")
-    employee_list.heading("department", text="Department")
+    employee_list.heading("phone_number", text="Phone Number", command=lambda c=columns_list[4] : tree_column_sort(employee_list, 4, False))
+    employee_list.heading("email", text="Email", command=lambda c=columns_list[5] : tree_column_sort(employee_list, 5, False))
+    employee_list.heading("start_date", text="Starting Date", command=lambda c=columns_list[6] : tree_column_sort(employee_list, 6, False))
+    employee_list.heading("end_date", text="Ending Date", command=lambda c=columns_list[7] : tree_column_sort(employee_list, 7, False))
+    employee_list.heading("classification", text="Classification", command=lambda c=columns_list[8] : tree_column_sort(employee_list, 8, False))
+    employee_list.heading("title", text="Title", command=lambda c=columns_list[9] : tree_column_sort(employee_list, 9, False))
+    employee_list.heading("department", text="Department", command=lambda c=columns_list[10] : tree_column_sort(employee_list, 10, False))
 
     #Style - striped rows
     employee_list.tag_configure("evenrows", background = "honeydew")
@@ -384,7 +381,7 @@ def open_employee(employee, permission_level):
     #First Name
     first_name_title = Label(employee_window, text="First Name")\
         .grid(row=1, column=0, padx=10, pady=15)
-    first_name_label = Label(employee_window, text=employee.first_name)\
+    first_name_label = Label(employee_window, text=emp.first_name)\
         .grid(row=2, column=0, padx=10, pady=10)
     #Last Name
     last_name_title = Label(employee_window, text="Last Name").grid(row=1,\
