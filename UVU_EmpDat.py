@@ -15,7 +15,9 @@ Developed with:
 Python version 3.7.2
 Tkinter version 8.6
 """
-
+"""
+test
+"""
 # TODO: FIXME:
 # Need to go over my notes at the bottom with Abbie, Tristan, and the
 #   team.
@@ -257,6 +259,17 @@ def open_admin():
     #Create Employee Tree Frame
     emp_frame = Frame(admin_window)
     
+    """
+    def tree_column_sort(tree, the_column, other_way):
+        information = [(tree.set(k, the_column), k) for k in tree.get_children('')]
+        information.sort(reverse=other_way)
+        #Rearrange to sorted positions
+        for index, (val, k) in enumerate(1):
+            tree.move(k, '', index)
+        #Reverse the sort on next click
+        tree.heading(the_column, command = lambda: tree_column_sort(tree, the_column, not other_way))
+    """
+    
     #Define columns
     columns_list = ("employee_id", "first_name", "last_name", \
         "social_security_number", "phone_number", "email", "start_date", \
@@ -266,6 +279,7 @@ def open_admin():
         show="headings")
 
     #Define headings
+    #employee_list.heading("employee_id", text="Employee ID", command=lambda: tree_column_sort(employee_list, 0, False))
     employee_list.heading("employee_id", text="Employee ID")
     employee_list.heading("first_name", text="First Name")
     employee_list.heading("last_name", text="Last Name")
@@ -778,8 +792,8 @@ def button_close_warning():
     the program exits.
     """
     #Prompt warning about to close program
-    answer = askokcancel("Confirmation", "Are you sure you want to \
-        quit?", icon=WARNING)
+    answer = askokcancel("Confirmation", "Are you sure you want to quit?", \
+        icon=WARNING)
     if answer:
         login_window.destroy()
 
