@@ -15,9 +15,7 @@ Developed with:
 Python version 3.7.2
 Tkinter version 8.6
 """
-"""
-test
-"""
+
 # TODO: FIXME:
 # Need to go over my notes at the bottom with Abbie, Tristan, and the
 #   team.
@@ -260,6 +258,7 @@ def open_admin():
     emp_frame = Frame(admin_window)
     
     """
+    #Don't know if this works yet, need a populated tree
     def tree_column_sort(tree, the_column, other_way):
         information = [(tree.set(k, the_column), k) for k in tree.get_children('')]
         information.sort(reverse=other_way)
