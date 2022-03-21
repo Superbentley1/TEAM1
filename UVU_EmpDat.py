@@ -45,6 +45,8 @@ class Employee():
 
     def __init__(self, id, name, birth_date, SSN, phone, email, classification):
         self.id = id
+        if self.id is not None:
+            self.id = int(self.id)
         self.name = name
         if isinstance(self.name, str):
             if ' ' in name:
@@ -103,7 +105,7 @@ class Employee():
         self.end_date = end_date
 
     def populate_from_row(self, row):
-        self.id = row["ID"]
+        self.id = int(row["ID"])
         self.name = row["Name"]
         name = self.name.split(" ")
         self.first_name = name[0]
@@ -153,13 +155,14 @@ class EmployeeDB:
                 writer = csv.writer(DB)
                 writer.writerow(
                     "ID,Name,Address,City,State,Zip,Classification,\
-                        PayMethod,Salary,Hourly,Commission,Route,Account,\
-                            Social Security Number,Phone Number,Email,\
-                                Start Date,End Date,Title,Department,\
-                                    Password".split(','))
+                    PayMethod,Salary,Hourly,Commission,Route,Account,\
+                    Social Security Number,Phone Number,Email,\
+                    Start Date,End Date,Title,Department,\
+                    Password".split(
+                        ','))
                 self.db = DB
         else:
-            self.db = open("employees.csv", )
+            self.db = open("employees.csv")
         self.emp_list = []
         self.update_emp_list()
 
@@ -321,10 +324,7 @@ def open_admin():
         for selected_emp_idx in employee_list.selection():
             emp_data = employee_list.item(selected_emp_idx)
             emp_id = emp_data["values"][0]
-            print(emp_data["values"])
-            print(emp_id)
             emp = find_employee_by_id(emp_id, uvuEmpDat.emp_list)
-            print(emp)
             open_employee(emp, "admin")
             
     #Double-Click to bring up employee information
@@ -381,7 +381,7 @@ def open_employee(employee, permission_level):
     #First Name
     first_name_title = Label(employee_window, text="First Name")\
         .grid(row=1, column=0, padx=10, pady=15)
-    first_name_label = Label(employee_window, text=emp.first_name)\
+    first_name_label = Label(employee_window, text=employee.first_name)\
         .grid(row=2, column=0, padx=10, pady=10)
     #Last Name
     last_name_title = Label(employee_window, text="Last Name").grid(row=1,\
@@ -858,8 +858,8 @@ def main():
     """
     # Run the login_screen() function, and (/or?) any mainloops required!
     # Testing:
-    for emp in uvuEmpDat.emp_list:
-        print(f'{emp.name}\'s ID is {emp.id}')
+    # for emp in uvuEmpDat.emp_list:
+    #     print(f'{emp.name}\'s ID is {emp.id}')
 
 
     #Run the window; real code:
