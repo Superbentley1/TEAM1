@@ -119,8 +119,12 @@ How to split up Sprint 4 tasks:
    - Tristan:
      - Employee Class update
      - Edit employee functionality
+     - Add new employees functionality
    - Abbie:
      - GUI
+     - All of the fine-tuning involved with that.
    - Matt:
-     - Report
+     - Reports
+     - Login functional
+     - Update UML charts
    - Anyone else?
