@@ -43,7 +43,7 @@ class Employee():
     categories
     """
 
-    def __init__(self, id, name, birth_date, SSN, phone, email, classification):
+    def __init__(self, id, name, birth_date, SSN, phone, email, classification, permission):
         self.id = id
         if self.id is not None:
             self.id = int(self.id)
@@ -81,6 +81,7 @@ class Employee():
         self.end_date = None
         self.title = None
         self.dept = None
+        self.permission = permission
         self.password = None
 
     def set_address(self, address, city, state, zip):
@@ -129,6 +130,7 @@ class Employee():
         self.end_date = row["End Date"]
         self.title = row["Title"]
         self.dept = row["Department"]
+        self.permission = row["Permission Level"]
         self.password = row["Password"]
 
     def __str__(self):
@@ -169,7 +171,7 @@ class EmployeeDB:
     def update_emp_list(self):
         reader = csv.DictReader(self.db)
         for row in reader:
-            emp = Employee(None, None, None, None, None, None, None)
+            emp = Employee(None, None, None, None, None, None, None, None)
             emp.populate_from_row(row)
             self.emp_list.append(emp)
     # TODO
@@ -185,6 +187,9 @@ uvuEmpDat = EmployeeDB()
 def find_employee_by_id(employee_id, emp_list):
     """Finds an employee with the given ID in the given employee list, and
     returns it. Returns None if no employee has the given ID.
+
+    Input: int, list of Employee objects
+    Output: Employee object with matching id, or None.
     """
     for employee in emp_list:
         if employee.id == employee_id:
@@ -219,12 +224,12 @@ def validate_login(username, password): # working as designed.
     """Checks whether there is a user with the given username, and whether
     the given password matches that user's password.
     
+    Input: int, string
     Output: Two bool values, the first saying whether the username was
             valid, the second saying whether the password was valid.
     """
     valid_username = False
     valid_password = False
-    username = int(username)
     for employee in uvuEmpDat.emp_list:
         if employee.id == username:
             valid_username = True
@@ -232,9 +237,39 @@ def validate_login(username, password): # working as designed.
                 valid_password = True
     return valid_username, valid_password
 
+
+def login():
+    """Initiates the login process, and if login is valid, logs the user
+    in. Logs them in according to their permission level. Admins see the
+    admin screen, and normal employees just see their own data.
+    """    
+    # Allow for exception if username is not a string.
+    try:
+        # Get username and password variables from entries on login GUI
+        #   screen.
+        user_id = int(username.get())
+        user_password = password.get()
+
+        # Validate login with username and password from the login GUI
+        #   screen entries. 
+        username_valid, password_valid = validate_login(user_id,
+                                            user_password)
+        if username_valid and password_valid:
+            employee = find_employee_by_id(user_id, uvuEmpDat.emp_list)
+            if employee.permission == "admin":
+                open_admin_view()
+            else:
+                open_employee(employee, employee.permission)
+            pass
+        else:
+            login_error()
+    # If username is not a string:
+    except:
+        print("Username was not an integer.")
+        login_error()
     
-# Need to fill the employee list.
-    
+
+
 def open_admin():
     """Generates a GUI window of the admin view, a list of all employees,
     and generates all of its functionality, so that you can click on
@@ -775,11 +810,19 @@ def archive_employee(employee):
     #   EmployeeDatabase.archived list.
 
 
+def login_error():
+    """Displays an error message in relation to logging in. To be
+    displayed if a user tries to login with invalid information.
+    """
+    showinfo("Invalid Login", "The username or password entered was invalid.",
+        icon=WARNING)
+
+
 def under_construction():
     """Displays a warning message that the section is still under
     development.
     """
-    showinfo("Warning", "This function is still under development.", \
+    showinfo("Warning", "This function is still under development.",
         icon=WARNING)
     
     
@@ -814,6 +857,7 @@ def classification_translate(num):
 #Login Window functionality. Global so that all functions can access it.
 
 login_window = Tk()
+login_window.update()
 #Size of Login Window
 login_window.geometry("515x360")
 #Title of Login Window
@@ -823,10 +867,10 @@ login_window_label = Label(login_window, text="Login").grid(row=1, \
     columnspan=3, padx=50, pady=50)
 
 #Username Text
-username_label = Label(login_window, text="User Name").grid(row=2, \
+username_label = Label(login_window, text="Username").grid(row=2, \
     column=1, padx=25, pady=5)
 #Username Textbox
-username = StringVar()
+username = StringVar(login_window)
 username_entry = Entry(login_window, textvariable=username)\
     .grid(row=2, column=2, padx=50, pady=5)  
 
@@ -834,24 +878,18 @@ username_entry = Entry(login_window, textvariable=username)\
 password_label = Label(login_window,text="Password").grid(row=3, \
     column=1, padx=25, pady=5)
 #Password Textbox
-password = StringVar()
+password = StringVar(login_window)
 password_entry = Entry(login_window, textvariable=password, show='*')\
     .grid(row=3, column=2, padx=5, pady=5)  
 
 #Login Button
 login_button = Button(login_window, text="Login", \
-    command=open_admin_view).grid(row=4, column=2, padx=25, pady=25)
+    command=login).grid(row=4, column=2, padx=25, pady=25)
 
 #Close Button
 exit_button = Button(login_window, text="Close", \
     command=button_close_warning).grid(row=5, column = 4, padx=5, pady=5)
 
-
-#Delete/comment out this next line when login is implemented
-under_construction()
-
-#next line is for employee testing
-# emp_file.close()
 
 def main():   
     """Starts up the entire application, starting with the login screen.
@@ -859,10 +897,10 @@ def main():
     # Run the login_screen() function, and (/or?) any mainloops required!
     # Testing:
     # for emp in uvuEmpDat.emp_list:
-    #     print(f'{emp.name}\'s ID is {emp.id}')
+        # print(f'{emp.name}\'s permission level is {emp.permission}')
 
 
-    #Run the window; real code:
+    #Run the window
     login_window.mainloop()
     
 
