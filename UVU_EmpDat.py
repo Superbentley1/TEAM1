@@ -22,12 +22,129 @@ Tkinter version 8.6
 
 import csv
 from csv import reader
+from msilib.schema import Class
 from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import showinfo, askokcancel, WARNING
 import os  # use if helpful to delete files. Can just overwrite?
 import os.path
 from functools import partial
+
+
+class Classification():
+    """Used for tracking the payment type and rate of an employee, and
+    calculating how much they will be paid. An abstract class.
+    """
+    def __init__(self):
+        """Initialize the abstract class.
+        """
+        pass
+
+    def calculate_payment(self):
+        """Calculates the employee's pay. Implemented differently in child
+        classes based on payment type.
+        """
+        pass
+
+    def __str__(self):
+        """Returns the employee's payment type, i.e. the name of the
+        class.
+        """
+        pass
+
+
+class Hourly(Classification):
+    """Used for tracking the payment rate of an hourly-paid employee, and
+    to store the hours they've worked, and calculate their pay.
+    """
+    def __init__(self, hourly_rate):
+        """Initialize the hourly employee's data members, with no
+        timecards stored.
+        """
+        super().__init__()
+        self.hourly_rate = hourly_rate
+        self.timecards = []
+
+    def add_timecard(self, hours):
+        """Adds the hours worked in a day to the hourly employee's
+        timecards record.
+        """
+        self.timecards.append(hours)
+
+    def calculate_payment(self):
+        """Calculates the amount that will be paid to the hourly employee,
+        hours worked x hourly rate.
+        """
+        payment = 0
+        for hours in self.timecards:
+            payment += hours * self.hourly_rate
+       
+        return payment
+
+    def __str__(self):
+        """Return's a string representing employee's payment type.
+        """
+        return "hourly"
+
+
+class Salary(Classification):
+    """Used to track the salary of a salaried employee, and to calculate
+    their pay.
+    """
+    def __init__(self, salary):
+        """Initialize the salaried employee's data members.
+        """
+        super().__init__()
+        self.salary = salary
+
+    def calculate_payment(self):
+        """Calculates the amount that will be paid to the salaried
+        employee, 1/24th of their salary.
+        """
+        payment = self.salary / 24
+        
+        return payment
+
+    def __str__(self):
+        """Return's a string representing employee's payment type.
+        """
+        return "salary"
+
+
+class Commissioned(Salary):
+    """Used for tracking the salary of a commissioned employee and storing
+    their commission rate and the commissions they've made. Also used to
+    calculate their pay.
+    """
+    def __init__(self, salary, commission_rate):
+        """Initialize the commissioned employee's data members, with no
+        commission receipts stored.
+        """
+        super().__init__(salary)
+        self.commission_rate = commission_rate
+        self.receipts = []
+
+    def add_receipt(self, receipt):
+        """Adds the number of commissions made in a day to the employee's
+        receipts record.
+        """
+        self.receipts.append(receipt)
+
+    def calculate_payment(self):
+        """Calculates the amount that will be paid to the commissioned
+        employee, 1/24th of their salary, and their commissions x
+        commission rate.
+        """
+        payment = super().calculate_payment()
+        for receipt in self.receipts:
+            payment += self.commission_rate * receipt
+        
+        return payment
+
+    def __str__(self):
+        """Return's a string representing employee's payment type.
+        """
+        return "commissioned"
 
 
 class Employee():
@@ -84,6 +201,28 @@ class Employee():
         self.permission = permission
         self.password = None
 
+
+
+    # def set_classification(self, class_num, pay_val_1, pay_val_2=0):
+    #     """Sets the self.classification member of the employee class
+    #     properly to an Hourly, Salary or Commissioned object, and stores
+    #     the appropriate payment info within it.
+
+    #     Input: The int 1, 2, or 3 for classification type of Hourly,
+    #             Salary, or Commissioned, respectively.
+                
+    #             For Hourly, input just hourly pay rate (float).
+    #             For Salaried, input just salary (float).
+    #             For Commissioned, input salary first (float), then
+    #                 commission pay rate (float).
+    #     """
+    #     if class_num == 1:
+    #         self.classification = Hourly(pay_val_1)
+    #     elif class_num == 2:
+    #         self.classification = Salary(pay_val_1)
+    #     elif class_num == 3:
+    #         self.classification = Commissioned(pay_val_1, pay_val_2)
+
     def set_address(self, address, city, state, zip):
         self.address = address
         self.city = city
@@ -111,7 +250,19 @@ class Employee():
         name = self.name.split(" ")
         self.first_name = name[0]
         self.last_name = name[-1]
-        self.classification = row["Classification"]
+        
+        # Set the appropriate classification type:
+        classification = int(row["Classification"])
+        if classification == 1:
+            self.classification = Hourly(float(row["Hourly"]))
+        elif classification == 2:
+            self.classification = Salary(float(row["Salary"]))
+        elif classification == 3:
+            self.classification = Commissioned(float(row["Salary"]),
+                                    float(row["Commission"]))
+        else:
+            raise Exception(f'Classification for emp: "{self.name}" invalid.')
+
         self.ssn = row["Social Security Number"]
         self.phone = row["Phone Number"]
         self.email = row["Email"]
@@ -544,15 +695,21 @@ def open_employee(employee, permission_level):
         .grid(row=12, column=5, padx=10, pady=10)
 
     # Buttons
-    back_button = Button(employee_window, text="Back", \
-        command=partial(exit_window, employee_window)).grid(row=13, \
-        column=3, padx=10, pady=10)
     edit_button = Button(employee_window, text="Edit", \
-        command=partial(edit_employee, "admin")).grid(row=13, column=4, \
+        command=partial(edit_employee, "admin")).grid(row=13, column=4,
         padx=10, pady=10)
-    pay_stub_button = Button(employee_window, text="Get Pay Stub", \
-        command=partial(generate_pay_stub, employee)).grid(row=13, \
+    pay_stub_button = Button(employee_window, text="Get Pay Stub",
+        command=partial(generate_pay_stub, employee)).grid(row=13,
         column=5, padx=10, pady=10)
+
+    if permission_level == "admin":
+        back_button = Button(employee_window, text="Back", 
+            command=partial(exit_window, employee_window)).grid(row=13, 
+            column=3, padx=10, pady=10)
+        report_all_button = Button(employee_window,
+            text="All Emps Report", command=prompt_report_all_employees)\
+                .grid(row=13, column=0, padx=10, pady=10)
+
 
     # FIXME: add "Edit" button and functionality, and "Pay Stub" and
     #   "Back" buttons and functionalities.
@@ -579,23 +736,24 @@ def prompt_report_all_employees():
     # If user clicks "No", calls generate_report_all_employees(False)
     # If user clicks the "x", the window will go away. Or initialize a
     #   "Cancel" button instead, if needed or helpful.
+    generate_report_all_employees(True)
 
 
 # Should this report be a payment report, just a general info report, or
 #   both?
 def generate_report_all_employees(include_archived):
     """Generates a report of all employees in the database, in the form of
-    a text document titled uvu_empDat_report.txt? The report will include
-    the info of archived employees if include_archived is True, and will
-    not if it is False.
+    a text document titled report.csv. The report will include the info of
+    archived employees if include_archived is True, and will not if it is
+    False.
     """
     # If include_archived, then emp_list will be all employees
-    if include_archived:
+    # if include_archived:
     #   (from EmployeeDatabase.archived and EmployeeDatabase.database).
-        emp_list = uvuEmpDat.emp_list + uvuEmpDat.archived
-    else: # Otherwise emp_list will be all non-archived employees (from
+        # emp_list = uvuEmpDat.emp_list + uvuEmpDat.archived
+    # else: # Otherwise emp_list will be all non-archived employees (from
     #   EmployeeDatabase.database).
-        emp_list = uvuEmpDat.emp_list
+    emp_list = uvuEmpDat.emp_list
 
     # os.remove("report.csv")    # Delete the previous "report.csv" file 
     #   (if necessary. Will writing over it be just as good?).
@@ -607,29 +765,18 @@ def generate_report_all_employees(include_archived):
         for employee in emp_list:
             # Write a line to "report.csv" that includes all of the employee's
             #   data members, separated by commas.
-            report.write(f"{employee.id},{employee.first_name},\
-                            {employee.last_name},{employee.address},\
-                            {employee.city},{employee.state},\
-                            {employee.zip},{employee.phone},\
-                            {employee.email},\
-                            {employee.classification},\
-                            {employee.paytype},\
-                            {employee.date_of_birth},\
-                            {employee.social_security_num},\
-                            {employee.start_date},{employee.end_date},\
-                            {employee.permission_level},\
-                            {employee.password},{employee.title},\
-                            {employee.department}\n")            
+            report.write(f"{employee.id},{employee.first_name},{employee.last_name},{employee.address},{employee.city},{employee.state},{employee.zip},{employee.classification},{employee.pay_method},{employee.salary},{employee.hourly},{employee.commission},{employee.route},{employee.account},{employee.birth_date},{employee.ssn},{employee.phone},{employee.email},{employee.start_date},{employee.end_date},{employee.title},{employee.dept},{employee.permission},{employee.password}\n")
+       
             # Write the next line in "report.csv" by calling
             #   employee.issue_payment() (and save amount and date they were
             #   paid into variables).
-            report.write(f"\t{employee.issue_payment()}\n")
+            # report.write(f"\t{employee.issue_payment()}\n")
             # Fill tkinter screen (Treeview?) with the employee's data members
             # Fill tkinter screen in next row (formatted nicely) with the info
             #   about what that employee was payed and when, from variables.
 
-    os.remove("timecards.csv")
-    os.remove("receipts.csv")  # Delete "timecards.csv" and "receipts.csv".
+    # os.remove("timecards.csv")
+    # os.remove("receipts.csv")  # Delete "timecards.csv" and "receipts.csv".
 
     # Print message in GUI screen saying that report can also be viewed
     #   and shared from "report.csv".
@@ -896,8 +1043,8 @@ def main():
     """
     # Run the login_screen() function, and (/or?) any mainloops required!
     # Testing:
-    # for emp in uvuEmpDat.emp_list:
-        # print(f'{emp.name}\'s permission level is {emp.permission}')
+    for emp in uvuEmpDat.emp_list:
+        print(f'{emp.name} receives {str(emp.classification)} pay.')
 
 
     #Run the window
