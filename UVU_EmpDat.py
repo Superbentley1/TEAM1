@@ -1015,60 +1015,60 @@ def generate_report_all_employees(include_archived):
             if str(employee.classification) == "hourly":
                 if str(employee.pay_method) == "direct deposit":
                     report.write(
-                        f"Employee ID: {employee.id};       Name: {employee.name};         Address: {employee.full_address()};\n"
-                        f"Classification: {employee.classification};    Hourly pay: ${employee.classification.hourly_rate:.2f};       Payment method: {employee.pay_method};\n"
-                        f"Routing num: {employee.pay_method.route_num};   Account num: {employee.pay_method.account_num}; Date of birth: {employee.birth_date};\n"
-                        f"SSN: {employee.ssn};          Phone: {employee.phone};     Email: {employee.email};\n"
-                        f"Start date: {employee.start_date};     End date: {employee.end_date}\n"
-                        f"Title: {employee.title};           Dept: {employee.dept};\n"
-                        f"Permission level: {employee.permission};   Password: {employee.password}\n\n")
+                        f"Employee ID: {employee.id}       Name: {employee.name}         Address: {employee.full_address()}\n"
+                        f"Classification: {employee.classification}    Hourly pay: ${employee.classification.hourly_rate:.2f}       Payment method: {employee.pay_method}\n"
+                        f"Routing num: {employee.pay_method.route_num}   Account num: {employee.pay_method.account_num} Date of birth: {employee.birth_date}\n"
+                        f"SSN: {employee.ssn}          Phone: {employee.phone}     Email: {employee.email}\n"
+                        f"Start date: {employee.start_date}     End date: {employee.end_date}\n"
+                        f"Title: {employee.title}           Dept: {employee.dept}\n"
+                        f"Permission level: {employee.permission}   Password: {employee.password}\n\n")
                 elif str(employee.pay_method) == "mail":
                     report.write(
-                        f"Employee ID: {employee.id};        Name: {employee.name};   Address: {employee.full_address()};\n"
-                        f"Classification: {employee.classification};     Hourly pay: ${employee.classification.hourly_rate:.2f};       Payment method: {employee.pay_method};\n"
-                        f"Date of birth: {employee.birth_date};  SSN: {employee.ssn};\n"
-                        f"Phone: {employee.phone};       Email: {employee.email};\n"
-                        f"Start date: {employee.start_date};       End date: {employee.end_date};\n"
-                        f"Title: {employee.title};      Dept: {employee.dept};\n"
-                        f"Permission level: {employee.permission}; Password: {employee.password}\n\n")
+                        f"Employee ID: {employee.id}        Name: {employee.name}   Address: {employee.full_address()}\n"
+                        f"Classification: {employee.classification}     Hourly pay: ${employee.classification.hourly_rate:.2f}       Payment method: {employee.pay_method}\n"
+                        f"Date of birth: {employee.birth_date}  SSN: {employee.ssn}\n"
+                        f"Phone: {employee.phone}       Email: {employee.email}\n"
+                        f"Start date: {employee.start_date}       End date: {employee.end_date}\n"
+                        f"Title: {employee.title}      Dept: {employee.dept}\n"
+                        f"Permission level: {employee.permission} Password: {employee.password}\n\n")
             elif str(employee.classification) == "salary":
                 if str(employee.pay_method) == "direct deposit":
                     report.write(
-                        f"Employee ID: {employee.id};        Name: {employee.name};      Address: {employee.full_address()};\n"
-                        f"Classification: {employee.classification};     Salary: ${employee.classification.salary:.2f};    Payment method: {employee.pay_method};\n"
-                        f"Routing number: {employee.pay_method.route_num}; Account number: {employee.pay_method.account_num};    Date of birth: {employee.birth_date};\n"
-                        f"SSN: {employee.ssn};           Phone: {employee.phone};    Email: {employee.email};\n"
-                        f"Start date: {employee.start_date};       End date: {employee.end_date};\n"
-                        f"Title: {employee.title};           Dept: {employee.dept};\n"
-                        f"Permission level: {employee.permission};    Password: {employee.password}\n\n")
+                        f"Employee ID: {employee.id}        Name: {employee.name}      Address: {employee.full_address()}\n"
+                        f"Classification: {employee.classification}     Salary: ${employee.classification.salary:.2f}    Payment method: {employee.pay_method}\n"
+                        f"Routing number: {employee.pay_method.route_num} Account number: {employee.pay_method.account_num}    Date of birth: {employee.birth_date}\n"
+                        f"SSN: {employee.ssn}           Phone: {employee.phone}    Email: {employee.email}\n"
+                        f"Start date: {employee.start_date}       End date: {employee.end_date}\n"
+                        f"Title: {employee.title}           Dept: {employee.dept}\n"
+                        f"Permission level: {employee.permission}    Password: {employee.password}\n\n")
                 elif str(employee.pay_method) == "mail":
                     report.write(
-                        f"Employee ID: {employee.id};      Name: {employee.name};    Address: {employee.full_address()};\n"
-                        f"Classification: {employee.classification};   Salary: ${employee.classification.salary:.2f};       Payment method: {employee.pay_method};\n"
-                        f"Date of birth: {employee.birth_date}; SSN: {employee.ssn};\n"
-                        f"Phone: {employee.phone};     Email: {employee.email};\n"
-                        f"Start date: {employee.start_date};     End date: {employee.end_date};\n"
-                        f"Title: {employee.title};           Dept: {employee.dept};\n"
-                        f"Permission level: {employee.permission};  Password: {employee.password}\n\n")                
+                        f"Employee ID: {employee.id}      Name: {employee.name}    Address: {employee.full_address()}\n"
+                        f"Classification: {employee.classification}   Salary: ${employee.classification.salary:.2f}       Payment method: {employee.pay_method}\n"
+                        f"Date of birth: {employee.birth_date} SSN: {employee.ssn}\n"
+                        f"Phone: {employee.phone}     Email: {employee.email}\n"
+                        f"Start date: {employee.start_date}     End date: {employee.end_date}\n"
+                        f"Title: {employee.title}           Dept: {employee.dept}\n"
+                        f"Permission level: {employee.permission}  Password: {employee.password}\n\n")                
             elif str(employee.classification) == "commissioned":
                 if str(employee.pay_method) == "direct deposit":
                     report.write(
-                        f"Employee ID: {employee.id};             Name: {employee.name};      Address: {employee.full_address()};\n"
-                        f"Classification: {employee.classification};    Salary: ${employee.classification.salary:.2f};          Commission rate: ${employee.classification.commission_rate:.2f};\n"
-                        f"Payment method: {employee.pay_method};  Routing number: {employee.pay_method.route_num}; Account number: {employee.pay_method.account_num};\n"
-                        f"Date of birth: {employee.birth_date};        SSN: {employee.ssn};           Phone: {employee.phone};\n"
-                        f"Email: {employee.email};    Start date: {employee.start_date};      End date: {employee.end_date};\n"
-                        f"Title: {employee.title};         Dept: {employee.dept};\n"
-                        f"Permission level: {employee.permission};      Password: {employee.password}\n\n")
+                        f"Employee ID: {employee.id}             Name: {employee.name}      Address: {employee.full_address()}\n"
+                        f"Classification: {employee.classification}    Salary: ${employee.classification.salary:.2f}          Commission rate: ${employee.classification.commission_rate:.2f}\n"
+                        f"Payment method: {employee.pay_method}  Routing number: {employee.pay_method.route_num} Account number: {employee.pay_method.account_num}\n"
+                        f"Date of birth: {employee.birth_date}        SSN: {employee.ssn}           Phone: {employee.phone}\n"
+                        f"Email: {employee.email}    Start date: {employee.start_date}      End date: {employee.end_date}\n"
+                        f"Title: {employee.title}         Dept: {employee.dept}\n"
+                        f"Permission level: {employee.permission}      Password: {employee.password}\n\n")
                 elif str(employee.pay_method) == "mail":
                     report.write(
-                        f"Employee ID: {employee.id};          Name: {employee.name};    Address: {employee.full_address()};\n"
-                        f"Classification: {employee.classification}; Salary: ${employee.classification.salary:.2f};        Commission rate: ${employee.classification.commission_rate:.2f};\n"
-                        f"Payment method: {employee.pay_method};         Date of birth: {employee.birth_date};\n"
-                        f"SSN: {employee.ssn};             Phone: {employee.phone};     Email: {employee.email};\n"
-                        f"Start date: {employee.start_date};        End date: {employee.end_date};\n"
-                        f"Title: {employee.title};               Dept: {employee.dept};\n"
-                        f"Permission level: {employee.permission};      Password: {employee.password}\n\n")
+                        f"Employee ID: {employee.id}          Name: {employee.name}    Address: {employee.full_address()}\n"
+                        f"Classification: {employee.classification} Salary: ${employee.classification.salary:.2f}        Commission rate: ${employee.classification.commission_rate:.2f}\n"
+                        f"Payment method: {employee.pay_method}         Date of birth: {employee.birth_date}\n"
+                        f"SSN: {employee.ssn}             Phone: {employee.phone}     Email: {employee.email}\n"
+                        f"Start date: {employee.start_date}        End date: {employee.end_date}\n"
+                        f"Title: {employee.title}               Dept: {employee.dept}\n"
+                        f"Permission level: {employee.permission}      Password: {employee.password}\n\n")
             
             # Write a line to "report.csv" stating what the employee will
             #   be paid.
@@ -1103,17 +1103,27 @@ def generate_pay_stub(employee):
     # To show it, show the amount they were paid, based on their salary,
     #   and their other payment options
     # Initialize variable called pay to 0.
-    # Initialize variable called pay_date to "".
-    # Initialize variable called pay_num (stores hours or commissions).
-    # Initialize found variable to False.
-    # Initialize line_count to 0.
-    # For each line in "reports.csv":
-        # line_count += 1.
-        # if line_count is even:
-            # continue (skip iteration).
-        # parse line items separated by comma into a list.
-        # if first item in line = employee.emp_id:
-            # found = True.
+    pay_date = "" # Not sure if this will be used.
+    pay_amount = 0
+    pay_num = 0   # For storing hours or commissions.
+    found = False
+    with open("report.csv", 'r') as report:
+        line_count = 0
+        for line in report:
+            line_count += 1
+
+            # Check if the line is a line with an employee id (only 
+            #   certain lines have them). Skip iteration if not.
+            if not (line_count - 1) % 11 == 0:
+                continue
+
+            info = line.strip().split(' ')
+            if int(info[2]) == employee.id:
+                found = True
+                for num in range(7):
+                    report.readline()
+                pay_info = report.readline()
+                print(pay_info)
             # get the next_line from "reports.csv"
             # parse next_line items separated by comma into a list.
             # from next_line list, store their pay into pay variable.
