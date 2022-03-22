@@ -719,6 +719,7 @@ def open_employee(employee, permission_level):
     edit_menu.add_command(label="Last Name", command=under_construction)
     edit_menu.add_command(label="Social Security Number", command=under_construction)
     edit_menu.add_command(label="Phone Number", command=under_construction)
+    edit_menu.add_command(label="Email", command=under_construction)
     edit_menu.add_command(label="Street Address", command=under_construction)
     edit_menu.add_command(label="City", command=under_construction)
     edit_menu.add_command(label="State", command=under_construction)
