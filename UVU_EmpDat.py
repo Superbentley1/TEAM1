@@ -696,6 +696,21 @@ def open_admin_view():
     under_construction()
     open_admin()
     
+def edit_employee_info(the_edit):
+    """Generates a GUI window with information of the employee.
+    Also generates an entry box and a button to update information"""
+    #Creates the edit window
+    edit_window = Toplevel(login_window)
+    #Shows previous information before edit
+    prev_info = Label(edit_window, text="Previous Information:  ").grid(row=0, column=0, padx=10, pady=10)
+    edit_this = Label(edit_window, text=the_edit).grid(row=0, column=1, padx=10, pady=10)
+    #Label what the entry box is for
+    info_here_label = Label(edit_window, text="Enter new info here:  ").grid(row=1, column=0, padx=10, pady=10)
+    new_info = StringVar()
+    #New information entry box
+    updated_info = Entry(edit_window, textvariable=new_info).grid(row=1, column=1, padx=10, pady=10)
+    #Button to update information
+    update_button = Button(edit_window, text="Update Information", command=under_construction).grid(row=2, columnspan=2, padx=10, pady=10)
 
 
 
@@ -717,26 +732,26 @@ def open_employee(employee, permission_level):
     file_menu = Menu(menu_bar, tearoff=0)
     edit_menu = Menu(menu_bar, tearoff=0)
     #The sub-options under 'Edit'
-    edit_menu.add_command(label="First Name", command=under_construction)
-    edit_menu.add_command(label="Last Name", command=under_construction)
-    edit_menu.add_command(label="Social Security Number", command=under_construction)
-    edit_menu.add_command(label="Phone Number", command=under_construction)
-    edit_menu.add_command(label="Email", command=under_construction)
-    edit_menu.add_command(label="Street Address", command=under_construction)
-    edit_menu.add_command(label="City", command=under_construction)
-    edit_menu.add_command(label="State", command=under_construction)
-    edit_menu.add_command(label="Zip Code", command=under_construction)
-    edit_menu.add_command(label="Date of Birth", command=under_construction)
-    edit_menu.add_command(label="Password", command=under_construction)
-    edit_menu.add_command(label="Employee ID", command=under_construction)
-    edit_menu.add_command(label="Job Title", command=under_construction)
-    edit_menu.add_command(label="Department", command=under_construction)
-    edit_menu.add_command(label="Start Date", command=under_construction)
-    edit_menu.add_command(label="End Date", command=under_construction)
-    edit_menu.add_command(label="Account Number", command=under_construction)
-    edit_menu.add_command(label="Routing Number", command=under_construction)
-    edit_menu.add_command(label="Payment Method", command=under_construction)
-    edit_menu.add_command(label="Classification", command=under_construction)
+    edit_menu.add_command(label="First Name", command=lambda:edit_employee_info(employee.first_name))
+    edit_menu.add_command(label="Last Name", command=lambda:edit_employee_info(employee.last_name))
+    edit_menu.add_command(label="Social Security Number", command=lambda:edit_employee_info(employee.ssn))
+    edit_menu.add_command(label="Phone Number", command=lambda:edit_employee_info(employee.phone))
+    edit_menu.add_command(label="Email", command=lambda:edit_employee_info(employee.email))
+    edit_menu.add_command(label="Street Address", command=lambda:edit_employee_info(employee.address))
+    edit_menu.add_command(label="City", command=lambda:edit_employee_info(employee.city))
+    edit_menu.add_command(label="State", command=lambda:edit_employee_info(employee.state))
+    edit_menu.add_command(label="Zip Code", command=lambda:edit_employee_info(employee.zip))
+    edit_menu.add_command(label="Date of Birth", command=lambda:edit_employee_info(employee.birth_date))
+    edit_menu.add_command(label="Password", command=lambda:edit_employee_info(employee.password))
+    edit_menu.add_command(label="Employee ID", command=lambda:edit_employee_info(employee.id))
+    edit_menu.add_command(label="Job Title", command=lambda:edit_employee_info(employee.title))
+    edit_menu.add_command(label="Department", command=lambda:edit_employee_info(employee.dept))
+    edit_menu.add_command(label="Start Date", command=lambda:edit_employee_info(employee.start_date))
+    edit_menu.add_command(label="End Date", command=lambda:edit_employee_info(employee.end_date))
+    edit_menu.add_command(label="Account Number", command=lambda:edit_employee_info(employee.pay_method.account_num))
+    edit_menu.add_command(label="Routing Number", command=lambda:edit_employee_info(employee.pay_method.route_num))
+    edit_menu.add_command(label="Payment Method", command=lambda:edit_employee_info(employee.pay_method))
+    edit_menu.add_command(label="Classification", command=lambda:edit_employee_info(employee.classification))
     #Adds 'Edit' options
     file_menu.add_cascade(label="Edit", menu=edit_menu)
     #Puts in a line in the menu list
