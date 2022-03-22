@@ -40,7 +40,7 @@ class Classification():
         """
         pass
 
-    def calculate_payment(self):
+    def calculate_pay(self):
         """Calculates the employee's pay. Implemented differently in child
         classes based on payment type.
         """
@@ -71,14 +71,17 @@ class Hourly(Classification):
         """
         self.timecards.append(hours)
 
-    def calculate_payment(self):
+    def calculate_pay(self):
         """Calculates the amount that will be paid to the hourly employee,
         hours worked x hourly rate.
         """
         payment = 0
         for hours in self.timecards:
             payment += hours * self.hourly_rate
-       
+
+        # Clear timecards so they are not reused.
+        self.timecards = []
+
         return payment
 
     def __str__(self):
@@ -97,7 +100,7 @@ class Salary(Classification):
         super().__init__()
         self.salary = salary
 
-    def calculate_payment(self):
+    def calculate_pay(self):
         """Calculates the amount that will be paid to the salaried
         employee, 1/24th of their salary.
         """
@@ -130,21 +133,91 @@ class Commissioned(Salary):
         """
         self.receipts.append(receipt)
 
-    def calculate_payment(self):
+    def calculate_pay(self):
         """Calculates the amount that will be paid to the commissioned
         employee, 1/24th of their salary, and their commissions x
         commission rate.
         """
-        payment = super().calculate_payment()
+        payment = super().calculate_pay()
         for receipt in self.receipts:
             payment += self.commission_rate * receipt
         
+        # Clear receipts so they are not reused.
+        self.receipts = []
+
         return payment
 
     def __str__(self):
         """Return's a string representing employee's payment type.
         """
         return "commissioned"
+
+
+class PayMethod():
+    """Used to track an employee's payment method, and print an applicable
+    message about how and how much they will be paid. An abstract class.
+    """
+    def __init__(self, employee):
+        """Initialize data members.
+
+        Input: Employee object ("employee" param)
+        """
+        self.employee = employee
+
+    def payment_message(self, amount):
+        """Used to print an applicable message about how much employee
+        will be paid, and in what method.
+        """
+        pass
+
+
+class DirectMethod(PayMethod):
+    """Used for employees who opt to be paid by direct deposit. Stores
+    their bank account information, and prints an applicable message about
+    how much they will be paid via direct deposit on their next payday.
+    """
+    def __init__(self, employee, route_num, account_num):
+        """Initialize data members for direct deposit. Keeps track of
+        associated employee, their bank's routing number, and their bank
+        account number.
+        """
+        super().__init__(employee)
+        self.route_num = route_num
+        self.account_num = account_num
+
+    def payment_message(self, amount):
+        """Used to print a message about how much the employee will be
+        paid via direct deposit on their next payday.
+        """
+        return f'Will transfer ${amount:.2f} for {self.employee.name} to {self.route_num} at {self.account_num}'
+
+    def __str__(self):
+        """Returns a string representing the desired pay method.
+        """
+        return "direct deposit"
+
+
+class MailedMethod(PayMethod):
+    """Used for employees who opt to be paid by mail. Prints an applicable
+    message about how much they will be paid via mail on their next
+    payday.
+    """
+    def __init__(self, employee):
+        """Initialize data members for mail method. Keeps track of the
+        employee, and can access employee's mailing address.
+        """
+        super().__init__(employee)
+
+    def payment_message(self, amount):
+        """Used to print a message about how much the employee will be
+        paid via mail on their next payday.
+        """
+        return f'Will mail ${amount:.2f} to {self.employee.name} at {self.employee.full_address()}'
+
+    def __str__(self):
+        """Returns a string representing the desired pay method.
+        """
+        return "mail"
 
 
 class Employee():
@@ -160,7 +233,7 @@ class Employee():
     categories
     """
 
-    def __init__(self, id, name, birth_date, SSN, phone, email, classification, permission):
+    def __init__(self, id, name, birth_date, SSN, phone, email, permission):
         self.id = id
         if self.id is not None:
             self.id = int(self.id)
@@ -183,13 +256,8 @@ class Employee():
         self.city = None
         self.state = None
         self.zip = None
-        self.classification = classification
+        self.classification = None
         self.pay_method = None
-        self.salary = None
-        self.hourly = None
-        self.commission = None
-        self.route = None
-        self.account = None
         self.birth_date = birth_date
         self.ssn = SSN
         self.phone = phone
@@ -201,27 +269,41 @@ class Employee():
         self.permission = permission
         self.password = None
 
+    def set_classification(self, class_num, pay_val_1, pay_val_2=0):
+        """Sets the self.classification member of the employee class
+        properly to an Hourly, Salary or Commissioned object, and stores
+        the appropriate payment info within it.
+        This function can be used to set/change an employee's pay, as
+        well.
 
+        Input: The int 1, 2, or 3 for classification type of Hourly,
+                Salary, or Commissioned, respectively.
 
-    # def set_classification(self, class_num, pay_val_1, pay_val_2=0):
-    #     """Sets the self.classification member of the employee class
-    #     properly to an Hourly, Salary or Commissioned object, and stores
-    #     the appropriate payment info within it.
+                For Hourly, input just hourly pay rate (float).
+                For Salaried, input just salary (float).
+                For Commissioned, input salary first (float), then
+                    commission pay rate (float).
+        """
+        if class_num == 1:
+            self.classification = Hourly(pay_val_1)
+        elif class_num == 2:
+            self.classification = Salary(pay_val_1)
+        elif class_num == 3:
+            self.classification = Commissioned(pay_val_1, pay_val_2)
+        else:
+            raise Exception(f'Classification for emp: "{self.name}" invalid.')
 
-    #     Input: The int 1, 2, or 3 for classification type of Hourly,
-    #             Salary, or Commissioned, respectively.
-                
-    #             For Hourly, input just hourly pay rate (float).
-    #             For Salaried, input just salary (float).
-    #             For Commissioned, input salary first (float), then
-    #                 commission pay rate (float).
-    #     """
-    #     if class_num == 1:
-    #         self.classification = Hourly(pay_val_1)
-    #     elif class_num == 2:
-    #         self.classification = Salary(pay_val_1)
-    #     elif class_num == 3:
-    #         self.classification = Commissioned(pay_val_1, pay_val_2)
+    def set_pay_method(self, pay_method_num, route=0, account=0):
+        """Sets the self.pay_method member of the employee class properly
+        to a DirectMethod or MailedMethod object, and stores the route and
+        account number if DirectMethod.
+        """
+        if pay_method_num == 1:
+            self.pay_method = DirectMethod(self, route, account)
+        elif pay_method_num == 2:
+            self.pay_method = MailedMethod(self)
+        else:
+            raise Exception(f'Pay method for emp: "{self.name}" invalid.')
 
     def set_address(self, address, city, state, zip):
         self.address = address
@@ -229,12 +311,6 @@ class Employee():
         self.state = state
         self.zip = zip
 
-    def set_pay(self, method, salary, hourly, commission, route):
-        self.pay_method = method
-        self.salary = salary
-        self.hourly = hourly
-        self.commission = commission
-        self.route = route
 
     def set_job(self, start_date, title, dept):
         self.start_date = start_date
@@ -270,12 +346,16 @@ class Employee():
         self.city = row["City"]
         self.state = row["State"]
         self.zip = row["Zip"]
-        self.pay_method = row["PayMethod"]
-        self.salary = row["Salary"]
-        self.hourly = row["Hourly"]
-        self.commission = row["Commission"]
-        self.route = row["Route"]
-        self.account = row["Account"]
+
+        # Set the desired pay method:
+        pay_method = int(row["PayMethod"])
+        if pay_method == 1:
+            self.pay_method = DirectMethod(self, row["Route"], row["Account"])
+        elif pay_method == 2:
+            self.pay_method = MailedMethod(self)
+        else:
+            raise Exception(f'Pay method for emp: "{self.name}" invalid.')
+
         self.birth_date = row["Date of Birth"]
         self.start_date = row["Start Date"]
         self.end_date = row["End Date"]
@@ -283,6 +363,19 @@ class Employee():
         self.dept = row["Department"]
         self.permission = row["Permission Level"]
         self.password = row["Password"]
+
+    def check_payment(self):
+        """Returns a message that states how much the employee will be
+        paid, and in what method.
+        """
+        payment = self.classification.calculate_pay()
+
+        return self.pay_method.payment_message(payment)
+
+    def full_address(self):
+        """Returns the employee's full address.
+        """
+        return f'{self.address}, {self.city}, {self.state} {self.zip}'
 
     def __str__(self):
         return self.name
@@ -446,29 +539,29 @@ def login():
     admin screen, and normal employees just see their own data.
     """    
     # Allow for exception if username is not a string.
-    try:
-        # Get username and password variables from entries on login GUI
-        #   screen.
-        user_id = int(username.get())
-        user_password = password.get()
+    # try:
+    #     # Get username and password variables from entries on login GUI
+    #     #   screen.
+    user_id = int(username.get())
+    user_password = password.get()
 
-        # Validate login with username and password from the login GUI
-        #   screen entries. 
-        username_valid, password_valid = validate_login(user_id,
-                                            user_password)
-        if username_valid and password_valid:
-            employee = find_employee_by_id(user_id, uvuEmpDat.emp_list)
-            if employee.permission == "admin":
-                open_admin_view()
-            else:
-                open_employee(employee, employee.permission)
-            pass
+    # Validate login with username and password from the login GUI
+    #   screen entries.
+    username_valid, password_valid = validate_login(user_id,
+                                        user_password)
+    if username_valid and password_valid:
+        employee = find_employee_by_id(user_id, uvuEmpDat.emp_list)
+        if employee.permission == "admin":
+            open_admin_view()
         else:
-            login_error()
-    # If username is not a string:
-    except:
-        print("Username was not an integer.")
+            open_employee(employee, employee.permission)
+        pass
+    else:
         login_error()
+    # If username is not a string:
+    # except:
+    #     print("Username was not an integer.")
+    #     login_error()
     
 
 
@@ -542,13 +635,13 @@ def open_admin():
             employee_list.insert('', END, values=(emp.id, emp.first_name,\
                         emp.last_name, emp.ssn, emp.phone, emp.email, \
                         emp.start_date, emp.end_date, \
-                        classification_translate(emp.classification), \
+                        str(emp.classification), \
                         emp.title, emp.dept), tags=("evenrows",))
         else:
             employee_list.insert('', END, values=(emp.id, emp.first_name,\
                         emp.last_name, emp.ssn, emp.phone, emp.email, \
                         emp.start_date, emp.end_date, \
-                        classification_translate(emp.classification), \
+                        str(emp.classification), \
                         emp.title, emp.dept), tags=("oddrows",))
         count+=1
     
@@ -700,50 +793,53 @@ def open_employee(employee, permission_level):
         column=5, padx=10, pady=10)
     end_date_label = Label(employee_window, text=employee.end_date)\
         .grid(row=6, column=5, padx=10, pady=10)     
-    #Account Number
-    account_title = Label(employee_window, text="Account Number")\
-        .grid(row=7, column=3, padx=10, pady=10)
-    # FIXME: Have the account_label connect with the employee's payment
-    #   method. Only shows account if they are paid by direct method.
-    account_label = Label(employee_window, text=employee.account)\
-        .grid(row=8, column=3, padx=10, pady=10)     
-    #Routing Number
-    routing_title = Label(employee_window, text="Routing Number")\
-        .grid(row=7, column=4, padx=10, pady=10)
-    # FIXME: Have the routing_label connect with the employee's payment
-    #   method. Only shows routing num if they are paid by direct method.
-    routing_label = Label(employee_window, text=employee.route)\
-        .grid(row=8, column=4, padx=10, pady=10)     
+
+    #Account and Routing Numbers, if employee uses direct deposit:
+    if str(employee.pay_method) == "direct deposit":
+        account_title = Label(employee_window, text="Account Number")\
+            .grid(row=7, column=3, padx=10, pady=10)
+        # FIXME: Have the account_label connect with the employee's payment
+        #   method. Only shows account if they are paid by direct method.
+        account_label = Label(employee_window, text=str(employee.pay_method.account_num))\
+            .grid(row=8, column=3, padx=10, pady=10)
+
+        routing_title = Label(employee_window, text="Routing Number")\
+            .grid(row=7, column=4, padx=10, pady=10)
+        # FIXME: Have the routing_label connect with the employee's payment
+        #   method. Only shows routing num if they are paid by direct method.
+        routing_label = Label(employee_window, text=employee.pay_method.route_num)\
+            .grid(row=8, column=4, padx=10, pady=10)
+
     #Payment Method
     payment_title = Label(employee_window, text="Payment Method")\
         .grid(row=7, column=5, padx=10, pady=10)
     # FIXME: Give PayMethod class a "print()" method that prints "Direct
     #   Deposit" or "Mail", whichever child class they have.
-    payment_label = Label(employee_window, text=employee.pay_method)\
+    payment_label = Label(employee_window, text=str(employee.pay_method))\
         .grid(row=8, column=5, padx=10, pady=10)
+
     #Classification
     classification_title = Label(employee_window, text="Classification")\
         .grid(row=9, column=3, padx=10, pady=10)
     classification_label = Label(employee_window, \
-        text=classification_translate(employee.classification))\
+        text=str(employee.classification))\
         .grid(row=10, column=3, padx=10, pady=10)
-    #Hourly
-    # FIXME: We can change this in the future to only show the type of pay
-    #   they get, based on their classification. Define employee.classification.pay_amount() method.
-    hourly_title = Label(employee_window, text="Hourly Rate")\
-        .grid(row=11, column=3, padx=10, pady=10)
-    hourly_label = Label(employee_window, text=employee.hourly)\
-        .grid(row=12, column=3, padx=10, pady=10) 
-    #Salary
-    salary_title = Label(employee_window, text="Salary Amount")\
-        .grid(row=11, column=4, padx=10, pady=10)
-    salary_label = Label(employee_window, text=employee.salary)\
-        .grid(row=12, column=4, padx=10, pady=10)     
-    #Commission
-    commission_title = Label(employee_window, text="Commission")\
-        .grid(row=11, column=5, padx=10, pady=10)
-    commission_label = Label(employee_window, text=employee.commission)\
-        .grid(row=12, column=5, padx=10, pady=10)
+
+    # # Show pay amounts, based on classification type:
+    # hourly_title = Label(employee_window, text="Hourly Rate")\
+    #     .grid(row=11, column=3, padx=10, pady=10)
+    # hourly_label = Label(employee_window, text=employee.hourly)\
+    #     .grid(row=12, column=3, padx=10, pady=10)
+    # #Salary
+    # salary_title = Label(employee_window, text="Salary Amount")\
+    #     .grid(row=11, column=4, padx=10, pady=10)
+    # salary_label = Label(employee_window, text=employee.salary)\
+    #     .grid(row=12, column=4, padx=10, pady=10)
+    # #Commission
+    # commission_title = Label(employee_window, text="Commission")\
+    #     .grid(row=11, column=5, padx=10, pady=10)
+    # commission_label = Label(employee_window, text=employee.commission)\
+    #     .grid(row=12, column=5, padx=10, pady=10)
 
     # Buttons
     edit_button = Button(employee_window, text="Edit", \
@@ -775,6 +871,38 @@ def open_employee(employee, permission_level):
 
     # run the mainloop to open this window if a regular employee is using
     #   it?
+
+
+def read_timecards():
+    """Reads in all timecard lists from the "timecards.csv" file, and adds
+    them to the hourly employees' individual records.
+    """
+    with open("timecards.csv", 'r') as timecards:
+        for line in timecards:
+            times = line.split(',')
+            emp_id = int(times.pop(0))
+            employee = find_employee_by_id(emp_id, uvuEmpDat.emp_list)
+
+            if employee:
+                if str(employee.classification) == "hourly":
+                    for time in times:
+                        employee.classification.add_timecard(float(time))
+
+
+def read_receipts():
+    """Reads in all receipt lists from the "receipts.csv" file, and adds
+    them to the commissioned employees' individual records.
+    """
+    with open("receipts.csv", 'r') as receipts:
+        for line in receipts:
+            sales = line.split(',')
+            emp_id = int(sales.pop(0))
+            employee = find_employee_by_id(emp_id, uvuEmpDat.emp_list)
+
+            if employee:
+                if str(employee.classification) == "commissioned":
+                    for receipt in sales:
+                        employee.classification.add_receipt(float(receipt))
 
 
 def prompt_report_all_employees():
@@ -812,6 +940,8 @@ def generate_report_all_employees(include_archived):
     # Initialize the tkinter generate_report_all_employees window,
     #   configuring formatting and colors, with columns for all employee
     #   data members.
+    read_timecards()
+    read_receipts()
     with open("report.csv", "w") as report:
         for employee in emp_list:
             # Write a line to "report.csv" that includes all of the employee's
@@ -1053,7 +1183,6 @@ def classification_translate(num):
 
 
 #Login Window functionality. Global so that all functions can access it.
-
 login_window = Tk()
 login_window.update()
 #Size of Login Window
@@ -1094,8 +1223,6 @@ def main():
     """
     # Run the login_screen() function, and (/or?) any mainloops required!
     # Testing:
-    for emp in uvuEmpDat.emp_list:
-        print(f'{emp.name} receives {str(emp.classification)} pay.')
 
 
     #Run the window
