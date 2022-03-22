@@ -287,6 +287,12 @@ class Employee():
     def __str__(self):
         return self.name
 
+    def __eq__(self, other):
+        if self.id == other.id:
+            return True
+        else:
+            return False
+
 
 class EmployeeDB:
     """
@@ -316,8 +322,6 @@ class EmployeeDB:
                 self.db = DB
         else:
             self.db = open("employees.csv")
-        self.emp_list = []
-        self.update_emp_list()
 
         # Make Admin csv file if it doesnt exist
         if os.path.exists("admins.csv") != True:
@@ -341,17 +345,39 @@ class EmployeeDB:
         else:
             self.archived = open("archived.csv")
         self.emp_list = []
+        self.archived_list = []
         self.update_emp_list()
 
-
+    # Pulls data from the CSV to the emp list
     def update_emp_list(self):
-        reader = csv.DictReader(self.db)
-        for row in reader:
+        archDict = csv.DictReader(self.archived)
+        for row in archDict:
             emp = Employee(None, None, None, None, None, None, None, None)
             emp.populate_from_row(row)
-            self.emp_list.append(emp)
-    # TODO
-    # def updateCSV
+            self.archived_list.append(emp)
+        empDict = csv.DictReader(self.db)
+        for row in empDict:
+            emp = Employee(None, None, None, None, None, None, None, None)
+            emp.populate_from_row(row)
+            if emp not in self.archived_list:
+                self.emp_list.append(emp)
+
+    def _addRow(self, emp: Employee, file):
+        with open(file, "x") as DB:
+            writer = csv.writer(DB)
+            writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification,
+                            emp.pay_method, emp.salary, emp.hourly, emp.commission, emp.route, emp.account, emp.ssn,
+                            emp.phone, emp.email, emp.start_date, emp.end_date, emp.title, emp.dept, emp.password)
+
+    def archiveEmployee(self, id):
+        """Removes from emp list and adds them to the archived file"""
+        emp = find_employee_by_id(id, self.emp_list)
+        self.emp_list.remove(emp)
+        self._addRow(emp,"archived.csv")
+
+    def addEmployee(self,employee:Employee):
+        self._addRow(employee, "employees.csv")
+
 
 # Define global EmployeeDB object:
 # EmployeeDatabase object should be global, so all functions can access
