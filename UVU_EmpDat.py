@@ -713,9 +713,34 @@ def open_employee(employee, permission_level):
     menu_bar = Menu(employee_window)
     #Adds option of Edit to menu bar
     file_menu = Menu(menu_bar, tearoff=0)
-    file_menu.add_command(label="Edit", command=under_construction)
+    edit_menu = Menu(menu_bar, tearoff=0)
+    #The sub-options under 'Edit'
+    edit_menu.add_command(label="First Name", command=under_construction)
+    edit_menu.add_command(label="Last Name", command=under_construction)
+    edit_menu.add_command(label="Social Security Number", command=under_construction)
+    edit_menu.add_command(label="Phone Number", command=under_construction)
+    edit_menu.add_command(label="Street Address", command=under_construction)
+    edit_menu.add_command(label="City", command=under_construction)
+    edit_menu.add_command(label="State", command=under_construction)
+    edit_menu.add_command(label="Zip Code", command=under_construction)
+    edit_menu.add_command(label="Date of Birth", command=under_construction)
+    edit_menu.add_command(label="Password", command=under_construction)
+    edit_menu.add_command(label="Employee ID", command=under_construction)
+    edit_menu.add_command(label="Job Title", command=under_construction)
+    edit_menu.add_command(label="Department", command=under_construction)
+    edit_menu.add_command(label="Start Date", command=under_construction)
+    edit_menu.add_command(label="End Date", command=under_construction)
+    edit_menu.add_command(label="Account Number", command=under_construction)
+    edit_menu.add_command(label="Routing Number", command=under_construction)
+    edit_menu.add_command(label="Payment Method", command=under_construction)
+    edit_menu.add_command(label="Classification", command=under_construction)
+    #Adds 'Edit' options
+    file_menu.add_cascade(label="Edit", menu=edit_menu)
+    #Puts in a line in the menu list
     file_menu.add_separator()
+    #Option to close the file
     file_menu.add_command(label="Close All", command=button_close_warning)
+    #Adds'File' options
     menu_bar.add_cascade(label="File", menu=file_menu)
     #Adds option of Help to menu bar
     help_menu = Menu(menu_bar, tearoff=0)
