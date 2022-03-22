@@ -25,7 +25,8 @@ from csv import reader
 from msilib.schema import Class
 from tkinter import *
 from tkinter import ttk
-from tkinter.messagebox import showinfo, askokcancel, WARNING
+from tkinter import messagebox
+from tkinter.messagebox import showinfo, askokcancel, askyesno, WARNING
 import os  # use if helpful to delete files. Can just overwrite?
 import os.path
 from functools import partial
@@ -364,7 +365,7 @@ class Employee():
         self.permission = row["Permission Level"]
         self.password = row["Password"]
 
-    def check_payment(self):
+    def payment_report(self):
         """Returns a message that states how much the employee will be
         paid, and in what method.
         """
@@ -401,7 +402,7 @@ class EmployeeDB:
     """
 
     def __init__(self):
-        # create employee csv file if it does not exist
+        # Create employee csv file if it does not exist
         if os.path.exists("employees.csv") != True:
             with open("employees.csv", "x") as DB:
                 writer = csv.writer(DB)
@@ -416,7 +417,7 @@ class EmployeeDB:
         else:
             self.db = open("employees.csv")
 
-        # Make Admin csv file if it doesnt exist
+        # Make Admin csv file if it doesn't exist
         if os.path.exists("admins.csv") != True:
             with open("admins.csv", "x") as DB:
                 writer = csv.writer(DB)
@@ -445,12 +446,12 @@ class EmployeeDB:
     def update_emp_list(self):
         archDict = csv.DictReader(self.archived)
         for row in archDict:
-            emp = Employee(None, None, None, None, None, None, None, None)
+            emp = Employee(None, None, None, None, None, None, None)
             emp.populate_from_row(row)
             self.archived_list.append(emp)
         empDict = csv.DictReader(self.db)
         for row in empDict:
-            emp = Employee(None, None, None, None, None, None, None, None)
+            emp = Employee(None, None, None, None, None, None, None)
             emp.populate_from_row(row)
             if emp not in self.archived_list:
                 self.emp_list.append(emp)
@@ -462,13 +463,14 @@ class EmployeeDB:
                             emp.pay_method, emp.salary, emp.hourly, emp.commission, emp.route, emp.account, emp.ssn,
                             emp.phone, emp.email, emp.start_date, emp.end_date, emp.title, emp.dept, emp.password)
 
-    def archiveEmployee(self, id):
-        """Removes from emp list and adds them to the archived file"""
+    def archive_employee(self, id):
+        """Removes from emp list and adds them to the archived file.
+        """
         emp = find_employee_by_id(id, self.emp_list)
         self.emp_list.remove(emp)
         self._addRow(emp,"archived.csv")
 
-    def addEmployee(self,employee:Employee):
+    def add_employee(self,employee:Employee):
         self._addRow(employee, "employees.csv")
 
 
@@ -853,21 +855,28 @@ def open_employee(employee, permission_level):
         text=str(employee.classification))\
         .grid(row=10, column=3, padx=10, pady=10)
 
-    # # Show pay amounts, based on classification type:
-    # hourly_title = Label(employee_window, text="Hourly Rate")\
-    #     .grid(row=11, column=3, padx=10, pady=10)
-    # hourly_label = Label(employee_window, text=employee.hourly)\
-    #     .grid(row=12, column=3, padx=10, pady=10)
-    # #Salary
-    # salary_title = Label(employee_window, text="Salary Amount")\
-    #     .grid(row=11, column=4, padx=10, pady=10)
-    # salary_label = Label(employee_window, text=employee.salary)\
-    #     .grid(row=12, column=4, padx=10, pady=10)
-    # #Commission
-    # commission_title = Label(employee_window, text="Commission")\
-    #     .grid(row=11, column=5, padx=10, pady=10)
-    # commission_label = Label(employee_window, text=employee.commission)\
-    #     .grid(row=12, column=5, padx=10, pady=10)
+    # Show pay amounts, based on classification type:
+    if str(employee.classification) == "hourly":
+        hourly_title = Label(employee_window, text="Hourly Rate")\
+            .grid(row=11, column=3, padx=10, pady=10)
+        hourly_label = Label(employee_window, text=f'${employee.classification.hourly_rate:.2f}')\
+            .grid(row=12, column=3, padx=10, pady=10)
+    #Salary
+    elif str(employee.classification) == "salary":
+        salary_title = Label(employee_window, text="Salary")\
+            .grid(row=11, column=3, padx=10, pady=10)
+        salary_label = Label(employee_window, text=f'${employee.classification.salary:.2f}')\
+            .grid(row=12, column=3, padx=10, pady=10)
+    #Commission
+    elif str(employee.classification) == "commissioned":
+        salary_title = Label(employee_window, text="Salary")\
+            .grid(row=11, column=3, padx=10, pady=10)
+        salary_label = Label(employee_window, text=f'${employee.classification.salary:.2f}')\
+            .grid(row=12, column=3, padx=10, pady=10)
+        commission_title = Label(employee_window, text="Commission Rate")\
+            .grid(row=11, column=4, padx=10, pady=10)
+        commission_label = Label(employee_window, text=f'${employee.classification.commission_rate:.2f}')\
+            .grid(row=12, column=4, padx=10, pady=10)
 
     # Buttons
     edit_button = Button(employee_window, text="Edit", \
@@ -939,11 +948,14 @@ def prompt_report_all_employees():
     based on the user's response. Also allows user to click a cancel
     button to close the window without generating a report.
     """
-    # If user clicks "Yes", calls generate_report_all_employees(True)
-    # If user clicks "No", calls generate_report_all_employees(False)
-    # If user clicks the "x", the window will go away. Or initialize a
-    #   "Cancel" button instead, if needed or helpful.
-    generate_report_all_employees(True)
+    res = askyesno("Employee Report", "Do you want to include archived employees in the report?")
+    print(res)
+    if res == True:
+        print("Generating archive report.")
+        generate_report_all_employees(True)
+    else:
+        print("Generating non-archive report.")
+        generate_report_all_employees(False)
 
 
 # Should this report be a payment report, just a general info report, or
@@ -955,12 +967,12 @@ def generate_report_all_employees(include_archived):
     False.
     """
     # If include_archived, then emp_list will be all employees
-    # if include_archived:
+    if include_archived:
     #   (from EmployeeDatabase.archived and EmployeeDatabase.database).
-        # emp_list = uvuEmpDat.emp_list + uvuEmpDat.archived
-    # else: # Otherwise emp_list will be all non-archived employees (from
+        emp_list = uvuEmpDat.emp_list + uvuEmpDat.archived_list
+    else: # Otherwise emp_list will be all non-archived employees (from
     #   EmployeeDatabase.database).
-    emp_list = uvuEmpDat.emp_list
+        emp_list = uvuEmpDat.emp_list
 
     # os.remove("report.csv")    # Delete the previous "report.csv" file 
     #   (if necessary. Will writing over it be just as good?).
@@ -972,20 +984,76 @@ def generate_report_all_employees(include_archived):
     read_receipts()
     with open("report.csv", "w") as report:
         for employee in emp_list:
-            # Write a line to "report.csv" that includes all of the employee's
-            #   data members, separated by commas.
-            report.write(f"{employee.id},{employee.first_name},{employee.last_name},{employee.address},{employee.city},{employee.state},{employee.zip},{employee.classification},{employee.pay_method},{employee.salary},{employee.hourly},{employee.commission},{employee.route},{employee.account},{employee.birth_date},{employee.ssn},{employee.phone},{employee.email},{employee.start_date},{employee.end_date},{employee.title},{employee.dept},{employee.permission},{employee.password}\n")
-       
-            # Write the next line in "report.csv" by calling
-            #   employee.issue_payment() (and save amount and date they were
+            # Write a line to "report.csv" that reports on all data
+            #   members for the employee.
+            if str(employee.classification) == "hourly":
+                if str(employee.pay_method) == "direct deposit":
+                    report.write(
+                        f"Employee ID: {employee.id};       Name: {employee.name};         Address: {employee.full_address()};\n"
+                        f"Classification: {employee.classification};    Hourly pay: ${employee.classification.hourly_rate:.2f};       Payment method: {employee.pay_method};\n"
+                        f"Routing num: {employee.pay_method.route_num};   Account num: {employee.pay_method.account_num}; Date of birth: {employee.birth_date};\n"
+                        f"SSN: {employee.ssn};          Phone: {employee.phone};     Email: {employee.email};\n"
+                        f"Start date: {employee.start_date};     End date: {employee.end_date}\n"
+                        f"Title: {employee.title};           Dept: {employee.dept};\n"
+                        f"Permission level: {employee.permission};   Password: {employee.password}\n\n")
+                elif str(employee.pay_method) == "mail":
+                    report.write(
+                        f"Employee ID: {employee.id};        Name: {employee.name};   Address: {employee.full_address()};\n"
+                        f"Classification: {employee.classification};     Hourly pay: ${employee.classification.hourly_rate:.2f};       Payment method: {employee.pay_method};\n"
+                        f"Date of birth: {employee.birth_date};  SSN: {employee.ssn};\n"
+                        f"Phone: {employee.phone};       Email: {employee.email};\n"
+                        f"Start date: {employee.start_date};       End date: {employee.end_date};\n"
+                        f"Title: {employee.title};      Dept: {employee.dept};\n"
+                        f"Permission level: {employee.permission}; Password: {employee.password}\n\n")
+            elif str(employee.classification) == "salary":
+                if str(employee.pay_method) == "direct deposit":
+                    report.write(
+                        f"Employee ID: {employee.id};        Name: {employee.name};      Address: {employee.full_address()};\n"
+                        f"Classification: {employee.classification};     Salary: ${employee.classification.salary:.2f};    Payment method: {employee.pay_method};\n"
+                        f"Routing number: {employee.pay_method.route_num}; Account number: {employee.pay_method.account_num};    Date of birth: {employee.birth_date};\n"
+                        f"SSN: {employee.ssn};           Phone: {employee.phone};    Email: {employee.email};\n"
+                        f"Start date: {employee.start_date};       End date: {employee.end_date};\n"
+                        f"Title: {employee.title};           Dept: {employee.dept};\n"
+                        f"Permission level: {employee.permission};    Password: {employee.password}\n\n")
+                elif str(employee.pay_method) == "mail":
+                    report.write(
+                        f"Employee ID: {employee.id};      Name: {employee.name};    Address: {employee.full_address()};\n"
+                        f"Classification: {employee.classification};   Salary: ${employee.classification.salary:.2f};       Payment method: {employee.pay_method};\n"
+                        f"Date of birth: {employee.birth_date}; SSN: {employee.ssn};\n"
+                        f"Phone: {employee.phone};     Email: {employee.email};\n"
+                        f"Start date: {employee.start_date};     End date: {employee.end_date};\n"
+                        f"Title: {employee.title};           Dept: {employee.dept};\n"
+                        f"Permission level: {employee.permission};  Password: {employee.password}\n\n")                
+            elif str(employee.classification) == "commissioned":
+                if str(employee.pay_method) == "direct deposit":
+                    report.write(
+                        f"Employee ID: {employee.id};             Name: {employee.name};      Address: {employee.full_address()};\n"
+                        f"Classification: {employee.classification};    Salary: ${employee.classification.salary:.2f};          Commission rate: ${employee.classification.commission_rate:.2f};\n"
+                        f"Payment method: {employee.pay_method};  Routing number: {employee.pay_method.route_num}; Account number: {employee.pay_method.account_num};\n"
+                        f"Date of birth: {employee.birth_date};        SSN: {employee.ssn};           Phone: {employee.phone};\n"
+                        f"Email: {employee.email};    Start date: {employee.start_date};      End date: {employee.end_date};\n"
+                        f"Title: {employee.title};         Dept: {employee.dept};\n"
+                        f"Permission level: {employee.permission};      Password: {employee.password}\n\n")
+                elif str(employee.pay_method) == "mail":
+                    report.write(
+                        f"Employee ID: {employee.id};          Name: {employee.name};    Address: {employee.full_address()};\n"
+                        f"Classification: {employee.classification}; Salary: ${employee.classification.salary:.2f};        Commission rate: ${employee.classification.commission_rate:.2f};\n"
+                        f"Payment method: {employee.pay_method};         Date of birth: {employee.birth_date};\n"
+                        f"SSN: {employee.ssn};             Phone: {employee.phone};     Email: {employee.email};\n"
+                        f"Start date: {employee.start_date};        End date: {employee.end_date};\n"
+                        f"Title: {employee.title};               Dept: {employee.dept};\n"
+                        f"Permission level: {employee.permission};      Password: {employee.password}\n\n")
+            
+            # Write a line to "report.csv" stating what the employee will
+            #   be paid.
+            pay_report = employee.payment_report()
+            report.write(f"\t{pay_report}\n\n\n")
+            # (and save amount and date they were
             #   paid into variables).
             # report.write(f"\t{employee.issue_payment()}\n")
             # Fill tkinter screen (Treeview?) with the employee's data members
             # Fill tkinter screen in next row (formatted nicely) with the info
             #   about what that employee was payed and when, from variables.
-
-    # os.remove("timecards.csv")
-    # os.remove("receipts.csv")  # Delete "timecards.csv" and "receipts.csv".
 
     # Print message in GUI screen saying that report can also be viewed
     #   and shared from "report.csv".
@@ -1154,18 +1222,6 @@ def edit_employee(permission_level):
         # return False
 
 
-# Need to archive employee when admin clicks "archive".
-def archive_employee(employee):
-    """Archives the employee that is referenced in the parameters.
-    """
-    # Update the employee with all of the employee's current info, and
-    #   also an end_date of today's date (datetime object). (or set an
-    #   archived data member, etc.) Call employee.update_emp_info(with
-    #                                       data, including end_date)
-    # Remove employee from the EmployeeDatabase.database, and into the
-    #   EmployeeDatabase.archived list.
-
-
 def login_error():
     """Displays an error message in relation to logging in. To be
     displayed if a user tries to login with invalid information.
@@ -1265,8 +1321,7 @@ def main():
     """
     # Run the login_screen() function, and (/or?) any mainloops required!
     # Testing:
-
-
+    
     #Run the window
     login_window.mainloop()
     
