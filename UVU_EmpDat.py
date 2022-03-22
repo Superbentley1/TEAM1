@@ -412,6 +412,31 @@ class EmployeeDB:
         self.emp_list = []
         self.update_emp_list()
 
+        # Make Admin csv file if it doesnt exist
+        if os.path.exists("admins.csv") != True:
+            with open("admins.csv", "x") as DB:
+                writer = csv.writer(DB)
+                writer.writerow("ID,Name".split(','))
+                self.admins = DB
+        else:
+            self.admins = open("admins.csv")
+
+        if os.path.exists("archived.csv") != True:
+            with open("archived.csv", "x") as DB:
+                writer = csv.writer(DB)
+                writer.writerow(
+                    "ID,Name,Address,City,State,Zip,Classification,\
+                    PayMethod,Salary,Hourly,Commission,Route,Account,\
+                    Social Security Number,Phone Number,Email,\
+                    Start Date,End Date,Title,Department,\
+                    Password".split(','))
+                self.archived = DB
+        else:
+            self.archived = open("archived.csv")
+        self.emp_list = []
+        self.update_emp_list()
+
+
     def update_emp_list(self):
         reader = csv.DictReader(self.db)
         for row in reader:
