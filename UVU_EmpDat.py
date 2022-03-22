@@ -573,6 +573,7 @@ def open_admin():
     employees to view their data, and can generate a report of all
     employees.
     """
+
     #Admin Window
     admin_window = Toplevel(login_window)
     #Menu Bar of Admin Employee list screen    
@@ -622,6 +623,8 @@ def open_admin():
 
     employee_list = ttk.Treeview(admin_window, columns=columns_list, \
         show="headings")
+    for column in columns_list:
+        employee_list.column(column, width=130)
 
     #Define headings
     employee_list.heading("employee_id", text="Employee ID", command=lambda c=columns_list[0] : tree_column_sort(employee_list, 0, False))
