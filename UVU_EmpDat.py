@@ -1003,7 +1003,7 @@ def prompt_report_all_employees():
 #   both?
 def generate_report_all_employees(include_archived):
     """Generates a report of all employees in the database, in the form of
-    a text document titled report.csv. The report will include the info of
+    a text document titled report.txt. The report will include the info of
     archived employees if include_archived is True, and will not if it is
     False.
     """
@@ -1015,7 +1015,7 @@ def generate_report_all_employees(include_archived):
     #   EmployeeDatabase.database).
         emp_list = uvuEmpDat.emp_list
 
-    # os.remove("report.csv")    # Delete the previous "report.csv" file 
+    # os.remove("report.txt")    # Delete the previous "report.txt" file 
     #   (if necessary. Will writing over it be just as good?).
 
     # Initialize the tkinter generate_report_all_employees window,
@@ -1023,9 +1023,9 @@ def generate_report_all_employees(include_archived):
     #   data members.
     read_timecards()
     read_receipts()
-    with open("report.csv", "w") as report:
+    with open("report.txt", "w") as report:
         for employee in emp_list:
-            # Write a line to "report.csv" that reports on all data
+            # Write a line to "report.txt" that reports on all data
             #   members for the employee.
             if str(employee.classification) == "hourly":
                 if str(employee.pay_method) == "direct deposit":
@@ -1085,44 +1085,84 @@ def generate_report_all_employees(include_archived):
                         f"Title: {employee.title}               Dept: {employee.dept}\n"
                         f"Permission level: {employee.permission}      Password: {employee.password}\n\n")
             
-            # Write a line to "report.csv" stating what the employee will
+            # Write a line to "report.txt" stating what the employee will
             #   be paid.
             pay_report = employee.payment_report()
             report.write(f"\t{pay_report}\n\n\n")
-            # (and save amount and date they were
-            #   paid into variables).
-            # report.write(f"\t{employee.issue_payment()}\n")
-            # Fill tkinter screen (Treeview?) with the employee's data members
-            # Fill tkinter screen in next row (formatted nicely) with the info
-            #   about what that employee was payed and when, from variables.
+    
+    # report_window = Toplevel()
 
+    # with open("report.txt", 'r') as report_in:
+    #     count = 0
+    #     for line in report_in:
+    #         count += 1
+    #         Label(report_window, text=line).grid(row=count, padx=10,
+    #             pady=10)
+    # #Scrollbar
+    # scrollbar = ttk.Scrollbar(report_window, orient=VERTICAL, \
+    #                     command=report_window.yview)
+                        
+    # report_window.config(yscroll=scrollbar.set)
+    # scrollbar.grid(row=1, column=1, sticky="ns")
+
+    # report_window.mainloop()
+    
     # Print message in GUI screen saying that report can also be viewed
-    #   and shared from "report.csv".
-
+    #   and shared from "report.txt".
     # Bind event listener to "Back" button to exit the report's window.
 
 
-# Need to generate report of an individual employee's data and/or PAYMENT
-#   INFO AND PAYMENT TYPE.
-    # Is it different than a paystub, or should this be the same?
-
-
-# Should this just be their pay for the previous two weeks, or pay period?
-#   Or all of their pay recorded, based on two-week periods?
 def generate_pay_stub(employee):
     """Generates a pay stub/report for the given employee, with the name:
-    {employee_full_name}_pay_stub.txt.
+    {employee.last_name}_{employee.first_name}_pay_stub.txt.
     """
-    under_construction()
-    # Show the pay stub, and allow the option to export it to CSV.
-    # To show it, show the amount they were paid, based on their salary,
-    #   and their other payment options
-    # Initialize variable called pay to 0.
+    def export_pay_stub_csv(name_message, pay_message, rate_message_1, rate_message_2):
+        """Exports the pay stub to a .csv file, named with the employee's
+        name and saved in the same directory as this program.
+        
+        Input: the text that should be printed on the pay stub.
+        Output: writes to a pay stub file, named based on the employee's
+                name.
+        """
+        with open(f'{employee.last_name}_{employee.first_name}_pay_stub.txt', 'w') as pay_file:
+            pay_file.write(
+                f'{name_message}\n'
+                f'{rate_message_1}\n'
+                f'{rate_message_2}\n'
+                f'{pay_message}\n'
+            )
+
+    def pay_stub_screen(name_message, pay_message, rate_message_1, rate_message_2): # If we don't use this function, bypass
+        # straight to export_pay_stub_csv, and just generate a stub file.
+        """Initialize a GUI screen that shows the text for how much the
+        employee was payed on their last pay date, and any other
+        applicable pay stub info, like hours worked or commissions made.
+        Also allows the user the option to export the pay stub to .csv
+        format.
+        """
+        pay_stub_window = Toplevel()
+        # pay_stub_window.geometry("500x250")
+        
+        # Message:
+        name_label = Label(pay_stub_window, text=name_message)\
+            .grid(row=1, column=0, padx=10, pady=10)
+        rate_1_label = Label(pay_stub_window, text=rate_message_1)\
+            .grid(row=2, column=0, padx=10, pady=10)
+        rate_2_label = Label(pay_stub_window, text=rate_message_2)\
+            .grid(row=3, column=0, padx=10, pady=10)
+        pay_message_label = Label(pay_stub_window, text=pay_message)\
+            .grid(row=5, column=0, padx=10, pady=10)
+
+        export_button = Button(pay_stub_window, text="Export to CSV",
+        command=partial(export_pay_stub_csv, name_message, pay_message,
+            rate_message_1, rate_message_2)).grid(row=7, column=3,
+            padx=10, pady=10)     
+
+        pay_stub_window.mainloop()
+        
     pay_date = "" # Not sure if this will be used.
-    pay_amount = 0
     pay_num = 0   # For storing hours or commissions.
-    found = False
-    with open("report.csv", 'r') as report:
+    with open("report.txt", 'r') as report:
         line_count = 0
         for line in report:
             line_count += 1
@@ -1131,79 +1171,37 @@ def generate_pay_stub(employee):
             #   certain lines have them). Skip iteration if not.
             if not (line_count - 1) % 11 == 0:
                 continue
-
             info = line.strip().split(' ')
             if int(info[2]) == employee.id:
-                found = True
                 for num in range(7):
                     report.readline()
-                pay_info = report.readline()
-                print(pay_info)
-            # get the next_line from "reports.csv"
-            # parse next_line items separated by comma into a list.
-            # from next_line list, store their pay into pay variable.
-            # from next_line list, store their pay date into pay_date
-            #   variable.
-            # from next_line list, store hour or commission number based
-            #   on index into pay_num variable. (Will be invalid for
-            #   salaried employees, that's okay.)
-            # break
-    # If found:
-        # Call pay_stub_screen(employee) to generate GUI screen and finish
-        #   report.
-    # Else:
-        # Show an error pop-up message, that the employee was not payed in
-        #   the last pay period (may happen before any "report.csv" file
-        #   is generated).
+                pay_info = report.readline().split(' ')
+            
+                # Get the payment amount without the dollar sign? Use [1:]
+                pay_amount = pay_info[2][1:]
+                pay_message = f"Paid ${pay_amount} to {employee.name}."
+                rate_message_1=""
+                rate_message_2=""
+                if str(employee.classification) == "hourly":
+                    rate_message_1 = f'Hourly pay: ${employee.classification.hourly_rate}'
+                elif str(employee.classification) == "salary":
+                    rate_message_1 = f'Salary: ${employee.classification.salary}'
+                elif str(employee.classification) == "commissioned":
+                    rate_message_1 = f'Salary: ${employee.classification.salary}'
+                    rate_message_2 = f'Commission rate: ${employee.classification.commission_rate}'
+                else:
+                    raise Exception(f'Error with employee "{employee.name}\'s" classification')
+                
+                name_message = f'Employee Name: {employee.name}'
 
-
-    def pay_stub_screen(employee): # If we don't use this function, bypass
-        # straight to export_pay_stub_csv, and just generate a stub file.
-        """Initialize a GUI screen that shows the text for how much the
-        employee was payed on their last pay date, and any other
-        applicable pay stub info, like hours worked or commissions made.
-        Also allows the user the option to export the pay stub to .csv
-        format.
-        """
-        # Initialize a variable called classification to be the employee's
-        #   classification type (employee.classification.print()).
-        # Initialize a variable called pay_stub_message to be the text
-        #   that will be printed on the pay stub (start as empty string).
-        # Initialize a GUI screen to show the pay stub, along with the
-        #   formatting and colors that will be used.
-        # if classification = "hourly":
-            # Create pay_stub_message using pay, pay_date, and pay_num,
-            #   and pay_num will represent the number of hours worked.
-            #   Make message applicable by stating pay, hours, and date
-            #   received.
-        # if classification = "salary":
-            # Create pay_stub_message using pay and pay_date. Make message
-            #   applicable by stating pay and date received.
-        # if classification = "commissioned":
-            # Create pay_stub_message using pay, pay_date, and pay_num,
-            #   and pay_num will represent the number of commissions made.
-            #   Make message applicable by stating pay, number of
-            #   commissions, and date received.
-
-        # Add pay_stub_message to the GUI screen.
-
-        # Initalize an "Export to .csv" button on the screen.
-        # Bind event listener to "Export to .csv" button that calls
-        #   "export_pay_stub_csv(pay_stub_message)"
-
-
-    def export_pay_stub_csv(pay_stub_message):
-        """Exports the pay stub to a .csv file, named with the employee's
-        name and saved in the same directory as this program.
-        
-        Input: the text that should be printed on the pay stub.
-        Output: writes to a pay stub file, named based on the employee's
-                name.
-        """
-        # Should open a file named
-        #   f'{employee.first_name}_{employee.last_name}_pay_stub.csv'.
-            # Write pay_stub_message to the file.
-        # Close the file.
+                pay_stub_screen(name_message, pay_message, rate_message_1, rate_message_2)
+                
+                break
+               
+            # Else:
+                # Show an error pop-up message, that the employee was not payed in
+                #   the last pay period (may happen before any "report.txt" file
+                #   is generated).
 
 
 def edit_employee(permission_level):
