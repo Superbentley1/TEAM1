@@ -573,6 +573,21 @@ def open_admin():
     """
     #Admin Window
     admin_window = Toplevel(login_window)
+    #Menu Bar of Admin Employee list screen    
+    menu_bar = Menu(admin_window)
+    #Adds option of File to menu bar
+    file_menu = Menu(menu_bar, tearoff=0)
+    file_menu.add_command(label="New", command=under_construction)
+    file_menu.add_separator()
+    file_menu.add_command(label="Close All", command=button_close_warning)
+    menu_bar.add_cascade(label="File", menu=file_menu)
+    #Adds option of Help to menu bar
+    help_menu = Menu(menu_bar, tearoff=0)
+    help_menu.add_command(label="Help", command=under_construction)
+    help_menu.add_command(label="Read Me", command=under_construction)
+    menu_bar.add_cascade(label="Help", menu=help_menu)
+    #Adds the menu bar
+    admin_window.config(menu=menu_bar)    
     #Title of Admin Window
     admin_window.title("UVU Employee Database")
     
@@ -584,8 +599,6 @@ def open_admin():
 
     style.map("Treeview", background=[("selected", "olivedrab")])
     
-    #File and Help Menu
-    # FIXME: create file and help menu bar.
     
     #Create Employee Tree Frame
     emp_frame = Frame(admin_window)
@@ -696,6 +709,21 @@ def open_employee(employee, permission_level):
     under_construction()
     #Employee Window
     employee_window = Toplevel(login_window)
+    #Menu Bar of Employee Information screen
+    menu_bar = Menu(employee_window)
+    #Adds option of Edit to menu bar
+    file_menu = Menu(menu_bar, tearoff=0)
+    file_menu.add_command(label="Edit", command=under_construction)
+    file_menu.add_separator()
+    file_menu.add_command(label="Close All", command=button_close_warning)
+    menu_bar.add_cascade(label="File", menu=file_menu)
+    #Adds option of Help to menu bar
+    help_menu = Menu(menu_bar, tearoff=0)
+    help_menu.add_command(label="Help", command=under_construction)
+    help_menu.add_command(label="Read Me", command=under_construction)
+    menu_bar.add_cascade(label="Help", menu=help_menu)
+    #Adds the menu bar
+    employee_window.config(menu=menu_bar)
     
     #Title of Login Window
     employee_window.title("UVU Employee Database")
@@ -1185,6 +1213,20 @@ def classification_translate(num):
 #Login Window functionality. Global so that all functions can access it.
 login_window = Tk()
 login_window.update()
+#Menu Bar of Login screen
+menu_bar = Menu(login_window)
+#Adds option of File to menu bar
+file_menu = Menu(menu_bar, tearoff=0)
+file_menu.add_command(label="Close All", command=button_close_warning)
+menu_bar.add_cascade(label="File", menu=file_menu)
+#Adds option of Help to menu bar
+help_menu = Menu(menu_bar, tearoff=0)
+help_menu.add_command(label="Help", command=under_construction)
+help_menu.add_command(label="Read Me", command=under_construction)
+menu_bar.add_cascade(label="Help", menu=help_menu)
+#Adds the menu bar
+login_window.config(menu=menu_bar)
+
 #Size of Login Window
 login_window.geometry("515x360")
 #Title of Login Window
