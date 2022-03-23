@@ -10,6 +10,8 @@ To Do:
    - Make sure they are properly stored in the database.
 
 - Implement archiving of employees in the GUI (and the database).
+   - The database has methods now, but we need to integrate it with the
+     GUI.
 
 - Put button for report for all employees on the admin employee list page.
 
