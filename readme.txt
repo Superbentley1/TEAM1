@@ -48,8 +48,10 @@ Report" has been run, because pay stubs are based off of previous pay, and
 not future pay.
 
 At any time, you can click "Help" on top menu. The Help -> Read Me option
-will open this readme message. The Help -> Help option is not yet
-implemented, but will have a user guide there in a future sprint.
+will open this readme message. The Help -> Help option will have a user
+guide there in a future sprint. Neither option is currently functional,
+but will should be working in future Sprints (Sprint 5 for the readme
+file).
 
 Thank you for your time!
 

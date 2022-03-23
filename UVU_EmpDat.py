@@ -600,7 +600,7 @@ def login():
         if username_valid and password_valid:
             employee = find_employee_by_id(users_id, uvuEmpDat.emp_list)
             if employee.permission == "admin":
-                open_admin_view()
+                open_admin()
             else:
                 open_employee(employee, employee.permission)
             pass
@@ -734,16 +734,6 @@ def open_admin():
     
     #Run the window
     admin_window.mainloop()
-
-# FIXME: need to add "Report" button and functionality.
-# initialize event listeners for clicking the "report/issue-payment"
-#   button:
-    # call prompt_report_all_employees().
-
-def open_admin_view():
-    #This function is so the warning is shown before admin view is open
-    under_construction()
-    open_admin()
 
 
 def add_employee_screen():
@@ -902,8 +892,6 @@ def open_employee(employee, permission_level):
     well if permission_level is "admin".
     Input: Employee object, string.
     """
-    #Under development
-    under_construction()
     #Employee Window
     employee_window = Toplevel(login_window)
     #Menu Bar of Employee Information screen
@@ -1100,9 +1088,6 @@ def open_employee(employee, permission_level):
             .grid(row=12, column=4, padx=10, pady=10)
 
     # Buttons
-    edit_button = Button(employee_window, text="Edit", \
-        command=partial(edit_employee, "admin")).grid(row=13, column=4,
-        padx=10, pady=10)
     pay_stub_button = Button(employee_window, text="Get Pay Stub",
         command=partial(generate_pay_stub, employee)).grid(row=13,
         column=5, padx=10, pady=10)
@@ -1110,7 +1095,7 @@ def open_employee(employee, permission_level):
     if permission_level == "admin":
         back_button = Button(employee_window, text="Back", 
             command=partial(exit_window, employee_window)).grid(row=13, 
-            column=3, padx=10, pady=10)
+            column=4, padx=10, pady=10)
         report_all_button = Button(employee_window,
             text="All Emps Report", command=prompt_report_all_employees)\
                 .grid(row=13, column=0, padx=10, pady=10)
@@ -1363,73 +1348,6 @@ def generate_pay_stub(employee):
                 #   is generated).
 
 
-def edit_employee(permission_level):
-    """Allows you to edit and save an employee's information. If
-    permission level is "admin", allows user to edit all information. If
-    permission level is "employee", allows user to edit only their
-    username, physical address, phone number, email address, and payment
-    type.
-    """
-    under_construction()
-    # Replace the "Edit" button with a "Save" button.
-    # If permission_level is admin:    
-        # Change admin-level data labels to fields.
-        # Bind event listener to save button. When clicked:
-            # If changes made: (call employee_data_changed(employee))
-                # save_employee_changes(employee)
-            # Else if no changes made, do nothing.
-        # change edit fields back to labels, and "Save" button back to
-        #   "Edit" (no more editing until you re-click edit)
-
-    # Else if permission level is employee (or anything else):
-        # Change normal employee-level data labels to fields.
-        # Bind event listener to save button. When clicked:
-            # If changes made: (call employee_data_changed(employee))
-                # save_employee_changes(employee)
-            # Else if no changes made, do nothing.
-        # change edit fields back to labels, and "Save" button back to
-        #   "Edit" (no more editing until you re-click edit)
-
-    # Bind event listener to cancel button. When clicked, exits edit mode:
-        # if employee data changed: (call employee_data_changed(employee))
-            # populate employee fields to match employee object data.
-        # change edit fields back to labels, and "Save" button back to
-        #   "Edit" (no more editing until you re-click edit)
-
-
-    def save_employee_changes(employee): # (nested in edit_employee.)
-        """Saves any changes made to employee data during editing. Updates
-        the employee's data within the database.
-        """
-        # if permission_level is "admin":
-            # calls employee.update_emp_info(with all employee data)
-        # else if permission_level is "employee" (or anything else?):
-            # calls employee.update_own_info(with data that normal
-            #   employees can edit only, from GUI fields)
-
-    # Need a function to handle checking if an employee's data has changed
-    #   (saving it if so?).
-    def employee_data_changed(employee): # (nested in edit_employee.)
-        """Checks the employee fields that are editable, and sees if they
-        match the previous data of the employee. If they match, False is
-        returned. If they don't match, True is returned (employee data was
-        changed).
-        """
-        # If permission_level is "admin":
-            # For each data field that admin can edit:
-                # Compare that data field to the matching employee data
-                #   field.
-                    # If it doesn't match:
-                        # return True
-        # Else if permission_level is "employee" (or anything else):
-            # For each data field that employee can edit:
-                # Compare that data field to the matching employee data
-                #   field.
-                    # If it doesn't match:
-                        # return True
-        # return False
-
-
 def login_error():
     """Displays an error message in relation to logging in. To be
     displayed if a user tries to login with invalid information.
@@ -1534,101 +1452,3 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-# Extra notes and questions:
-
-    # Questions and comments for everyone:
-        # NEED A WAY TO INTEGRATE THE PAYMENT FUNCTIONS WITH THE GUI!!!
-        # Need a way to upload employee timecards and receipts into the DB
-        #   using the GUI.
-            # Can only admins do that? Can employees themselves?
-        # Whether they have timecards or receipts depends on their
-        #   classification!
-
-        # Should reports all be payment reports?
-        # Should they include all current timecards, etc., for employees,
-        #   and then wipe them? Or should it keep a history of all
-        #   payments made to those employees? If so, employee timecards/
-        #   receipt files should be added to over time, somewhat like the
-        #   employee db file.
-        
-        # What should be shown when archived employees are included in the
-        #   report? Should their payment info from old paychecks be
-        #   included?
-
-        # Need to brainstorm what each of the reports should include, and
-        #   then write them to do so. (We should have access to all of the
-        #   data we need; my real question is simply what the reports
-        #   should be.) What do my pay stubs look like?
-
-        # Should the pay stub be the same as the report printed when an
-        #   employer looks at an employee's records?
-
-        # (Need to make sure there can't be more than one user with the
-        #   same username, when creating new user, to keep bug-free.)
-
-        # Double-check: which data members do we want to show with an
-        #   individual employee's data? Different when admin views?
-
-        # Which data should employees be able to edit? Which should admins
-        #   be able to edit?
-
-        # Instead of uploading files, does it seem reasonable to say that
-        #   we can use files that are in the current directory, and
-        #   possibly clear them whenever we "issue payment"/generate the
-        #   general report? Just find the files based on their names?
-
-        # Do we need a way to drag and drop/upload files, or can we just
-        #   read the files named timecards.csv, receipts.csv, etc., and
-        #   assume they'll have the right data? I'm going to assume we can
-        #   just use files with those names, and assume they have the
-        #   correct data.
-
-        # WE NEED TO VALIDATE DATA PUT INTO THE GUI, TO MAKE SURE IT'S ALL
-        #   IN THE RIGHT TYPES.
-
-
-    # Questions and comments for Tristan:
-
-        # Let Tristan know, we need to write to the file when an employee
-        #   is archived, so that when the program restarts, it will
-        #   remember that the employee is archived.
-
-        # Do we want an "archived" data member, or should we just read/
-        #   check whether they have an end_date? (If so, end date must be
-        #   after start date, otherwise they've returned.) Or do we want a
-        #   list item that is not a data member, but tells the DB which
-        #   list to put that employee in? (Says, ",archived,", or is empty
-        #   (",,"), for example?)
-
-        # See if Tristan can add a "print()" method to each of the payment
-        #   method and classification classes, so that their types can be
-        #   printed easily on the GUI. (e.g., Hourly class prints
-        #   "hourly".)
-
-        # Would it work to have "hourly.issue_payment()" also print how
-        #   many hours they worked, and "commissioned.issue_payment()"
-        #   also print how many commissions they made? (Sum up the numbers
-        #   from the timecards/receipts?)
-
-
-    # Questions and comments for Abbie:
-
-        # Have all of the GUI stuff/listeners put into a function that is
-        #   called in main?
-        
-        # We may need to make a function (or see if Abbie can?) to
-        #   validate whether GUI field info still matches employee
-        #   object's info, and returns boolean, True if matches. Does that
-        #   seem doable with the info users type into the GUI?
-
-        # I have a suggestion for the single employee GUI page:
-            # I think it would look nice to have all of the labels in one
-            #   column on the left, with all of the data in one column on
-            #   the right, with both columns aligned (left col. right-
-            #   aligned, right col. left-aligned?).
-            # We could still keep personal and employment info separate,
-            #   though, if we want. Two separated columns, each with a 
-            #   column of labels and data?
-            # Also, could style fonts, and buttons, etc., maybe just a
-            #   little bit.
