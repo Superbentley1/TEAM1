@@ -1,0 +1,29 @@
+To Do:
+
+- Implement editing functionality in both GUI and database.
+   - Can we edit employee in the GUI?
+        - Do we want to use the "File" dropdown, or change the labels to
+          fields?
+   - Is database file rewritten when we edit them and save?
+
+- Implement the creating of new employees using the GUI.
+   - Make sure they are properly stored in the database.
+
+- Implement archiving of employees in the GUI (and the database).
+
+- Put button for report for all employees on the admin employee list page.
+
+- Add a GUI screen when admin is generating report for all employees
+  (.csv file is working).
+   - Scrolling has been confusing on this one.
+
+- Clarify how we will be keeping track of admin permissions.
+   - Currently, an employee.permission data member is being used.
+
+- Organize the files to be more modular and testable.
+
+- Attach the readme to the "Help -> Help" dropdown.
+
+- Work with Gabriel to write and perform test cases, and record bugs.
+
+- Fix bugs.
