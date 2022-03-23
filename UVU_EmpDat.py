@@ -1168,7 +1168,7 @@ def prompt_report_all_employees():
 #   both?
 def generate_report_all_employees(include_archived):
     """Generates a report of all employees in the database, in the form of
-    a text document titled report.txt. The report will include the info of
+    a text document titled report.csv. The report will include the info of
     archived employees if include_archived is True, and will not if it is
     False.
     """
@@ -1182,9 +1182,9 @@ def generate_report_all_employees(include_archived):
 
     read_timecards()
     read_receipts()
-    with open("report.txt", "w") as report:
+    with open("report.csv", "w") as report:
         for employee in emp_list:
-            # Write a line to "report.txt" that reports on all data
+            # Write a line to "report.csv" that reports on all data
             #   members for the employee.
             if str(employee.classification) == "hourly":
                 if str(employee.pay_method) == "direct deposit":
@@ -1244,14 +1244,14 @@ def generate_report_all_employees(include_archived):
                         f"Title: {employee.title}               Dept: {employee.dept}\n"
                         f"Permission level: {employee.permission}      Password: {employee.password}\n\n")
             
-            # Write a line to "report.txt" stating what the employee will
+            # Write a line to "report.csv" stating what the employee will
             #   be paid.
             pay_report = employee.payment_report()
             report.write(f"\t{pay_report}\n\n\n")
     
     # report_window = Toplevel()
 
-    # with open("report.txt", 'r') as report_in:
+    # with open("report.csv", 'r') as report_in:
     #     count = 0
     #     for line in report_in:
     #         count += 1
@@ -1267,13 +1267,13 @@ def generate_report_all_employees(include_archived):
     # report_window.mainloop()
     
     # Print message in GUI screen saying that report can also be viewed
-    #   and shared from "report.txt".
+    #   and shared from "report.csv".
     # Bind event listener to "Back" button to exit the report's window.
 
 
 def generate_pay_stub(employee):
     """Generates a pay stub/report for the given employee, with the name:
-    {employee.last_name}_{employee.first_name}_pay_stub.txt.
+    {employee.last_name}_{employee.first_name}_pay_stub.csv.
     """
     def export_pay_stub_csv(name_message, pay_message, rate_message_1, rate_message_2):
         """Exports the pay stub to a .csv file, named with the employee's
@@ -1283,7 +1283,7 @@ def generate_pay_stub(employee):
         Output: writes to a pay stub file, named based on the employee's
                 name.
         """
-        with open(f'{employee.last_name}_{employee.first_name}_pay_stub.txt', 'w') as pay_file:
+        with open(f'{employee.last_name}_{employee.first_name}_pay_stub.csv', 'w') as pay_file:
             pay_file.write(
                 f'{name_message}\n'
                 f'{rate_message_1}\n'
@@ -1321,7 +1321,7 @@ def generate_pay_stub(employee):
         
     pay_date = "" # Not sure if this will be used.
     pay_num = 0   # For storing hours or commissions.
-    with open("report.txt", 'r') as report:
+    with open("report.csv", 'r') as report:
         line_count = 0
         for line in report:
             line_count += 1
@@ -1359,7 +1359,7 @@ def generate_pay_stub(employee):
                
             # Else:
                 # Show an error pop-up message, that the employee was not payed in
-                #   the last pay period (may happen before any "report.txt" file
+                #   the last pay period (may happen before any "report.csv" file
                 #   is generated).
 
 
