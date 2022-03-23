@@ -53,5 +53,9 @@ guide there in a future sprint. Neither option is currently functional,
 but will should be working in future Sprints (Sprint 5 for the readme
 file).
 
+We need to fix up some of the employee editing capabilities, as the
+database currently doesn't take changes (though it is reading in data
+well). That is a top-priority item on our backlog.
+
 Thank you for your time!
 
