@@ -53,6 +53,12 @@ class Classification():
         """
         pass
 
+    def num(self):
+        """Returns an integer that represents the classification of the
+        employee.
+        """
+        pass
+
 
 class Hourly(Classification):
     """Used for tracking the payment rate of an hourly-paid employee, and
@@ -86,9 +92,14 @@ class Hourly(Classification):
         return payment
 
     def __str__(self):
-        """Return's a string representing employee's payment type.
+        """Returns a string representing employee's payment type.
         """
         return "hourly"
+
+    def num(self):
+        """Returns an integer representing the hourly classification type.
+        """
+        return 1
 
 
 class Salary(Classification):
@@ -113,6 +124,11 @@ class Salary(Classification):
         """Return's a string representing employee's payment type.
         """
         return "salary"
+    
+    def num(self):
+        """Returns an integer representing the salary classification type.
+        """
+        return 2
 
 
 class Commissioned(Salary):
@@ -152,6 +168,12 @@ class Commissioned(Salary):
         """Return's a string representing employee's payment type.
         """
         return "commissioned"
+    
+    def num(self):
+        """Returns an integer representing the commissioned classification
+        type.
+        """
+        return 3
 
 
 class PayMethod():
@@ -168,6 +190,12 @@ class PayMethod():
     def payment_message(self, amount):
         """Used to print an applicable message about how much employee
         will be paid, and in what method.
+        """
+        pass
+
+    def num(self):
+        """Returns an integer that represents the payment method in the
+        data file.
         """
         pass
 
@@ -197,6 +225,12 @@ class DirectMethod(PayMethod):
         """
         return "direct deposit"
 
+    def num(self):
+        """Returns an integer that represents the direct pay method in the
+        database file.
+        """
+        return 1
+
 
 class MailedMethod(PayMethod):
     """Used for employees who opt to be paid by mail. Prints an applicable
@@ -219,6 +253,12 @@ class MailedMethod(PayMethod):
         """Returns a string representing the desired pay method.
         """
         return "mail"
+
+    def num(self):
+        """Returns an integer that represents the mail pay method in the
+        database file.
+        """
+        return 2
 
 
 class Employee():
@@ -269,6 +309,7 @@ class Employee():
         self.dept = None
         self.permission = permission
         self.password = None
+
 
     def set_classification(self, class_num, pay_val_1, pay_val_2=0):
         """Sets the self.classification member of the employee class
@@ -456,22 +497,50 @@ class EmployeeDB:
             if emp not in self.archived_list:
                 self.emp_list.append(emp)
 
-    def _addRow(self, emp: Employee, file):
+    def _add_row(self, emp: Employee, file):
         with open(file, "x") as DB:
             writer = csv.writer(DB)
-            writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification,
-                            emp.pay_method, emp.salary, emp.hourly, emp.commission, emp.route, emp.account, emp.ssn,
-                            emp.phone, emp.email, emp.start_date, emp.end_date, emp.title, emp.dept, emp.password)
+            if str(emp.classification) == "hourly":
+                if str(emp.pay_method) == "direct deposit":
+                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
+                                emp.pay_method.num(), -1, emp.classification.hourly_rate, -1, emp.pay_method.route_num,
+                                emp.pay_method.account_num, emp.ssn, emp.phone, emp.email, emp.start_date, emp.end_date,
+                                emp.title, emp.dept, emp.password)
+                elif str(emp.pay_method) == "mail":
+                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
+                                emp.pay_method.num(), -1, emp.classification.hourly_rate, -1, -1, -1, emp.ssn, emp.phone,
+                                emp.email, emp.start_date, emp.end_date, emp.title, emp.dept, emp.password)
+            elif str(emp.classification) == "salary":
+                if str(emp.pay_method) == "direct deposit":
+                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
+                                emp.pay_method.num(), emp.classification.salary, -1, -1, emp.pay_method.route_num,
+                                emp.pay_method.account_num, emp.ssn, emp.phone, emp.email, emp.start_date, emp.end_date,
+                                emp.title, emp.dept, emp.password)
+                elif str(emp.pay_method) == "mail":
+                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
+                                emp.pay_method.num(), emp.classification.salary, -1, -1, -1, -1, emp.ssn, emp.phone,
+                                emp.email, emp.start_date, emp.end_date, emp.title, emp.dept, emp.password)
+            elif str(emp.classification) == "commissioned":
+                if str(emp.pay_method) == "direct deposit":
+                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
+                                emp.pay_method.num(), emp.classification.salary, -1, emp.classification.commission_rate,
+                                emp.pay_method.route_num, emp.pay_method.account_num, emp.ssn, emp.phone, emp.email,
+                                emp.start_date, emp.end_date, emp.title, emp.dept, emp.password)
+                elif str(emp.pay_method) == "mail":
+                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
+                                emp.pay_method.num(), emp.classification.salary, -1, emp.classification.commission_rate,
+                                -1, -1, emp.ssn, emp.phone, emp.email, emp.start_date, emp.end_date, emp.title, emp.dept,
+                                emp.password)
 
     def archive_employee(self, id):
         """Removes from emp list and adds them to the archived file.
         """
         emp = find_employee_by_id(id, self.emp_list)
         self.emp_list.remove(emp)
-        self._addRow(emp,"archived.csv")
+        self._add_row(emp,"archived.csv")
 
     def add_employee(self,employee:Employee):
-        self._addRow(employee, "employees.csv")
+        self._add_row(employee, "employees.csv")
 
 
 # Define global EmployeeDB object:
@@ -492,29 +561,6 @@ def find_employee_by_id(employee_id, emp_list):
         if employee.id == employee_id:
             return employee
     return None
-
-
-# Need to generate the login screen.
-def login_screen(): # May need to do at the global level, not sure.
-    """Generates a functional login screen for the UVU Employee Database.
-    """
-    # Initialize the tkinter window for the login screen, and it's size
-    #   and geometry.
-    # Initialize the "Username" and "Password" labels and fields.
-    # Initialize the "Login" button, to call the validate_login function
-    #   with the username and password from the Username and Password
-    #   fields.
-    # If login was valid:
-        # If employee.permission_level is "admin":
-            # call "open_admin()"
-        # Else if employee.permission_level is "employee" (or anything
-        #   else):
-            # call "open_employee(employee, 'employee')"
-    # Else: (if not valid)
-        # Show the login error (have a simple tkinter window for this, or
-        #   a printed label?)
-    
-    # Run the mainloop to open the login window.
 
 
 def validate_login(username, password): # working as designed.
@@ -541,29 +587,29 @@ def login():
     admin screen, and normal employees just see their own data.
     """    
     # Allow for exception if username is not a string.
-    # try:
-    #     # Get username and password variables from entries on login GUI
-    #     #   screen.
-    user_id = int(username.get())
-    user_password = password.get()
+    try:
+        # Get username and password variables from entries on login GUI
+        #   screen.
+        users_id = int(user_id.get())
+        user_password = password.get()
 
-    # Validate login with username and password from the login GUI
-    #   screen entries.
-    username_valid, password_valid = validate_login(user_id,
-                                        user_password)
-    if username_valid and password_valid:
-        employee = find_employee_by_id(user_id, uvuEmpDat.emp_list)
-        if employee.permission == "admin":
-            open_admin_view()
+        # Validate login with username and password from the login GUI
+        #   screen entries.
+        username_valid, password_valid = validate_login(users_id,
+                                            user_password)
+        if username_valid and password_valid:
+            employee = find_employee_by_id(users_id, uvuEmpDat.emp_list)
+            if employee.permission == "admin":
+                open_admin_view()
+            else:
+                open_employee(employee, employee.permission)
+            pass
         else:
-            open_employee(employee, employee.permission)
-        pass
-    else:
-        login_error()
+            login_error()
     # If username is not a string:
-    # except:
-    #     print("Username was not an integer.")
-    #     login_error()
+    except:
+        print("Username was not an integer.")
+        login_error()
     
 
 
@@ -580,7 +626,7 @@ def open_admin():
     menu_bar = Menu(admin_window)
     #Adds option of File to menu bar
     file_menu = Menu(menu_bar, tearoff=0)
-    file_menu.add_command(label="New", command=under_construction)
+    file_menu.add_command(label="New", command=add_employee_screen)
     file_menu.add_separator()
     file_menu.add_command(label="Close All", command=button_close_warning)
     menu_bar.add_cascade(label="File", menu=file_menu)
@@ -698,7 +744,138 @@ def open_admin_view():
     #This function is so the warning is shown before admin view is open
     under_construction()
     open_admin()
+
+
+def add_employee_screen():
+    """Opens a screen for entering information to add a new user to the
+    UVU Employee Database.
+    """
+    add_emp_window = Toplevel()
     
+    max_id = 0
+    for emp in uvuEmpDat.emp_list + uvuEmpDat.archived_list:
+        if emp.id > max_id:
+            max_id = emp.id
+        
+    new_id = max_id + 1
+
+    # ID Entry:
+    id_title = Label(add_emp_window, text="Employee ID:").grid(row=1,
+            column=1, padx=25, pady=5)
+    id_label = Entry(add_emp_window, text=new_id)\
+            .grid(row=1, column=2, padx=50, pady=5)
+    
+    # First name entry:
+    first_name_label = Label(add_emp_window, text="First Name:").grid(row=2,
+            column=1, padx=25, pady=5)
+    first_name = StringVar(add_emp_window)
+    id_first_name = Entry(add_emp_window, textvariable=first_name)\
+            .grid(row=2, column=2, padx=50, pady=5)
+
+    # Last name entry:
+    last_name_label = Label(add_emp_window, text="Last Name:").grid(row=3,
+            column=1, padx=25, pady=5)
+    last_name = StringVar(add_emp_window)
+    last_name_entry = Entry(add_emp_window, textvariable=last_name)\
+            .grid(row=3, column=2, padx=50, pady=5)
+
+    # Classification entry:
+    # Make a classification drop-down box. Also a way to say what their
+    #   pay is, based on their classification's pay type.
+
+    # Social security number entry:
+    ssn_label = Label(add_emp_window, text="SSN:").grid(row=4,
+            column=1, padx=25, pady=5)
+    ssn = StringVar(add_emp_window)
+    ssn_entry = Entry(add_emp_window, textvariable=ssn)\
+            .grid(row=4, column=2, padx=50, pady=5)
+
+    # Phone entry:
+    phone_label = Label(add_emp_window, text="Phone:").grid(row=5,
+            column=1, padx=25, pady=5)
+    phone = StringVar(add_emp_window)
+    phone_entry = Entry(add_emp_window, textvariable=phone)\
+            .grid(row=5, column=2, padx=50, pady=5)
+
+    # Email entry:
+    email_label = Label(add_emp_window, text="Email:").grid(row=6,
+            column=1, padx=25, pady=5)
+    email = StringVar(add_emp_window)
+    email_entry = Entry(add_emp_window, textvariable=email)\
+            .grid(row=6, column=2, padx=50, pady=5)
+
+    # Address entry:
+    address_label = Label(add_emp_window, text="Street Address:").grid(row=7,
+            column=1, padx=25, pady=5)
+    address = StringVar(add_emp_window)
+    address_entry = Entry(add_emp_window, textvariable=address)\
+            .grid(row=7, column=2, padx=50, pady=5)
+
+    # City entry:
+    city_label = Label(add_emp_window, text="City:").grid(row=8,
+            column=1, padx=25, pady=5)
+    city = StringVar(add_emp_window)
+    city_entry = Entry(add_emp_window, textvariable=city)\
+            .grid(row=8, column=2, padx=50, pady=5)
+
+    # State entry:
+    state_label = Label(add_emp_window, text="State:").grid(row=9,
+            column=1, padx=25, pady=5)
+    state = StringVar(add_emp_window)
+    state_entry = Entry(add_emp_window, textvariable=state)\
+            .grid(row=9, column=2, padx=50, pady=5)
+
+    # Zip code entry:
+    zip_label = Label(add_emp_window, text="Zip Code:").grid(row=10,
+            column=1, padx=25, pady=5)
+    zip = StringVar(add_emp_window)
+    zip_entry = Entry(add_emp_window, textvariable=zip)\
+            .grid(row=10, column=2, padx=50, pady=5)
+
+    # PayMethod entry:
+    # Make a dropdown box to select PayMethod.
+
+    # Birth date entry:
+    birth_date_label = Label(add_emp_window, text="Birth Date:").grid(row=11,
+            column=1, padx=25, pady=5)
+    birth_date = StringVar(add_emp_window)
+    birth_date_entry = Entry(add_emp_window, textvariable=birth_date)\
+            .grid(row=11, column=2, padx=50, pady=5)
+
+    # Start date entry:
+    start_date_label = Label(add_emp_window, text="Start Date:").grid(row=1,
+            column=3, padx=25, pady=5)
+    start_date = StringVar(add_emp_window)
+    start_date_entry = Entry(add_emp_window, textvariable=start_date)\
+            .grid(row=1, column=4, padx=50, pady=5)
+
+    # Title entry:
+    title_label = Label(add_emp_window, text="Title:").grid(row=2,
+            column=3, padx=25, pady=5)
+    title = StringVar(add_emp_window)
+    title_entry = Entry(add_emp_window, textvariable=title)\
+            .grid(row=2, column=4, padx=50, pady=5)
+
+    # Dept entry:
+    dept_label = Label(add_emp_window, text="Department:").grid(row=3,
+            column=3, padx=25, pady=5)
+    dept = StringVar(add_emp_window)
+    dept_entry = Entry(add_emp_window, textvariable=dept)\
+            .grid(row=3, column=4, padx=50, pady=5)
+
+    # Admin entry:
+    # Some sort of entry or radio button or drop-down to select if admin.
+
+    # Password entry:
+    password_label = Label(add_emp_window, text="Password:").grid(row=4,
+            column=3, padx=25, pady=5)
+    password = StringVar(add_emp_window)
+    password_entry = Entry(add_emp_window, textvariable=password)\
+            .grid(row=4, column=4, padx=50, pady=5)
+
+    add_emp_window.mainloop()
+
+
 def edit_employee_info(the_edit):
     """Generates a GUI window with information of the employee.
     Also generates an entry box and a button to update information"""
@@ -939,21 +1116,6 @@ def open_employee(employee, permission_level):
                 .grid(row=13, column=0, padx=10, pady=10)
 
 
-    # FIXME: add "Edit" button and functionality, and "Pay Stub" and
-    #   "Back" buttons and functionalities.
-
-    # bind event listener to the "Edit" button:
-        # call the function to edit an individual employee, passing user
-        #   permission level in.
-    # bind event listener to the "Pay stub" button, tied to the function
-    #   to get paystub(s).
-    # bind event listener to "back" button, IF the user is admin (can go
-    #   back to admin view).
-
-    # run the mainloop to open this window if a regular employee is using
-    #   it?
-
-
 def read_timecards():
     """Reads in all timecard lists from the "timecards.csv" file, and adds
     them to the hourly employees' individual records.
@@ -1018,12 +1180,6 @@ def generate_report_all_employees(include_archived):
     #   EmployeeDatabase.database).
         emp_list = uvuEmpDat.emp_list
 
-    # os.remove("report.txt")    # Delete the previous "report.txt" file 
-    #   (if necessary. Will writing over it be just as good?).
-
-    # Initialize the tkinter generate_report_all_employees window,
-    #   configuring formatting and colors, with columns for all employee
-    #   data members.
     read_timecards()
     read_receipts()
     with open("report.txt", "w") as report:
@@ -1343,12 +1499,12 @@ login_window.title("UVU Employee Database")
 login_window_label = Label(login_window, text="Login").grid(row=1, \
     columnspan=3, padx=50, pady=50)
 
-#Username Text
-username_label = Label(login_window, text="Username").grid(row=2, \
+#User ID Text
+user_id_label = Label(login_window, text="User ID").grid(row=2, \
     column=1, padx=25, pady=5)
-#Username Textbox
-username = StringVar(login_window)
-username_entry = Entry(login_window, textvariable=username)\
+#User ID Textbox
+user_id = StringVar(login_window)
+user_id_entry = Entry(login_window, textvariable=user_id)\
     .grid(row=2, column=2, padx=50, pady=5)  
 
 #Password Text
@@ -1371,9 +1527,6 @@ exit_button = Button(login_window, text="Close", \
 def main():   
     """Starts up the entire application, starting with the login screen.
     """
-    # Run the login_screen() function, and (/or?) any mainloops required!
-    # Testing:
-    
     #Run the window
     login_window.mainloop()
     
