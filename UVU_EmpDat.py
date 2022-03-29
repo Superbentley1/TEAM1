@@ -543,6 +543,38 @@ class EmployeeDB:
         self._add_row(employee, "employees.csv")
 
 
+def read_timecards():
+    """Reads in all timecard lists from the "timecards.csv" file, and adds
+    them to the hourly employees' individual records.
+    """
+    with open("timecards.csv", 'r') as timecards:
+        for line in timecards:
+            times = line.split(',')
+            emp_id = int(times.pop(0))
+            employee = find_employee_by_id(emp_id, uvuEmpDat.emp_list)
+
+            if employee:
+                if str(employee.classification) == "hourly":
+                    for time in times:
+                        employee.classification.add_timecard(float(time))
+
+
+def read_receipts():
+    """Reads in all receipt lists from the "receipts.csv" file, and adds
+    them to the commissioned employees' individual records.
+    """
+    with open("receipts.csv", 'r') as receipts:
+        for line in receipts:
+            sales = line.split(',')
+            emp_id = int(sales.pop(0))
+            employee = find_employee_by_id(emp_id, uvuEmpDat.emp_list)
+
+            if employee:
+                if str(employee.classification) == "commissioned":
+                    for receipt in sales:
+                        employee.classification.add_receipt(float(receipt))
+
+
 # Define global EmployeeDB object:
 # EmployeeDatabase object should be global, so all functions can access
 #   it?
@@ -1101,36 +1133,6 @@ def open_employee(employee, permission_level):
                 .grid(row=13, column=0, padx=10, pady=10)
 
 
-def read_timecards():
-    """Reads in all timecard lists from the "timecards.csv" file, and adds
-    them to the hourly employees' individual records.
-    """
-    with open("timecards.csv", 'r') as timecards:
-        for line in timecards:
-            times = line.split(',')
-            emp_id = int(times.pop(0))
-            employee = find_employee_by_id(emp_id, uvuEmpDat.emp_list)
-
-            if employee:
-                if str(employee.classification) == "hourly":
-                    for time in times:
-                        employee.classification.add_timecard(float(time))
-
-
-def read_receipts():
-    """Reads in all receipt lists from the "receipts.csv" file, and adds
-    them to the commissioned employees' individual records.
-    """
-    with open("receipts.csv", 'r') as receipts:
-        for line in receipts:
-            sales = line.split(',')
-            emp_id = int(sales.pop(0))
-            employee = find_employee_by_id(emp_id, uvuEmpDat.emp_list)
-
-            if employee:
-                if str(employee.classification) == "commissioned":
-                    for receipt in sales:
-                        employee.classification.add_receipt(float(receipt))
 
 
 def prompt_report_all_employees():
