@@ -543,6 +543,11 @@ class EmployeeDB:
         self._add_row(employee, "employees.csv")
 
 
+def open_file(the_file):
+    """Function to open a file"""
+    os.system(the_file)
+
+
 def read_timecards():
     """Reads in all timecard lists from the "timecards.csv" file, and adds
     them to the hourly employees' individual records.
@@ -665,7 +670,7 @@ def open_admin():
     #Adds option of Help to menu bar
     help_menu = Menu(menu_bar, tearoff=0)
     help_menu.add_command(label="Help", command=under_construction)
-    help_menu.add_command(label="Read Me", command=under_construction)
+    help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
     menu_bar.add_cascade(label="Help", menu=help_menu)
     #Adds the menu bar
     admin_window.config(menu=menu_bar)    
@@ -963,7 +968,7 @@ def open_employee(employee, permission_level):
     #Adds option of Help to menu bar
     help_menu = Menu(menu_bar, tearoff=0)
     help_menu.add_command(label="Help", command=under_construction)
-    help_menu.add_command(label="Read Me", command=under_construction)
+    help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
     menu_bar.add_cascade(label="Help", menu=help_menu)
     #Adds the menu bar
     employee_window.config(menu=menu_bar)
@@ -1406,7 +1411,7 @@ menu_bar.add_cascade(label="File", menu=file_menu)
 #Adds option of Help to menu bar
 help_menu = Menu(menu_bar, tearoff=0)
 help_menu.add_command(label="Help", command=under_construction)
-help_menu.add_command(label="Read Me", command=under_construction)
+help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
 menu_bar.add_cascade(label="Help", menu=help_menu)
 #Adds the menu bar
 login_window.config(menu=menu_bar)
