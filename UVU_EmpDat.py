@@ -688,6 +688,7 @@ def open_admin():
     
     #Create Employee Tree Frame
     emp_frame = Frame(admin_window)
+    emp_frame.pack(pady=0)
     
     def tree_column_sort(tree, the_column, other_way):
         #Get the values to sort
@@ -704,7 +705,7 @@ def open_admin():
         "social_security_number", "phone_number", "email", "start_date", \
             "end_date", "classification", "title", "department")
 
-    employee_list = ttk.Treeview(admin_window, columns=columns_list, \
+    employee_list = ttk.Treeview(emp_frame, columns=columns_list, \
         show="headings")
     for column in columns_list:
         employee_list.column(column, width=130)
@@ -746,6 +747,13 @@ def open_admin():
                         emp.title, emp.dept), tags=("oddrows",))
         count+=1
     
+    #Button frame on Admin list
+    button_frame = Frame(admin_window)
+    button_frame.pack(pady=0)
+    #Report button
+    report_button = Button(button_frame, text="Report", command=under_construction).pack(anchor='w')
+
+    
     def employee_selected(event):
         """Brings up an employee's information in a separate GUI window.
         Intended to be called with a double-click event handler, so that
@@ -763,7 +771,7 @@ def open_admin():
     employee_list.grid(row=1, column=0, sticky="nsew")
     
     #Scrollbar
-    scrollbar = ttk.Scrollbar(admin_window, orient=VERTICAL, \
+    scrollbar = ttk.Scrollbar(emp_frame, orient=VERTICAL, \
                         command=employee_list.yview)
                         
     employee_list.config(yscroll=scrollbar.set)
