@@ -788,6 +788,120 @@ def add_employee_screen():
     """
     add_emp_window = Toplevel()
     
+    hourly_rate = StringVar(add_emp_window)
+    salary = StringVar(add_emp_window)
+    commission_rate = StringVar(add_emp_window)
+    route_num = StringVar(add_emp_window)
+    account_num = StringVar(add_emp_window)
+    
+    def generate_pay_fields(var, index, mode):
+        """Generates the correct pay fields on the create employee screen
+        based on the selected employee classification.
+
+        Takes parameters from a trace_add event.
+        """
+        delete_pay_fields()
+
+        if classification.get() == "Hourly":
+            # Field to set hourly pay rate:
+            global hourly_label
+            global hourly_entry
+            hourly_label = Label(add_emp_window, text="Hourly Pay Rate:")
+            hourly_label.grid(row=6, column=3, padx=25, pady=5)
+            hourly_entry = Entry(add_emp_window,\
+                textvariable=hourly_rate)
+            hourly_entry.grid(row=6, column=4, padx=50,
+                pady=5)
+        
+        elif classification.get() == "Salary":
+            # Field to set salary:
+            global salary_label
+            global salary_entry
+            salary_label = Label(add_emp_window, text="Salary:")
+            salary_label.grid(row=6, column=3, padx=25, pady=5)
+            salary_entry = Entry(add_emp_window,textvariable=salary)
+            salary_entry.grid(row=6, column=4, padx=50, pady=5)
+        
+        elif classification.get() == "Commission":
+            # Field to set salary:
+            global com_salary_label
+            global com_salary_entry
+            global commission_label
+            global commission_entry
+            com_salary_label = Label(add_emp_window, text="Salary:")
+            com_salary_label.grid(row=6, column=3, padx=25, pady=5)
+            com_salary_entry = Entry(add_emp_window,textvariable=salary)
+            com_salary_entry.grid(row=6, column=4, padx=50, pady=5)
+            
+            # Field to set commission pay rate:
+            commission_label = Label(add_emp_window,
+                text="Commission Pay Rate:")
+            commission_label.grid(row=7, column=3,
+                padx=10, pady=10)
+            commission_entry = Entry(add_emp_window,
+                textvariable=commission_rate)
+            commission_entry.grid(row=7, column=4,
+                padx=10, pady=10)
+
+    def delete_pay_fields():
+        """Deletes extra pay fields and labels that are not needed from
+        the create employee screen.
+        """
+        # Delete any non-applicable pay fields.
+        try:
+            hourly_label.destroy()
+            hourly_entry.destroy()
+        except Exception:
+            pass
+
+        try:
+            salary_label.destroy()
+            salary_entry.destroy()
+        except Exception:
+            pass
+
+        try:
+            commission_label.destroy()
+            commission_entry.destroy()
+            com_salary_label.destroy()
+            com_salary_entry.destroy()
+        except Exception:
+            pass
+
+    def generate_bank_fields(var, index, mode):
+        """Generates the bank info fields on the create employee screen
+        when the employee payment type is direct deposit.
+
+        Takes parameters from a trace_add event.
+        """
+        if pay_method.get() == "Direct Deposit":
+            # Routing number entry:
+            global route_label
+            global route_entry
+            route_label = Label(add_emp_window, text="Bank Routing Number:")
+            route_label.grid(row=9, column=3, padx=25, pady=5)
+            route_entry = Entry(add_emp_window,
+                textvariable=route_num)
+            route_entry.grid(row=9, column=4, padx=50, pady=5)
+            
+            # Account number entry:
+            global account_label
+            global account_entry
+            account_label = Label(add_emp_window, text="Bank Account Number:")
+            account_label.grid(row=10, column=3, padx=25, pady=5)
+            account_entry = Entry(add_emp_window,
+                textvariable=account_num)
+            account_entry.grid(row=10, column=4, padx=50, pady=5)
+
+        else:
+            try:
+                route_label.destroy()
+                route_entry.destroy()
+                account_label.destroy()
+                account_entry.destroy()
+            except Exception:
+                pass
+
     max_id = 0
     for emp in uvuEmpDat.emp_list + uvuEmpDat.archived_list:
         if emp.id > max_id:
@@ -798,7 +912,7 @@ def add_employee_screen():
     # ID Entry:
     id_title = Label(add_emp_window, text="Employee ID:").grid(row=1,
             column=1, padx=25, pady=5)
-    id_label = Entry(add_emp_window, text=new_id)\
+    id_label = Label(add_emp_window, text=new_id)\
             .grid(row=1, column=2, padx=50, pady=5)
     
     # First name entry:
@@ -814,10 +928,6 @@ def add_employee_screen():
     last_name = StringVar(add_emp_window)
     last_name_entry = Entry(add_emp_window, textvariable=last_name)\
             .grid(row=3, column=2, padx=50, pady=5)
-
-    # Classification entry:
-    # Make a classification drop-down box. Also a way to say what their
-    #   pay is, based on their classification's pay type.
 
     # Social security number entry:
     ssn_label = Label(add_emp_window, text="SSN:").grid(row=4,
@@ -868,9 +978,6 @@ def add_employee_screen():
     zip_entry = Entry(add_emp_window, textvariable=zip)\
             .grid(row=10, column=2, padx=50, pady=5)
 
-    # PayMethod entry:
-    # Make a dropdown box to select PayMethod.
-
     # Birth date entry:
     birth_date_label = Label(add_emp_window, text="Birth Date:").grid(row=11,
             column=1, padx=25, pady=5)
@@ -908,6 +1015,31 @@ def add_employee_screen():
     password = StringVar(add_emp_window)
     password_entry = Entry(add_emp_window, textvariable=password)\
             .grid(row=4, column=4, padx=50, pady=5)
+
+    # Classification entry:
+    classification_label = Label(add_emp_window, text="Classification:")\
+        .grid(row=5, column=3, padx=25, pady=5)
+    classification = StringVar(add_emp_window)
+    classification.set("Classficiation Type")
+    class_drop = OptionMenu(add_emp_window, classification, "Hourly",
+        "Salary", "Commission").grid(row=5, column=4, padx=50, pady=5)
+    classification.trace_add('write', generate_pay_fields)
+    # Make a classification drop-down box. Also a way to say what their
+    #   pay is, based on their classification's pay type.
+
+    # PayMethod entry:
+    # Make a dropdown box to select PayMethod.
+    method_label = Label(add_emp_window, text="Pay Method:")\
+        .grid(row=8, column=3, padx=25, pady=5)
+    pay_method = StringVar(add_emp_window)
+    pay_method.set("Payment Method")
+    method_drop = OptionMenu(add_emp_window, pay_method,
+        "Direct Deposit", "Mail").grid(row=8, column=4, padx=50, pady=5)
+    pay_method.trace_add('write', generate_bank_fields)
+
+    create_button = Button(add_emp_window, text="Create",
+        command=under_construction).grid(row=12, column=4, padx=10,
+        pady=10)    
 
     add_emp_window.mainloop()
 
