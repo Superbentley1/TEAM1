@@ -751,7 +751,8 @@ def open_admin():
     button_frame = Frame(admin_window)
     button_frame.pack(pady=0)
     #Report button
-    report_button = Button(button_frame, text="Report", command=under_construction).pack(anchor='w')
+    report_button = Button(button_frame, text="Report", \
+                           command=under_construction).grid(row=0, column=0, padx=5, pady=5)
 
     
     def employee_selected(event):
