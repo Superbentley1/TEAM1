@@ -176,6 +176,27 @@ class Commissioned(Salary):
         return 3
 
 
+def create_classification(class_num, pay_num_1, pay_num_2=0):
+    """Creates an Hourly, Salary, or Commissioned class object based on
+    the class_num, and assigns the proper data members.
+
+    Input: pay_num_1 - a float representing hourly pay or salary,
+                depending on the employee's classification.
+           pay_num_2 - a float representing commissioned pay rate, used
+                only for commissioned employees (class_num = 3).
+
+    Output: Either an Hourly, Salary, or Commissioned class object.
+    """
+    if class_num == 1:
+        return Hourly(pay_num_1)
+    elif class_num == 2:
+        return Salary(pay_num_1)
+    elif class_num == 3:
+        return Commissioned(pay_num_1, pay_num_2)
+    else:
+        raise Exception(f'Invalid classification number {class_num}. Should be 1, 2, or 3.')
+
+
 class PayMethod():
     """Used to track an employee's payment method, and print an applicable
     message about how and how much they will be paid. An abstract class.
@@ -261,6 +282,30 @@ class MailedMethod(PayMethod):
         return 2
 
 
+def create_pay_method(employee, pay_method_num, route_num=0,
+    account_num=0):
+    """Creates an DirectMethod or MailedMethod class object based on the
+    pay_method_num, and assigns the proper data members.
+
+    Input: employee - an employee class object that the pay method will be
+                tied to.
+           route_num - a string representing the employee's bank routing
+                number, used only if they're using DirectMethod
+                (pay_method_num = 1).
+           account_num - a string representing the employee's account
+                number, used only if they're using DirectMethod
+                (pay_method_num = 1).
+
+    Output: Either a DirectMethod or MailedMethod class object.
+    """
+    if pay_method_num == 1:
+        return DirectMethod(employee, route_num, account_num)
+    elif pay_method_num == 2:
+        return MailedMethod(employee)
+    else:
+        raise Exception(f'Invalid pay method number {pay_method_num}. Should be 1 or 2.')
+
+
 class Employee():
     """
     Main employee class
@@ -274,7 +319,10 @@ class Employee():
     categories
     """
 
-    def __init__(self, id, name, birth_date, SSN, phone, email, permission):
+    def __init__(self, id, name, classification, birth_date, SSN, phone,
+        email, permission, password):
+        """Initializes the employee object with basic data members.
+        """
         self.id = id
         if self.id is not None:
             self.id = int(self.id)
@@ -297,7 +345,7 @@ class Employee():
         self.city = None
         self.state = None
         self.zip = None
-        self.classification = None
+        self.classification = classification
         self.pay_method = None
         self.birth_date = birth_date
         self.ssn = SSN
@@ -308,7 +356,7 @@ class Employee():
         self.title = None
         self.dept = None
         self.permission = permission
-        self.password = None
+        self.password = password
 
 
     def set_classification(self, class_num, pay_val_1, pay_val_2=0):
@@ -352,7 +400,6 @@ class Employee():
         self.city = city
         self.state = state
         self.zip = zip
-
 
     def set_job(self, start_date, title, dept):
         self.start_date = start_date
@@ -487,50 +534,86 @@ class EmployeeDB:
     def update_emp_list(self):
         archDict = csv.DictReader(self.archived)
         for row in archDict:
-            emp = Employee(None, None, None, None, None, None, None)
+            emp = Employee(None, None, None, None, None, None, None, None,
+                None)
             emp.populate_from_row(row)
             self.archived_list.append(emp)
         empDict = csv.DictReader(self.db)
         for row in empDict:
-            emp = Employee(None, None, None, None, None, None, None)
+            emp = Employee(None, None, None, None, None, None, None, None,
+                None)
             emp.populate_from_row(row)
             if emp not in self.archived_list:
                 self.emp_list.append(emp)
 
     def _add_row(self, emp: Employee, file):
-        with open(file, "x") as DB:
-            writer = csv.writer(DB)
+        with open(file, "a") as DB:
+            writer = csv.writer(DB, delimiter=',')
             if str(emp.classification) == "hourly":
                 if str(emp.pay_method) == "direct deposit":
-                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
-                                emp.pay_method.num(), -1, emp.classification.hourly_rate, -1, emp.pay_method.route_num,
-                                emp.pay_method.account_num, emp.ssn, emp.phone, emp.email, emp.start_date, emp.end_date,
-                                emp.title, emp.dept, emp.password)
+                    writer.writerow([emp.id,emp.name,emp.address,
+                        emp.city,emp.state,emp.zip,
+                        emp.classification.num(),
+                        emp.pay_method.num(),-1,
+                        emp.classification.hourly_rate,-1,
+                        emp.pay_method.route_num,
+                        emp.pay_method.account_num,emp.birth_date,
+                        emp.ssn,emp.phone,emp.email,emp.start_date,
+                        emp.end_date,emp.title,emp.dept,
+                        emp.permission,emp.password])
                 elif str(emp.pay_method) == "mail":
-                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
-                                emp.pay_method.num(), -1, emp.classification.hourly_rate, -1, -1, -1, emp.ssn, emp.phone,
-                                emp.email, emp.start_date, emp.end_date, emp.title, emp.dept, emp.password)
+                    writer.writerow([emp.id,emp.name,emp.address,
+                        emp.city,emp.state,emp.zip,
+                        emp.classification.num(),
+                        emp.pay_method.num(),-1,
+                        emp.classification.hourly_rate,-1,-1,-1,
+                        emp.birth_date, emp.ssn,emp.phone,emp.email,
+                        emp.start_date,emp.end_date,emp.title,
+                        emp.dept,emp.permission,emp.password])
             elif str(emp.classification) == "salary":
                 if str(emp.pay_method) == "direct deposit":
-                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
-                                emp.pay_method.num(), emp.classification.salary, -1, -1, emp.pay_method.route_num,
-                                emp.pay_method.account_num, emp.ssn, emp.phone, emp.email, emp.start_date, emp.end_date,
-                                emp.title, emp.dept, emp.password)
+                    writer.writerow([emp.id,emp.name,emp.address,
+                        emp.city,emp.state,emp.zip,
+                        emp.classification.num(),
+                        emp.pay_method.num(),
+                        emp.classification.salary,-1,-1,
+                        emp.pay_method.route_num,
+                        emp.pay_method.account_num,emp.birth_date,
+                        emp.ssn,emp.phone,emp.email,emp.start_date,
+                        emp.end_date,emp.title,emp.dept,
+                        emp.permission,emp.password])
                 elif str(emp.pay_method) == "mail":
-                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
-                                emp.pay_method.num(), emp.classification.salary, -1, -1, -1, -1, emp.ssn, emp.phone,
-                                emp.email, emp.start_date, emp.end_date, emp.title, emp.dept, emp.password)
+                    writer.writerow([emp.id,emp.name,emp.address,
+                        emp.city,emp.state,emp.zip,
+                        emp.classification.num(),
+                        emp.pay_method.num(),
+                        emp.classification.salary,-1,-1,-1,-1,
+                        emp.birth_date,emp.ssn,emp.phone,emp.email,
+                        emp.start_date,emp.end_date,emp.title,
+                        emp.dept,emp.permission,emp.password])
             elif str(emp.classification) == "commissioned":
                 if str(emp.pay_method) == "direct deposit":
-                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
-                                emp.pay_method.num(), emp.classification.salary, -1, emp.classification.commission_rate,
-                                emp.pay_method.route_num, emp.pay_method.account_num, emp.ssn, emp.phone, emp.email,
-                                emp.start_date, emp.end_date, emp.title, emp.dept, emp.password)
+                    writer.writerow([emp.id,emp.name,emp.address,
+                        emp.city,emp.state,emp.zip,
+                        emp.classification.num(),
+                        emp.pay_method.num(),
+                        emp.classification.salary,-1,
+                        emp.classification.commission_rate,
+                        emp.pay_method.route_num,
+                        emp.pay_method.account_num,emp.birth_date,
+                        emp.ssn,emp.phone,emp.email,emp.start_date,
+                        emp.end_date,emp.title,emp.dept,
+                        emp.permission,emp.password])
                 elif str(emp.pay_method) == "mail":
-                    writer.writerow(emp.id, emp.name, emp.address, emp.city, emp.state, emp.zip, emp.classification.num(),
-                                emp.pay_method.num(), emp.classification.salary, -1, emp.classification.commission_rate,
-                                -1, -1, emp.ssn, emp.phone, emp.email, emp.start_date, emp.end_date, emp.title, emp.dept,
-                                emp.password)
+                    writer.writerow([emp.id,emp.name,emp.address,
+                        emp.city,emp.state,emp.zip,
+                        emp.classification.num(),
+                        emp.pay_method.num(),
+                        emp.classification.salary,-1,
+                        emp.classification.commission_rate,-1,-1,
+                        emp.birth_date,emp.ssn,emp.phone,emp.email,
+                        emp.start_date,emp.end_date,emp.title,
+                        emp.dept,emp.permission,emp.password])
 
     def archive_employee(self, id):
         """Removes from emp list and adds them to the archived file.
@@ -540,7 +623,27 @@ class EmployeeDB:
         self._add_row(emp,"archived.csv")
 
     def add_employee(self,employee:Employee):
+        self.emp_list.append(employee)
         self._add_row(employee, "employees.csv")
+
+
+def add_new_employee(empDB: EmployeeDB, id, first_name, last_name,
+    address, city, state, zip, classification, pay_method_num, birth_date,
+    SSN, phone, email, start_date, title, dept, permission, password,
+    route_num=0, account_num=0):
+    """Creates a new employee from given all of the necessary data, and
+    adds that employee to the database, and writes them to the
+    database file.
+    """
+    name = f'{first_name} {last_name}'
+    employee = Employee(id, name, classification, birth_date,
+        SSN, phone, email, permission, password)
+    
+    employee.set_address(address, city, state, zip)
+    employee.set_job(start_date, title, dept)
+    employee.set_pay_method(pay_method_num, route_num, account_num)
+
+    empDB.add_employee(employee)
 
 
 def open_file(the_file):
@@ -645,7 +748,6 @@ def login():
             login_error()
     # If username is not a string:
     except:
-        print("Username was not an integer.")
         login_error()
     
 
@@ -658,6 +760,7 @@ def open_admin():
     """
 
     #Admin Window
+    global admin_window
     admin_window = Toplevel(login_window)
     #Menu Bar of Admin Employee list screen    
     menu_bar = Menu(admin_window)
@@ -751,8 +854,9 @@ def open_admin():
     button_frame = Frame(admin_window)
     button_frame.pack(pady=0)
     #Report button
-    report_button = Button(button_frame, text="Report", \
-                           command=under_construction).grid(row=0, column=0, padx=5, pady=5)
+    report_button = Button(button_frame, text="Report",
+        command=prompt_report_all_employees)
+    report_button.grid(row=0, column=0, padx=5, pady=5)
 
     
     def employee_selected(event):
@@ -786,7 +890,7 @@ def add_employee_screen():
     """Opens a screen for entering information to add a new user to the
     UVU Employee Database.
     """
-    add_emp_window = Toplevel()
+    add_emp_window = Toplevel(admin_window)
     
     hourly_rate = StringVar(add_emp_window)
     salary = StringVar(add_emp_window)
@@ -902,6 +1006,68 @@ def add_employee_screen():
             except Exception:
                 pass
 
+    def create():
+        """Creates a new employee with all of the given data members on
+        the create employee GUI screen, after making sure the data in each
+        field is valid.
+        """
+        emp_f_name = first_name.get()
+        emp_l_name = last_name.get()
+        emp_address = address.get()
+        emp_city = city.get()
+        emp_state = state.get()
+        emp_zip = zip.get()
+        
+        emp_class = None
+        emp_class_str = classification.get()
+        if emp_class_str == "Hourly":
+            emp_hour_pay = hourly_rate.get()
+            emp_class = create_classification(1, emp_hour_pay)
+        elif emp_class_str == "Salary":
+            emp_salary = salary.get()
+            emp_class = create_classification(2, emp_salary)
+        elif emp_class_str == "Commissioned":
+            emp_salary = salary.get()
+            emp_com_rate = commission_rate.get()
+            emp_class = create_classification(3, emp_salary, emp_com_rate)
+        else:
+            # Need to show an error if incorrect data is selected.
+            raise Exception
+
+
+        emp_pay_num = 0
+        emp_route_num = 0
+        emp_account_num = 0
+        pay_method_str = pay_method.get()
+        if pay_method_str == "Direct Deposit":
+            emp_pay_num = 1
+            emp_route_num = route_num.get()
+            emp_account_num = account_num.get()
+        elif pay_method_str == "Mail":
+            emp_pay_num = 2
+        
+        emp_b_day = birth_date.get()
+        emp_ssn = ssn.get()
+        emp_phone = phone.get()
+        emp_email = email.get()
+        emp_start_date = start_date.get()
+        emp_title = title.get()
+        emp_dept = dept.get()
+        emp_permission = permission.get()
+        emp_pwd = password.get()
+        
+        add_new_employee(uvuEmpDat, new_id, emp_f_name, emp_l_name,
+            emp_address, emp_city, emp_state, emp_zip, emp_class,
+            emp_pay_num, emp_b_day, emp_ssn, emp_phone, emp_email,
+            emp_start_date, emp_title, emp_dept, emp_permission, emp_pwd,
+            emp_route_num, emp_account_num)
+
+        add_emp_window.destroy()
+
+        admin_window.update()
+        
+
+
     max_id = 0
     for emp in uvuEmpDat.emp_list + uvuEmpDat.archived_list:
         if emp.id > max_id:
@@ -1006,9 +1172,6 @@ def add_employee_screen():
     dept_entry = Entry(add_emp_window, textvariable=dept)\
             .grid(row=3, column=4, padx=50, pady=5)
 
-    # Admin entry:
-    # Some sort of entry or radio button or drop-down to select if admin.
-
     # Password entry:
     password_label = Label(add_emp_window, text="Password:").grid(row=4,
             column=3, padx=25, pady=5)
@@ -1022,13 +1185,10 @@ def add_employee_screen():
     classification = StringVar(add_emp_window)
     classification.set("Classficiation Type")
     class_drop = OptionMenu(add_emp_window, classification, "Hourly",
-        "Salary", "Commission").grid(row=5, column=4, padx=50, pady=5)
+        "Salary", "Commissioned").grid(row=5, column=4, padx=50, pady=5)
     classification.trace_add('write', generate_pay_fields)
-    # Make a classification drop-down box. Also a way to say what their
-    #   pay is, based on their classification's pay type.
-
+    
     # PayMethod entry:
-    # Make a dropdown box to select PayMethod.
     method_label = Label(add_emp_window, text="Pay Method:")\
         .grid(row=8, column=3, padx=25, pady=5)
     pay_method = StringVar(add_emp_window)
@@ -1037,8 +1197,17 @@ def add_employee_screen():
         "Direct Deposit", "Mail").grid(row=8, column=4, padx=50, pady=5)
     pay_method.trace_add('write', generate_bank_fields)
 
+    # Admin entry:
+    permission_label = Label(add_emp_window, text="Permission Level:")
+    permission_label.grid(row=11, column=3, padx=25, pady=5)
+    permission = StringVar(add_emp_window)
+    permission.set("admin")
+    permission_drop = OptionMenu(add_emp_window, permission, "admin",
+        "employee")
+    permission_drop.grid(row=11, column=4, padx=50, pady=5)
+
     create_button = Button(add_emp_window, text="Create",
-        command=under_construction).grid(row=12, column=4, padx=10,
+        command=create).grid(row=12, column=4, padx=10,
         pady=10)    
 
     add_emp_window.mainloop()
@@ -1274,11 +1443,6 @@ def open_employee(employee, permission_level):
         back_button = Button(employee_window, text="Back", 
             command=partial(exit_window, employee_window)).grid(row=13, 
             column=4, padx=10, pady=10)
-        report_all_button = Button(employee_window,
-            text="All Emps Report", command=prompt_report_all_employees)\
-                .grid(row=13, column=0, padx=10, pady=10)
-
-
 
 
 def prompt_report_all_employees():
@@ -1288,12 +1452,9 @@ def prompt_report_all_employees():
     button to close the window without generating a report.
     """
     res = askyesno("Employee Report", "Do you want to include archived employees in the report?")
-    print(res)
     if res == True:
-        print("Generating archive report.")
         generate_report_all_employees(True)
     else:
-        print("Generating non-archive report.")
         generate_report_all_employees(False)
 
 
