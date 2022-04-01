@@ -23,6 +23,7 @@ Tkinter version 8.6
 import csv
 from csv import reader
 from msilib.schema import Class
+import re
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -926,7 +927,7 @@ def add_employee_screen():
             salary_entry = Entry(add_emp_window,textvariable=salary)
             salary_entry.grid(row=6, column=4, padx=50, pady=5)
         
-        elif classification.get() == "Commission":
+        elif classification.get() == "Commissioned":
             # Field to set salary:
             global com_salary_label
             global com_salary_entry
@@ -1006,68 +1007,178 @@ def add_employee_screen():
             except Exception:
                 pass
 
-    def create():
+    def validate_new_emp():
         """Creates a new employee with all of the given data members on
         the create employee GUI screen, after making sure the data in each
         field is valid.
         """
-        emp_f_name = first_name.get()
-        emp_l_name = last_name.get()
-        emp_address = address.get()
-        emp_city = city.get()
-        emp_state = state.get()
-        emp_zip = zip.get()
+        # Initialize validity checker to False.
+        valid = True
+
+        emp_permission = permission.get() 
         
-        emp_class = None
-        emp_class_str = classification.get()
-        if emp_class_str == "Hourly":
-            emp_hour_pay = hourly_rate.get()
-            emp_class = create_classification(1, emp_hour_pay)
-        elif emp_class_str == "Salary":
-            emp_salary = salary.get()
-            emp_class = create_classification(2, emp_salary)
-        elif emp_class_str == "Commissioned":
-            emp_salary = salary.get()
-            emp_com_rate = commission_rate.get()
-            emp_class = create_classification(3, emp_salary, emp_com_rate)
-        else:
-            # Need to show an error if incorrect data is selected.
-            raise Exception
-
-
         emp_pay_num = 0
         emp_route_num = 0
         emp_account_num = 0
         pay_method_str = pay_method.get()
         if pay_method_str == "Direct Deposit":
             emp_pay_num = 1
-            emp_route_num = route_num.get()
+            
             emp_account_num = account_num.get()
+            if re.search("^\d+-?\d+$", emp_account_num) is None:
+                valid = False
+                msg = f'Bank account number should be numeric, with one '\
+                    'dash allowed.'         
+            
+            emp_route_num = route_num.get()
+            if re.search("^\d+-?\d+-?\d+$", emp_route_num) is None:
+                valid = False
+                msg = f'Routing number should be numeric, with up to '\
+                    'two dashes allowed.'
+
+
         elif pay_method_str == "Mail":
             emp_pay_num = 2
+        if emp_pay_num == 0:
+            valid = False
+            msg = f'You must select a payment method.'
+
+        emp_class = None
+        emp_class_str = classification.get()
+        if emp_class_str == "Hourly":
+            emp_hour_pay = hourly_rate.get()
+            try:
+                emp_hour_pay = float(emp_hour_pay)
+                emp_class = create_classification(1, emp_hour_pay)
+            except:
+                valid = False
+                emp_class = -1
+                msg = f'Hourly pay must be a number, with 1 decimal '\
+                    'point allowed.'            
+        elif emp_class_str == "Salary":
+            emp_salary = salary.get()
+            try:
+                emp_salary = float(emp_salary)
+                emp_class = create_classification(2, emp_salary)
+            except:
+                valid = False
+                emp_class = -1
+                msg = f'Salary must be a number, with 1 decimal point '\
+                    'allowed.'
+        elif emp_class_str == "Commissioned":
+            emp_salary = salary.get()
+            emp_com_rate = commission_rate.get()
+            try:
+                emp_salary = float(emp_salary)
+                emp_com_rate = float(emp_com_rate)
+                emp_class = create_classification(3, emp_salary, emp_com_rate)
+            except:
+                valid = False
+                emp_class = -1
+                msg = f'Salary and Commission rate must each be a '\
+                    'number, each with 1 decimal point allowed.'
+        if emp_class == None:
+            valid = False
+            msg = f'You must select a classification type.'
+
+        emp_pwd = password.get()
+        if re.search(".+", emp_pwd) is None:
+            valid = False
+            msg = f'Password must not be empty.'
+
+        emp_dept = dept.get()
+        if re.search(".+", emp_dept) is None:
+            valid = False
+            msg = f'Employee department must not be empty.'
+
+        emp_title = title.get()
+        if re.search("^\w+.?\w+$", emp_title) is None:
+            valid = False
+            msg = f'Employee Title must have letters and numbers only, '\
+                'with one special character in between characters '\
+                'allowed.'
+
+        emp_start_date = start_date.get()
+        if re.search("^\d\d\/\d\d\/\d\d\d\d$", emp_start_date) is None\
+                and re.search("^\d\d-\d\d-\d\d\d\d$", emp_start_date) is\
+                None:
+            valid = False
+            msg = f'Start date must match the format: MM/DD/YYYY or '\
+                'MM-DD-YYYY'
         
         emp_b_day = birth_date.get()
-        emp_ssn = ssn.get()
-        emp_phone = phone.get()
+        if re.search("^\d\d\/\d\d\/\d\d\d\d$", emp_b_day) is None and\
+                re.search("^\d\d-\d\d-\d\d\d\d$", emp_b_day) is None:
+            valid = False
+            msg = f'Birth date must match the format: MM/DD/YYYY or '\
+                'MM-DD-YYYY'
+
+        emp_zip = zip.get()
+        if re.search("\d\d\d\d\d", emp_zip) is None:
+            valid = False
+            msg = f'Zip code must contain 5 consecutive digits.'
+        
+        emp_state = state.get()
+        if re.search("^[A-Z][A-Z]$", emp_state) is None:
+            valid = False
+            msg = f'State must be a two-letter capital state code.'
+
+        emp_city = city.get()
+        if re.search("^[a-zA-Z]+[ -]*[a-zA-Z]+$", emp_city) is None:
+            valid = False
+            msg = f'City must have letters only, with one space or dash '\
+                'allowed.'
+
+        emp_address = address.get()
+        if re.search("[a-zA-Z]", emp_address) is None or\
+                re.search("[0-9]", emp_address) is None:
+            valid = False
+            msg = f'Address must have letters and numbers.'
+
         emp_email = email.get()
-        emp_start_date = start_date.get()
-        emp_title = title.get()
-        emp_dept = dept.get()
-        emp_permission = permission.get()
-        emp_pwd = password.get()
-        
-        add_new_employee(uvuEmpDat, new_id, emp_f_name, emp_l_name,
-            emp_address, emp_city, emp_state, emp_zip, emp_class,
-            emp_pay_num, emp_b_day, emp_ssn, emp_phone, emp_email,
-            emp_start_date, emp_title, emp_dept, emp_permission, emp_pwd,
-            emp_route_num, emp_account_num)
+        if re.search("^.*\w.*@\w.*\.\w+$", emp_email) is None:
+            valid = False
+            msg = f'Email address is not valid.'
 
-        add_emp_window.destroy()
+        emp_phone = phone.get()
+        if re.search("^\(\d\d\d\) \d\d\d-\d\d\d\d$", emp_phone) is None\
+                and re.search("^\d\d\d-\d\d\d-\d\d\d\d$", emp_phone) is\
+                None and re.search("^\d\d\d\d\d\d\d\d\d\d$", emp_phone)\
+                is None:
+            valid = False
+            msg = f'Phone number must match the format: (###) ###-#### '\
+                'or ###-###-#### or ##########'
 
-        admin_window.update()
-        
+        emp_ssn = ssn.get()
+        if re.search("^\d\d\d-\d\d-\d\d\d\d$", emp_ssn) is None and\
+                re.search("^\d\d\d\d\d\d\d\d\d$", emp_ssn) is None:
+            valid = False
+            msg = f'SSN must match the format: ###-##-#### or ######### '\
+                '(9 digits)'
 
+        emp_l_name = last_name.get()
+        if not emp_l_name.isalpha():
+            valid = False
+            msg = f'Last name must have letters only.'
 
+        emp_f_name = first_name.get()
+        if not emp_f_name.isalpha():
+            valid = False
+            msg = f'First name must have letters only.'
+
+        if valid:
+            add_new_employee(uvuEmpDat, new_id, emp_f_name, emp_l_name,
+                emp_address, emp_city, emp_state, emp_zip, emp_class,
+                emp_pay_num, emp_b_day, emp_ssn, emp_phone, emp_email,
+                emp_start_date, emp_title, emp_dept, emp_permission, emp_pwd,
+                emp_route_num, emp_account_num)
+
+            add_emp_window.destroy()
+
+            admin_window.update()
+        else:
+            validation_error(msg)
+    
     max_id = 0
     for emp in uvuEmpDat.emp_list + uvuEmpDat.archived_list:
         if emp.id > max_id:
@@ -1183,7 +1294,7 @@ def add_employee_screen():
     classification_label = Label(add_emp_window, text="Classification:")\
         .grid(row=5, column=3, padx=25, pady=5)
     classification = StringVar(add_emp_window)
-    classification.set("Classficiation Type")
+    classification.set("Classification Type")
     class_drop = OptionMenu(add_emp_window, classification, "Hourly",
         "Salary", "Commissioned").grid(row=5, column=4, padx=50, pady=5)
     classification.trace_add('write', generate_pay_fields)
@@ -1207,7 +1318,7 @@ def add_employee_screen():
     permission_drop.grid(row=11, column=4, padx=50, pady=5)
 
     create_button = Button(add_emp_window, text="Create",
-        command=create).grid(row=12, column=4, padx=10,
+        command=validate_new_emp).grid(row=12, column=4, padx=10,
         pady=10)    
 
     add_emp_window.mainloop()
@@ -1663,6 +1774,13 @@ def login_error():
     """
     showinfo("Invalid Login", "The username or password entered was invalid.",
         icon=WARNING)
+
+
+def validation_error(msg):
+    """Displays an error message when a user enters invalid data into the
+    database, and tries to save it. Displays the given message. 
+    """
+    showinfo("Invalid Entry", msg, icon=WARNING)
 
 
 def under_construction():

@@ -25,3 +25,4 @@ ID,Name,Address,City,State,Zip,Classification,PayMethod,Salary,Hourly,Commission
 934003,Kelsey K. Saunders,9920 Aliquam Av. Ap #128,Salt Lake City,UT,97100,1,1,42548.72,31.24,18,37723944-K,769125-4564,11/3/1999,292-59-9844,(801)375-3674,kksaunders@gmail.com,12/18/2017,,Essential Worker,Production,employee,85SuXMCgX
 377013,Teagan Goodwin,P.O. Box 317,Akron,OH,66603,3,2,69765.24,84.73,13,24639186-6,433898-4976,1/1/2001,959-74-6252,(216)105-1122,goodwinteagan@gmail.com,11/27/2013,,Essential Worker,Production,employee,LsYct8gyK
 983011,Matthew Ackerman,2274 Cherokee Lane,Nephi,UT,84761,1,1,-1,12.00,-1,1234567-my-bank,1234567,12/29/1997,123-45-6789,(801)789-4465,matt.ackerman@example.com,03/31/2022,,Developer,R&D,admin,m4tt
+983012,Geoffrey Southhamptom,34 Mulberry Street,Bellingham,WA,92301,2,1,72000.0,-1,-1,335-46352-12,98732-22,03/09/1994,432-54-1421,354-312-8932,geoffsouthhampton@test.com,07/21/2012,,Test Engineer,QA,admin,geofferyG3
