@@ -30,6 +30,21 @@ from EmployeeDB import *
 
 uvuEmpDat = EmployeeDB()
 
+def read_receipts():
+    """Reads in all receipt lists from the "receipts.csv" file, and adds
+    them to the commissioned employees' individual records.
+    """
+    with open("receipts.csv", 'r') as receipts:
+        for line in receipts:
+            sales = line.split(',')
+            emp_id = int(sales.pop(0))
+            employee = find_employee_by_id(emp_id, uvuEmpDat.emp_list)
+
+            if employee:
+                if str(employee.classification) == "commissioned":
+                    for receipt in sales:
+                        employee.classification.add_receipt(float(receipt))
+
 
 def read_timecards():
     """Reads in all timecard lists from the "timecards.csv" file, and adds

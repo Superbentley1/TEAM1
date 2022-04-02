@@ -462,21 +462,17 @@ class EmployeeDB:
 
     update_emp_list pulls data from the csv to the list
 
-    TODO:: updateCSV pulls data from the list and fills out the csv file
     """
 
     def __init__(self):
         # Create employee csv file if it does not exist
         if os.path.exists("employees.csv") != True:
-            with open("employees.csv", "x") as DB:
+            with open("employees.csv") as DB:
                 writer = csv.writer(DB)
                 writer.writerow(
-                    "ID,Name,Address,City,State,Zip,Classification,\
-                    PayMethod,Salary,Hourly,Commission,Route,Account,\
-                    Social Security Number,Phone Number,Email,\
-                    Start Date,End Date,Title,Department,\
-                    Password".split(
-                        ','))
+                    "ID,Name,Address,City,State,Zip,Classification,PayMethod,Salary,Hourly,Commission,Route,Account,\
+Date of Birth,Social Security Number,Phone Number,Email,Start Date,End Date,Title,Department,\
+Permission Level,Password".split(','))
                 self.db = DB
         else:
             self.db = open("employees.csv")
@@ -494,11 +490,9 @@ class EmployeeDB:
             with open("archived.csv", "x") as DB:
                 writer = csv.writer(DB)
                 writer.writerow(
-                    "ID,Name,Address,City,State,Zip,Classification,\
-                    PayMethod,Salary,Hourly,Commission,Route,Account,\
-                    Social Security Number,Phone Number,Email,\
-                    Start Date,End Date,Title,Department,\
-                    Password".split(','))
+                    "ID,Name,Address,City,State,Zip,Classification,PayMethod,Salary,Hourly,Commission,Route,Account,\
+Date of Birth,Social Security Number,Phone Number,Email,Start Date,End Date,Title,Department,\
+Permission Level,Password".split(','))
                 self.archived = DB
         else:
             self.archived = open("archived.csv")
@@ -602,6 +596,37 @@ class EmployeeDB:
         self.emp_list.append(employee)
         self._add_row(employee, "employees.csv")
 
+    def edit_employee(self, id, field, data):
+        """
+        Edits an existing employee given ID, the field you want to edit, and the data for that field
+
+        Be careful if you edit things it really edits them in the DB so while you're testing I would put
+        open("temp/employees.csv", "w",newline='') in on line 616 instead of open("employees.csv", "w",newline='')
+
+        """
+        with open("employees.csv") as DB:
+            empDict = csv.DictReader(DB)
+            temp = []
+            for row in empDict:
+                tempRow = row
+                if tempRow["ID"] == str(id):
+                    tempRow[field] = data
+                temp.append(tempRow)
+
+        with open("employees.csv", "w",newline='') as tempDB:
+            fieldnames = "ID,Name,Address,City,State,Zip,Classification,\
+PayMethod,Salary,Hourly,Commission,Route,Account,\
+Date of Birth,Social Security Number,Phone Number,Email,Start Date,End Date,Title,Department,\
+Permission Level,Password".split(',')
+            writer = csv.DictWriter(tempDB,fieldnames,)
+
+            writer.writerows(temp)
+            self.db = tempDB
+
+            for emp in self.emp_list:
+                if emp.id == id:
+                    setattr(emp,field.lower(),data)
+
 
 def add_new_employee(empDB: EmployeeDB, id, first_name, last_name,
                      address, city, state, zip, classification, pay_method_num, birth_date,
@@ -627,31 +652,6 @@ def open_file(the_file):
     os.system(the_file)
 
 
-
-
-
-def read_receipts():
-    """Reads in all receipt lists from the "receipts.csv" file, and adds
-    them to the commissioned employees' individual records.
-    """
-    with open("receipts.csv", 'r') as receipts:
-        for line in receipts:
-            sales = line.split(',')
-            emp_id = int(sales.pop(0))
-            employee = find_employee_by_id(emp_id, uvuEmpDat.emp_list)
-
-            if employee:
-                if str(employee.classification) == "commissioned":
-                    for receipt in sales:
-                        employee.classification.add_receipt(float(receipt))
-
-
-# Define global EmployeeDB object:
-# EmployeeDatabase object should be global, so all functions can access
-#   it?
-
-
-
 # emp_list should be a list of Employee objects.
 def find_employee_by_id(employee_id, emp_list):
     """Finds an employee with the given ID in the given employee list, and
@@ -664,3 +664,10 @@ def find_employee_by_id(employee_id, emp_list):
         if employee.id == employee_id:
             return employee
     return None
+
+
+if __name__ == '__main__':
+    testDB = EmployeeDB()
+    testDB.edit_employee(688997, "Name", "Test Test")
+    for emp in testDB.emp_list:
+        print(emp)
