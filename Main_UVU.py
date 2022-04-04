@@ -701,13 +701,49 @@ def edit_employee_info(the_edit):
     edit_this = Label(edit_window, text=the_edit).grid(row=0, column=1, padx=10, pady=10)
     # Label what the entry box is for
     info_here_label = Label(edit_window, text="Enter new info here:  ").grid(row=1, column=0, padx=10, pady=10)
+    # New Variables
     new_info = StringVar()
+    new_bank_routing = StringVar()
+    new_bank_account = StringVar()
+    new_hourly = StringVar()
+    new_salary = StringVar()
+    new_commissioned = StringVar()
     # New information entry box
-    updated_info = Entry(edit_window, textvariable=new_info).grid(row=1, column=1, padx=10, pady=10)
-    # Button to update information
-    update_button = Button(edit_window, text="Update Information", command=under_construction).grid(row=2, columnspan=2,
-                                                                                                    padx=10, pady=10)
-
+    if str(the_edit) == "direct deposit" or str(the_edit) == "mail":
+        # Payment Method options
+        Radiobutton(edit_window, text="Mail", variable=new_info, value="mail").grid(row=1, column=1, padx=10, pady=10)
+        Radiobutton(edit_window, text="Direct Deposit", variable=new_info, value="direct deposit").grid(row=2, column=1, padx=10, pady=10)
+        label_bank_routing = Label(edit_window, text="Bank Routing Number: ").grid(row=3, column=1, padx=10, pady=10)
+        updated_bank_routing = Entry(edit_window, textvariable=new_bank_routing).grid(row=3, column=2, padx=10, pady=10)
+        label_bank_account = Label(edit_window, text="Bank Account Number: ").grid(row=4, column=1, padx=10, pady=10)
+        updated_bank_account = Entry(edit_window, textvariable=new_bank_account).grid(row=4, column=2, padx=10, pady=10)
+        update_button = Button(edit_window, text="Update Information", command=under_construction).grid(row=6, columnspan=3,
+                                                                                                padx=10, pady=10)   
+    elif str(the_edit) ==  "hourly" or str(the_edit) ==  "salary" or str(the_edit) ==  "commissioned":
+        # Classification options
+        Radiobutton(edit_window, text="Hourly", variable=new_info, value="hourly").grid(row=1, column=1, padx=10, pady=10)
+        label_hourly = Label(edit_window, text="Hourly Pay Rate: ").grid(row=2, column=1, padx=10, pady=10)
+        updated_hourly = Entry(edit_window, textvariable=new_hourly).grid(row=2, column=2, padx=10, pady=10)
+        Radiobutton(edit_window, text="Salary", variable=new_info, value="salary").grid(row=3, column=1, padx=10, pady=10)
+        label_salary = Label(edit_window, text="Salary: ").grid(row=4, column=1, padx=10, pady=10)        
+        updated_salary = Entry(edit_window, textvariable=new_salary).grid(row=4, column=2, padx=10, pady=10)
+        Radiobutton(edit_window, text="Commissioned", variable=new_info, value="commissioned").grid(row=5, column=1, padx=10, pady=10)
+        label_commissioned = Label(edit_window, text="Commission Pay Rate: ").grid(row=6, column=1, padx=10, pady=10)        
+        updated_commissioned = Entry(edit_window, textvariable=new_commissioned).grid(row=6, column=2, padx=10, pady=10)
+        update_button = Button(edit_window, text="Update Information", command=under_construction).grid(row=7, columnspan=3,
+                                                                                                        padx=10, pady=10)
+    elif the_edit == "admin" or the_edit == "employee":
+        Radiobutton(edit_window, text="Employee", variable=new_info, value="employee").grid(row=1, column=1, padx=10, pady=10)
+        Radiobutton(edit_window, text="Admin", variable=new_info, value="admin").grid(row=2, column=1, padx=10, pady=10)
+        update_button = Button(edit_window, text="Update Information", command=under_construction).grid(row=3, columnspan=3,
+                                                                                                        padx=10, pady=10)
+    else:
+        # All other options
+        updated_info = Entry(edit_window, textvariable=new_info).grid(row=1, column=1, padx=10, pady=10)
+        # Button to update information
+        update_button = Button(edit_window, text="Update Information", command=under_construction).grid(row=6, columnspan=3,
+                                                                                                        padx=10, pady=10)
+    
 
 # Need to fill the fields for a single employee's data.
 def open_employee(employee, permission_level):
@@ -741,10 +777,10 @@ def open_employee(employee, permission_level):
     edit_menu.add_command(label="Department", command=lambda: edit_employee_info(employee.dept))
     edit_menu.add_command(label="Start Date", command=lambda: edit_employee_info(employee.start_date))
     edit_menu.add_command(label="End Date", command=lambda: edit_employee_info(employee.end_date))
-    edit_menu.add_command(label="Account Number", command=lambda: edit_employee_info(employee.pay_method.account_num))
-    edit_menu.add_command(label="Routing Number", command=lambda: edit_employee_info(employee.pay_method.route_num))
     edit_menu.add_command(label="Payment Method", command=lambda: edit_employee_info(employee.pay_method))
     edit_menu.add_command(label="Classification", command=lambda: edit_employee_info(employee.classification))
+    edit_menu.add_command(label="Permission", command=lambda: edit_employee_info(employee.permission))
+
     # Adds 'Edit' options
     file_menu.add_cascade(label="Edit", menu=edit_menu)
     # Puts in a line in the menu list
