@@ -41,7 +41,7 @@ class Hourly(Classification):
         timecards stored.
         """
         super().__init__()
-        self.hourly_rate = hourly_rate
+        self.hourly_rate = float(hourly_rate)
         self.timecards = []
 
     def add_timecard(self, hours):
@@ -83,7 +83,7 @@ class Salary(Classification):
         """Initialize the salaried employee's data members.
         """
         super().__init__()
-        self.salary = salary
+        self.salary = float(salary)
 
     def calculate_pay(self):
         """Calculates the amount that will be paid to the salaried
@@ -115,7 +115,7 @@ class Commissioned(Salary):
         commission receipts stored.
         """
         super().__init__(salary)
-        self.commission_rate = commission_rate
+        self.commission_rate = float(commission_rate)
         self.receipts = []
 
     def add_receipt(self, receipt):
@@ -404,8 +404,8 @@ class Employee():
         else:
             raise Exception(f'Classification for emp: "{self.name}" invalid.')
 
-        self.ssn = row["Social Security Number"]
-        self.phone = row["Phone Number"]
+        self.ssn = row["SSN"]
+        self.phone = row["Phone"]
         self.email = row["Email"]
         self.address = row["Address"]
         self.city = row["City"]
@@ -413,7 +413,7 @@ class Employee():
         self.zip = row["Zip"]
 
         # Set the desired pay method:
-        pay_method = int(row["PayMethod"])
+        pay_method = int(row["Pay_Method"])
         if pay_method == 1:
             self.pay_method = DirectMethod(self, row["Route"], row["Account"])
         elif pay_method == 2:
@@ -421,12 +421,12 @@ class Employee():
         else:
             raise Exception(f'Pay method for emp: "{self.name}" invalid.')
 
-        self.birth_date = row["Date of Birth"]
-        self.start_date = row["Start Date"]
-        self.end_date = row["End Date"]
+        self.birth_date = row["Birth_Date"]
+        self.start_date = row["Start_Date"]
+        self.end_date = row["End_Date"]
         self.title = row["Title"]
-        self.dept = row["Department"]
-        self.permission = row["Permission Level"]
+        self.dept = row["Dept"]
+        self.permission = row["Permission"]
         self.password = row["Password"]
 
     def payment_report(self):
@@ -470,9 +470,10 @@ class EmployeeDB:
             with open("employees.csv") as DB:
                 writer = csv.writer(DB)
                 writer.writerow(
-                    "ID,Name,Address,City,State,Zip,Classification,PayMethod,Salary,Hourly,Commission,Route,Account,\
-Date of Birth,Social Security Number,Phone Number,Email,Start Date,End Date,Title,Department,\
-Permission Level,Password".split(','))
+                    "ID,Name,Address,City,State,Zip,Classification,"\
+                    "Pay_Method,Salary,Hourly,Commission,Route,Account,"\
+                    "Birth_Date,SSN,Phone,Email,Start_Date,End_Date,"\
+                    "Title,Dept,Permission,Password".split(','))
                 self.db = DB
         else:
             self.db = open("employees.csv")
@@ -490,9 +491,10 @@ Permission Level,Password".split(','))
             with open("archived.csv", "x") as DB:
                 writer = csv.writer(DB)
                 writer.writerow(
-                    "ID,Name,Address,City,State,Zip,Classification,PayMethod,Salary,Hourly,Commission,Route,Account,\
-Date of Birth,Social Security Number,Phone Number,Email,Start Date,End Date,Title,Department,\
-Permission Level,Password".split(','))
+                    "ID,Name,Address,City,State,Zip,Classification,"\
+                    "Pay_Method,Salary,Hourly,Commission,Route,Account,"\
+                    "Birth_Date,SSN,Phone,Email,Start_Date,End_Date,"\
+                    "Title,Dept,Permission,Password".split(','))
                 self.archived = DB
         else:
             self.archived = open("archived.csv")
@@ -596,12 +598,15 @@ Permission Level,Password".split(','))
         self.emp_list.append(employee)
         self._add_row(employee, "employees.csv")
 
-    def edit_employee(self, id, field, data):
+    def edit_employee(self, id, fields: list, data: list):
         """
-        Edits an existing employee given ID, the field you want to edit, and the data for that field
+        Edits an existing employee given ID, the fields you want to edit,
+        and the data for those fields.
 
-        Be careful if you edit things it really edits them in the DB so while you're testing I would put
-        open("temp/employees.csv", "w",newline='') in on line 616 instead of open("employees.csv", "w",newline='')
+        Be careful if you edit things it really edits them in the DB so
+        while you're testing I would put
+        open("temp/employees.csv", "w",newline='') in on line 616 instead
+        of open("employees.csv", "w",newline='')
 
         """
         with open("employees.csv") as DB:
@@ -610,27 +615,48 @@ Permission Level,Password".split(','))
             for row in empDict:
                 tempRow = row
                 if tempRow["ID"] == str(id):
-                    tempRow[field] = data
+                    for index in range(len(fields)):
+                        tempRow[fields[index]] = data[index]
                 temp.append(tempRow)
-
+                
         with open("employees.csv", "w",newline='') as tempDB:
-            fieldnames = "ID,Name,Address,City,State,Zip,Classification,\
-PayMethod,Salary,Hourly,Commission,Route,Account,\
-Date of Birth,Social Security Number,Phone Number,Email,Start Date,End Date,Title,Department,\
-Permission Level,Password".split(',')
+            fieldnames = "ID,Name,Address,City,State,Zip,Classification,"\
+                    "Pay_Method,Salary,Hourly,Commission,Route,Account,"\
+                    "Birth_Date,SSN,Phone,Email,Start_Date,End_Date,"\
+                    "Title,Dept,Permission,Password".split(',')
             writer = csv.DictWriter(tempDB,fieldnames,)
-
+            writer.writeheader()
             writer.writerows(temp)
             self.db = tempDB
 
             for emp in self.emp_list:
                 if emp.id == id:
-                    setattr(emp,field.lower(),data)
+                    if fields[0] == "Pay_Method" and data[0] == 1:
+                        emp.pay_method = DirectMethod(emp, data[1], data[2])
+                    elif fields[0] == "Pay_Method" and data[0] == 2:
+                        emp.pay_method = MailedMethod(emp)
+                    elif fields[0] == "Classification" and data[0] == 1:
+                        emp.classification = Hourly(data[1])
+                    elif fields[0] == "Classification" and data[0] == 2:
+                        emp.classification = Salary(data[1])
+                    elif fields[0] == "Classification" and data[0] == 3:
+                        emp.classification = Commissioned(data[1], data[2])
+                    elif fields[0] == "Name":
+                        full_name = data[0].split(' ')
+                        first_name = full_name[0]
+                        last_name = full_name[1]
+                        setattr(emp, "first_name", first_name)
+                        setattr(emp, "last_name", last_name)
+                        setattr(emp, "name", data[0])
+                    else:
+                        for index in range(len(fields)):
+                            setattr(emp,fields[index].lower(),data[index])
 
 
 def add_new_employee(empDB: EmployeeDB, id, first_name, last_name,
-                     address, city, state, zip, classification, pay_method_num, birth_date,
-                     SSN, phone, email, start_date, title, dept, permission, password,
+                     address, city, state, zip, classification,
+                     pay_method_num, birth_date, SSN, phone, email,
+                     start_date, title, dept, permission, password,
                      route_num=0, account_num=0):
     """Creates a new employee from given all of the necessary data, and
     adds that employee to the database, and writes them to the

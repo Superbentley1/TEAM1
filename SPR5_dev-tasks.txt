@@ -1,4 +1,18 @@
 To Do:
+- Done - Multiple permission levels for edit functionality.
+
+- Data validation when editing employee fields.
+
+- Scrolling for all emps report.
+
+- Real-time updating of data when edited.
+   - Along with this, run all emp report, so pay stubs are correct.
+
+- Archiving employees - add to GUI
+
+- For docs: tell Gabe that username is no longer being used, only user ID.
+This may apply for the functional requirements, at least.
+
 
 - Implement editing functionality in both GUI and database.
    - Can we edit employee in the GUI?
@@ -6,14 +20,14 @@ To Do:
           fields?
    - Is database file rewritten when we edit them and save?
 
-- Implement the creating of new employees using the GUI.
+- Done - Implement the creating of new employees using the GUI.
    - Make sure they are properly stored in the database.
 
 - Implement archiving of employees in the GUI (and the database).
    - The database has methods now, but we need to integrate it with the
      GUI.
 
-- Put button for report for all employees on the admin employee list page.
+- Done - Put button for report for all employees on the admin employee list page.
 
 - Add a GUI screen when admin is generating report for all employees
   (.csv file is working).
@@ -22,7 +36,7 @@ To Do:
 - Clarify how we will be keeping track of admin permissions.
    - Currently, an employee.permission data member is being used.
 
-- Organize the files to be more modular and testable.
+- Done - Organize the files to be more modular and testable.
 
 - Attach the readme to the "Help -> Help" dropdown.
 

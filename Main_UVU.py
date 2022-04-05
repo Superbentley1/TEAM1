@@ -15,16 +15,12 @@ Developed with:
 Python version 3.7.2
 Tkinter version 8.6
 """
-
-# TODO: FIXME:
-# Need to go over my notes at the bottom with Abbie, Tristan, and the
-#   team.
-
-
+import re
 from functools import partial
 from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import showinfo, askokcancel, askyesno, WARNING
+from types import new_class
 
 from EmployeeDB import *
 
@@ -691,11 +687,74 @@ def add_employee_screen():
     add_emp_window.mainloop()
 
 
-def edit_employee_info(the_edit):
+def edit_employee_info(employee, fields, the_edit):
     """Generates a GUI window with information of the employee.
-    Also generates an entry box and a button to update information"""
+    Also generates an entry box and a button to update information, and
+    allows the updating of employee info on the GUI.
+    """
+    def update_emp(fields):
+        """Updates the employee's data members based on the given
+        parameters.
+        """
+        # For payment method updates:
+        if edit_type == 1:
+            pay_method = new_info.get()
+            if pay_method == "mail":
+                uvuEmpDat.edit_employee(employee.id, fields, [2])
+            elif pay_method == "direct deposit":
+                fields += ["Route", "Account"]
+                route_num = new_bank_routing.get()
+                account_num = new_bank_account.get()
+                uvuEmpDat.edit_employee(employee.id, fields, [1, route_num, account_num])
+
+        # For classification updates:
+        elif edit_type == 2:
+            new_classification = new_info.get()
+            if new_classification == "hourly":
+                fields += ["Hourly"]
+                hourly_rate = new_hourly.get()
+                uvuEmpDat.edit_employee(employee.id, fields, [1, hourly_rate])
+            elif new_classification == "salary":
+                fields += ["Salary"]
+                salary = new_salary.get()
+                uvuEmpDat.edit_employee(employee.id, fields, [2, salary])
+            elif new_classification == "commissioned":
+                fields += ["Salary", "Commission"]
+                com_salary = new_com_salary.get()
+                commission_rate = new_commission.get()
+                uvuEmpDat.edit_employee(employee.id, fields, [3, com_salary, commission_rate])
+
+        # For permission updates:
+        elif edit_type == 3:
+            permission = new_info.get()
+            if permission == "employee":
+                uvuEmpDat.edit_employee(employee.id, fields, ["employee"])
+            elif permission == "admin":
+                uvuEmpDat.edit_employee(employee.id, fields, ["admin"])
+
+        # For name updates:
+        elif edit_type == 4:
+            name = new_info.get()
+            if fields[0] == "First_Name":
+                first_name = name
+                last_name = employee.last_name
+            elif fields[0] == "Last_Name":
+                first_name = employee.first_name
+                last_name = name
+            full_name = f'{first_name} {last_name}'
+            fields[0] = "Name"
+            uvuEmpDat.edit_employee(employee.id, fields, [full_name])            
+
+        # For all other updates:
+        elif edit_type == 5:
+            uvuEmpDat.edit_employee(employee.id, fields, [new_info.get()])
+
+        edit_window.destroy()
+
     # Creates the edit window
     edit_window = Toplevel(login_window)
+    # Initialize variable to keep track of edit type.
+    edit_type = 0
     # Shows previous information before edit
     prev_info = Label(edit_window, text="Previous Information:  ").grid(row=0, column=0, padx=10, pady=10)
     edit_this = Label(edit_window, text=the_edit).grid(row=0, column=1, padx=10, pady=10)
@@ -707,20 +766,23 @@ def edit_employee_info(the_edit):
     new_bank_account = StringVar()
     new_hourly = StringVar()
     new_salary = StringVar()
-    new_commissioned = StringVar()
+    new_com_salary = StringVar()
+    new_commission = StringVar()
     # New information entry box
     if str(the_edit) == "direct deposit" or str(the_edit) == "mail":
         # Payment Method options
+        edit_type = 1
         Radiobutton(edit_window, text="Mail", variable=new_info, value="mail").grid(row=1, column=1, padx=10, pady=10)
         Radiobutton(edit_window, text="Direct Deposit", variable=new_info, value="direct deposit").grid(row=2, column=1, padx=10, pady=10)
         label_bank_routing = Label(edit_window, text="Bank Routing Number: ").grid(row=3, column=1, padx=10, pady=10)
         updated_bank_routing = Entry(edit_window, textvariable=new_bank_routing).grid(row=3, column=2, padx=10, pady=10)
         label_bank_account = Label(edit_window, text="Bank Account Number: ").grid(row=4, column=1, padx=10, pady=10)
         updated_bank_account = Entry(edit_window, textvariable=new_bank_account).grid(row=4, column=2, padx=10, pady=10)
-        update_button = Button(edit_window, text="Update Information", command=under_construction).grid(row=6, columnspan=3,
+        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=6, columnspan=3,
                                                                                                 padx=10, pady=10)   
     elif str(the_edit) ==  "hourly" or str(the_edit) ==  "salary" or str(the_edit) ==  "commissioned":
         # Classification options
+        edit_type = 2
         Radiobutton(edit_window, text="Hourly", variable=new_info, value="hourly").grid(row=1, column=1, padx=10, pady=10)
         label_hourly = Label(edit_window, text="Hourly Pay Rate: ").grid(row=2, column=1, padx=10, pady=10)
         updated_hourly = Entry(edit_window, textvariable=new_hourly).grid(row=2, column=2, padx=10, pady=10)
@@ -728,22 +790,31 @@ def edit_employee_info(the_edit):
         label_salary = Label(edit_window, text="Salary: ").grid(row=4, column=1, padx=10, pady=10)        
         updated_salary = Entry(edit_window, textvariable=new_salary).grid(row=4, column=2, padx=10, pady=10)
         Radiobutton(edit_window, text="Commissioned", variable=new_info, value="commissioned").grid(row=5, column=1, padx=10, pady=10)
-        label_commissioned = Label(edit_window, text="Commission Pay Rate: ").grid(row=6, column=1, padx=10, pady=10)        
-        updated_commissioned = Entry(edit_window, textvariable=new_commissioned).grid(row=6, column=2, padx=10, pady=10)
-        update_button = Button(edit_window, text="Update Information", command=under_construction).grid(row=7, columnspan=3,
+        label_com_salary = Label(edit_window, text="Salary: ").grid(row=6, column=1, padx=10, pady=10)        
+        updated_com_salary = Entry(edit_window, textvariable=new_com_salary).grid(row=6, column=2, padx=10, pady=10)
+        label_commissioned = Label(edit_window, text="Commission Pay Rate: ").grid(row=7, column=1, padx=10, pady=10)        
+        updated_commissioned = Entry(edit_window, textvariable=new_commission).grid(row=7, column=2, padx=10, pady=10)
+        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=8, columnspan=3,
                                                                                                         padx=10, pady=10)
     elif the_edit == "admin" or the_edit == "employee":
+        # Permission options.
+        edit_type = 3
         Radiobutton(edit_window, text="Employee", variable=new_info, value="employee").grid(row=1, column=1, padx=10, pady=10)
         Radiobutton(edit_window, text="Admin", variable=new_info, value="admin").grid(row=2, column=1, padx=10, pady=10)
-        update_button = Button(edit_window, text="Update Information", command=under_construction).grid(row=3, columnspan=3,
+        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=3, columnspan=3,
                                                                                                         padx=10, pady=10)
+
     else:
         # All other options
+        if fields[0] == "First_Name" or fields[0] == "Last_Name":
+            edit_type = 4
+        else:
+            edit_type = 5
         updated_info = Entry(edit_window, textvariable=new_info).grid(row=1, column=1, padx=10, pady=10)
         # Button to update information
-        update_button = Button(edit_window, text="Update Information", command=under_construction).grid(row=6, columnspan=3,
+        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=6, columnspan=3,
                                                                                                         padx=10, pady=10)
-    
+
 
 # Need to fill the fields for a single employee's data.
 def open_employee(employee, permission_level):
@@ -760,26 +831,14 @@ def open_employee(employee, permission_level):
     # Adds option of Edit to menu bar
     file_menu = Menu(menu_bar, tearoff=0)
     edit_menu = Menu(menu_bar, tearoff=0)
-    # The sub-options under 'Edit'
-    edit_menu.add_command(label="First Name", command=lambda: edit_employee_info(employee.first_name))
-    edit_menu.add_command(label="Last Name", command=lambda: edit_employee_info(employee.last_name))
-    edit_menu.add_command(label="Social Security Number", command=lambda: edit_employee_info(employee.ssn))
-    edit_menu.add_command(label="Phone Number", command=lambda: edit_employee_info(employee.phone))
-    edit_menu.add_command(label="Email", command=lambda: edit_employee_info(employee.email))
-    edit_menu.add_command(label="Street Address", command=lambda: edit_employee_info(employee.address))
-    edit_menu.add_command(label="City", command=lambda: edit_employee_info(employee.city))
-    edit_menu.add_command(label="State", command=lambda: edit_employee_info(employee.state))
-    edit_menu.add_command(label="Zip Code", command=lambda: edit_employee_info(employee.zip))
-    edit_menu.add_command(label="Date of Birth", command=lambda: edit_employee_info(employee.birth_date))
-    edit_menu.add_command(label="Password", command=lambda: edit_employee_info(employee.password))
-    edit_menu.add_command(label="Employee ID", command=lambda: edit_employee_info(employee.id))
-    edit_menu.add_command(label="Job Title", command=lambda: edit_employee_info(employee.title))
-    edit_menu.add_command(label="Department", command=lambda: edit_employee_info(employee.dept))
-    edit_menu.add_command(label="Start Date", command=lambda: edit_employee_info(employee.start_date))
-    edit_menu.add_command(label="End Date", command=lambda: edit_employee_info(employee.end_date))
-    edit_menu.add_command(label="Payment Method", command=lambda: edit_employee_info(employee.pay_method))
-    edit_menu.add_command(label="Classification", command=lambda: edit_employee_info(employee.classification))
-    edit_menu.add_command(label="Permission", command=lambda: edit_employee_info(employee.permission))
+    # The sub-options under 'Edit' for all employees:
+    edit_menu.add_command(label="Phone Number", command=lambda: edit_employee_info(employee, ["Phone"], employee.phone))
+    edit_menu.add_command(label="Email", command=lambda: edit_employee_info(employee, ["Email"], employee.email))
+    edit_menu.add_command(label="Street Address", command=lambda: edit_employee_info(employee, ["Address"], employee.address))
+    edit_menu.add_command(label="City", command=lambda: edit_employee_info(employee, ["City"], employee.city))
+    edit_menu.add_command(label="State", command=lambda: edit_employee_info(employee, ["State"], employee.state))
+    edit_menu.add_command(label="Zip Code", command=lambda: edit_employee_info(employee, ["Zip"], employee.zip))
+    edit_menu.add_command(label="Payment Method", command=lambda: edit_employee_info(employee, ["Pay_Method"], employee.pay_method))
 
     # Adds 'Edit' options
     file_menu.add_cascade(label="Edit", menu=edit_menu)
@@ -913,8 +972,6 @@ def open_employee(employee, permission_level):
     # Payment Method
     payment_title = Label(employee_window, text="Payment Method") \
         .grid(row=7, column=5, padx=10, pady=10)
-    # FIXME: Give PayMethod class a "print()" method that prints "Direct
-    #   Deposit" or "Mail", whichever child class they have.
     payment_label = Label(employee_window, text=str(employee.pay_method)) \
         .grid(row=8, column=5, padx=10, pady=10)
 
@@ -957,6 +1014,18 @@ def open_employee(employee, permission_level):
         back_button = Button(employee_window, text="Back",
                              command=partial(exit_window, employee_window)).grid(row=13,
                                                                                  column=4, padx=10, pady=10)
+        # The sub-options under "Edit" for admin employees:
+        edit_menu.add_command(label="First Name", command=lambda: edit_employee_info(employee, ["First_Name"], employee.first_name))
+        edit_menu.add_command(label="Last Name", command=lambda: edit_employee_info(employee, ["Last_Name"], employee.last_name))
+        edit_menu.add_command(label="Social Security Number", command=lambda: edit_employee_info(employee, ["SSN"], employee.ssn))
+        edit_menu.add_command(label="Date of Birth", command=lambda: edit_employee_info(employee, ["Birth_Date"], employee.birth_date))
+        edit_menu.add_command(label="Password", command=lambda: edit_employee_info(employee, ["Password"], employee.password))
+        edit_menu.add_command(label="Job Title", command=lambda: edit_employee_info(employee, ["Title"], employee.title))
+        edit_menu.add_command(label="Department", command=lambda: edit_employee_info(employee, ["Dept"], employee.dept))
+        edit_menu.add_command(label="Start Date", command=lambda: edit_employee_info(employee, ["Start_Date"], employee.start_date))
+        edit_menu.add_command(label="End Date", command=lambda: edit_employee_info(employee, ["End_Date"], employee.end_date))
+        edit_menu.add_command(label="Classification", command=lambda: edit_employee_info(employee, ["Classification"], employee.classification))
+        edit_menu.add_command(label="Permission", command=lambda: edit_employee_info(employee, ["Permission"], employee.permission))
 
 
 def prompt_report_all_employees():
@@ -1092,7 +1161,7 @@ def generate_pay_stub(employee):
         Output: writes to a pay stub file, named based on the employee's
                 name.
         """
-        with open(f'{employee.last_name}_{employee.first_name}_pay_stub.csv', 'w') as pay_file:
+        with open(f'{employee.last_name.lower()}_{employee.first_name.lower()}_pay_stub.csv', 'w') as pay_file:
             pay_file.write(
                 f'{name_message}\n'
                 f'{rate_message_1}\n'
@@ -1124,8 +1193,8 @@ def generate_pay_stub(employee):
 
         export_button = Button(pay_stub_window, text="Export to CSV",
                                command=partial(export_pay_stub_csv, name_message, pay_message,
-                                               rate_message_1, rate_message_2)).grid(row=7, column=3,
-                                                                                     padx=10, pady=10)
+                                    rate_message_1, rate_message_2)).grid(row=7, column=3,
+                                    padx=10, pady=10)
 
         pay_stub_window.mainloop()
 
@@ -1148,7 +1217,10 @@ def generate_pay_stub(employee):
 
                 # Get the payment amount without the dollar sign? Use [1:]
                 pay_amount = pay_info[2][1:]
-                pay_message = f"Paid ${pay_amount} to {employee.name}."
+                if str(employee.pay_method) == "direct deposit":
+                    pay_message = f"Transferred ${pay_amount} for {employee.name} to {employee.pay_method.route_num} at {employee.pay_method.account_num}."
+                elif str(employee.pay_method) == "mail":
+                    pay_message = f"Mailed ${pay_amount} to {employee.name} at {employee.full_address()}."
                 rate_message_1 = ""
                 rate_message_2 = ""
                 if str(employee.classification) == "hourly":
