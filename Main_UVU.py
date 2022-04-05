@@ -551,13 +551,13 @@ def add_employee_screen():
 
     # ID Entry:
     id_title = Label(add_emp_window, text="Employee ID:").grid(row=1,
-                                                               column=1, padx=25, pady=5)
-    id_label = Label(add_emp_window, text=new_id) \
-        .grid(row=1, column=2, padx=50, pady=5)
+                column=1, padx=25, pady=5)
+    id_label = Label(add_emp_window, text=new_id).grid(row=1, column=2,
+                padx=50, pady=5)
 
     # First name entry:
-    first_name_label = Label(add_emp_window, text="First Name:").grid(row=2,
-                                                                      column=1, padx=25, pady=5)
+    first_name_label = Label(add_emp_window, text="First Name:")\
+        .grid(row=2, column=1, padx=25, pady=5)
     first_name = StringVar(add_emp_window)
     id_first_name = Entry(add_emp_window, textvariable=first_name) \
         .grid(row=2, column=2, padx=50, pady=5)
@@ -864,156 +864,165 @@ def open_employee(employee, permission_level):
     label_font = "Arial 12"
 
     # Personal Information
-    personal_info_title = Label(employee_window, \
-                                text="Personal Information").grid(row=0, column=0, \
-                                                                  columnspan=3, padx=10, pady=10)
+    personal_info_title = Label(employee_window,
+        text="Personal Information").grid(row=0, column=0, columnspan=2,
+        padx=10, pady=10)
     # First Name
-    first_name_title = Label(employee_window, text="First Name") \
-        .grid(row=1, column=0, padx=10, pady=15)
-    first_name_label = Label(employee_window, text=employee.first_name) \
-        .grid(row=2, column=0, padx=10, pady=10)
+    first_name_title = Label(employee_window, text="First Name:")\
+        .grid(row=1, column=0, padx=10, pady=15, sticky=E)
+    first_name_label = Label(employee_window, text=employee.first_name)\
+        .grid(row=1, column=1, padx=10, pady=10, sticky=W)
     # Last Name
-    last_name_title = Label(employee_window, text="Last Name").grid(row=1, \
-                                                                    column=1, padx=10, pady=15)
-    last_name_label = Label(employee_window, text=employee.last_name) \
-        .grid(row=2, column=1, padx=10, pady=15)
+    last_name_title = Label(employee_window, text="Last Name:")\
+        .grid(row=2, column=0, padx=10, pady=15, sticky=E)
+    last_name_label = Label(employee_window, text=employee.last_name)\
+        .grid(row=2, column=1, padx=10, pady=15, sticky=W)
     # Social Security Number
-    sss_title = Label(employee_window, text="Social Security Number") \
-        .grid(row=1, column=2, padx=10, pady=15)
-    sss_label = Label(employee_window, text=employee.ssn).grid(row=2, \
-                                                               column=2, padx=10, pady=15)
+    sss_title = Label(employee_window, text="Social Security Number:")\
+        .grid(row=3, column=0, padx=10, pady=15, sticky=E)
+    sss_label = Label(employee_window, text=employee.ssn).grid(row=3,
+        column=1, padx=10, pady=15, sticky=W)
     # Phone Number
-    phone_number_title = Label(employee_window, text="Phone Number") \
-        .grid(row=3, column=0, padx=10, pady=10)
-    phone_number_label = Label(employee_window, text=employee.phone) \
-        .grid(row=4, column=0, padx=10, pady=10)
+    phone_number_title = Label(employee_window, text="Phone Number:")\
+        .grid(row=4, column=0, padx=10, pady=10, sticky=E)
+    phone_number_label = Label(employee_window, text=employee.phone)\
+        .grid(row=4, column=1, padx=10, pady=10, sticky=W)
     # Email
-    email_title = Label(employee_window, text="Email").grid(row=3, \
-                                                            column=2, padx=10, pady=10)
-    email_label = Label(employee_window, text=employee.email).grid(row=4, \
-                                                                   column=2, padx=10, pady=10)
+    email_title = Label(employee_window, text="Email:").grid(row=5,
+        column=0, padx=10, pady=10, sticky=E)
+    email_label = Label(employee_window, text=employee.email).grid(row=5,
+        column=1, padx=10, pady=10, sticky=W)
     # Address
-    address_title = Label(employee_window, text="Address").grid(row=5, \
-                                                                columnspan=3, padx=10, pady=10)
-    address_label = Label(employee_window, text=employee.address) \
-        .grid(row=6, columnspan=3, padx=10, pady=10)
+    address_title = Label(employee_window, text="Address:").grid(row=6,
+        column=0, padx=10, pady=10, sticky=E)
+    address_label = Label(employee_window, text=employee.address)\
+        .grid(row=6, column=1, padx=10, pady=10, sticky=W)
     # City
-    city_title = Label(employee_window, text="City").grid(row=7, \
-                                                          column=0, padx=10, pady=10)
-    city_label = Label(employee_window, text=employee.city).grid(row=8, \
-                                                                 column=0, padx=10, pady=10)
+    city_title = Label(employee_window, text="City:").grid(row=7,
+        column=0, padx=10, pady=10, sticky=E)
+    city_label = Label(employee_window, text=employee.city).grid(row=7,
+        column=1, padx=10, pady=10, sticky=W)
     # State Initials
-    state_title = Label(employee_window, text="State").grid(row=7, \
-                                                            column=1, padx=10, pady=10)
-    state_label = Label(employee_window, text=employee.state).grid(row=8, \
-                                                                   column=1, padx=10, pady=10)
+    state_title = Label(employee_window, text="State:").grid(row=8,
+        column=0, padx=10, pady=10, sticky=E)
+    state_label = Label(employee_window, text=employee.state).grid(row=8,
+        column=1, padx=10, pady=10, sticky=W)
     # Zip Code
-    zip_code_title = Label(employee_window, text="Zip Code").grid(row=7, \
-                                                                  column=2, padx=10, pady=10)
-    zip_code_label = Label(employee_window, text=employee.zip) \
-        .grid(row=8, column=2, padx=10, pady=10)
+    zip_code_title = Label(employee_window, text="Zip Code:").grid(row=9,
+        column=0, padx=10, pady=10, sticky=E)
+    zip_code_label = Label(employee_window, text=employee.zip)\
+        .grid(row=9, column=1, padx=10, pady=10, sticky=W)
     # Date of Birth
-    birth_date_title = Label(employee_window, text="Date of Birth") \
-        .grid(row=9, column=0, padx=10, pady=10)
-    birth_date_label = Label(employee_window, text=employee.birth_date) \
-        .grid(row=10, column=0, padx=10, pady=10)
+    birth_date_title = Label(employee_window, text="Date of Birth:")\
+        .grid(row=10, column=0, padx=10, pady=10, sticky=E)
+    birth_date_label = Label(employee_window, text=employee.birth_date)\
+        .grid(row=10, column=1, padx=10, pady=10, sticky=W)
     # Password
-    password_title = Label(employee_window, text="Password").grid(row=9, \
-                                                                  column=1, padx=10, pady=10)
-    password_label = Label(employee_window, text=employee.password) \
-        .grid(row=10, column=1, padx=10, pady=10)
+    password_title = Label(employee_window, text="Password:").grid(row=11,
+        column=0, padx=10, pady=10, sticky=E)
+    password_label = Label(employee_window, text=employee.password)\
+        .grid(row=11, column=1, padx=10, pady=10, sticky=W)
 
     # Employee Information
-    employee_info_title = Label(employee_window, \
-                                text="Employee Information").grid(row=0, column=3, columnspan=3, \
-                                                                  padx=10, pady=10)
+    employee_info_title = Label(employee_window,
+        text="Employee Information").grid(row=0, column=3, columnspan=2,
+        padx=10, pady=10)
     # Employee ID number
-    emp_id_title = Label(employee_window, text="Employee ID").grid(row=1, \
-                                                                   column=3, padx=10, pady=10)
-    emp_id_label = Label(employee_window, text=employee.id).grid(row=2, \
-                                                                 column=3, padx=10, pady=10)
+    emp_id_title = Label(employee_window, text="Employee ID:").grid(row=1,
+        column=3, padx=10, pady=10, sticky=E)
+    emp_id_label = Label(employee_window, text=employee.id).grid(row=1,
+        column=4, padx=10, pady=10, sticky=W)
     # Job title
-    job_title_title = Label(employee_window, text="Job Title") \
-        .grid(row=3, column=3, padx=10, pady=10)
-    job_title_label = Label(employee_window, text=employee.title) \
-        .grid(row=4, column=3, padx=10, pady=10)
+    job_title_title = Label(employee_window, text="Job Title:")\
+        .grid(row=2, column=3, padx=10, pady=10, sticky=E)
+    job_title_label = Label(employee_window, text=employee.title)\
+        .grid(row=2, column=4, padx=10, pady=10, sticky=W)
     # Department
-    department_title = Label(employee_window, text="Department") \
-        .grid(row=3, column=4, padx=10, pady=10)
-    department_label = Label(employee_window, text=employee.dept) \
-        .grid(row=4, column=4, padx=10, pady=10)
+    department_title = Label(employee_window, text="Department:")\
+        .grid(row=3, column=3, padx=10, pady=10, sticky=E)
+    department_label = Label(employee_window, text=employee.dept)\
+        .grid(row=3, column=4, padx=10, pady=10, sticky=W)
     # Start Date
-    start_date_title = Label(employee_window, text="Start Date") \
-        .grid(row=5, column=3, padx=10, pady=10)
-    start_date_label = Label(employee_window, text=employee.start_date) \
-        .grid(row=6, column=3, padx=10, pady=10)
+    start_date_title = Label(employee_window, text="Start Date:")\
+        .grid(row=4, column=3, padx=10, pady=10, sticky=E)
+    start_date_label = Label(employee_window, text=employee.start_date)\
+        .grid(row=4, column=4, padx=10, pady=10, sticky=W)
     # End Date
-    end_date_title = Label(employee_window, text="End Date").grid(row=5, \
-                                                                  column=5, padx=10, pady=10)
-    end_date_label = Label(employee_window, text=employee.end_date) \
-        .grid(row=6, column=5, padx=10, pady=10)
+    end_date_title = Label(employee_window, text="End Date:").grid(row=5,
+        column=3, padx=10, pady=10, sticky=E)
+    end_date_label = Label(employee_window, text=employee.end_date)\
+        .grid(row=5, column=4, padx=10, pady=10, sticky=W)
+
+    # Payment Method
+    payment_title = Label(employee_window, text="Payment Method:")\
+        .grid(row=6, column=3, padx=10, pady=10, sticky=E)
+    payment_label = Label(employee_window, text=str(employee.pay_method))\
+        .grid(row=6, column=4, padx=10, pady=10, sticky=W)
 
     # Account and Routing Numbers, if employee uses direct deposit:
     if str(employee.pay_method) == "direct deposit":
-        account_title = Label(employee_window, text="Account Number") \
-            .grid(row=7, column=3, padx=10, pady=10)
-        # FIXME: Have the account_label connect with the employee's payment
-        #   method. Only shows account if they are paid by direct method.
+        account_title = Label(employee_window, text="Account Number:")\
+            .grid(row=7, column=3, padx=10, pady=10, sticky=E)
         account_label = Label(employee_window, text=str(employee.pay_method.account_num)) \
-            .grid(row=8, column=3, padx=10, pady=10)
+            .grid(row=7, column=4, padx=10, pady=10, sticky=W)
 
-        routing_title = Label(employee_window, text="Routing Number") \
-            .grid(row=7, column=4, padx=10, pady=10)
-        # FIXME: Have the routing_label connect with the employee's payment
-        #   method. Only shows routing num if they are paid by direct method.
-        routing_label = Label(employee_window, text=employee.pay_method.route_num) \
-            .grid(row=8, column=4, padx=10, pady=10)
+        routing_title = Label(employee_window, text="Routing Number:")\
+            .grid(row=8, column=3, padx=10, pady=10, sticky=E)
+        routing_label = Label(employee_window, text=employee.pay_method.route_num)\
+            .grid(row=8, column=4, padx=10, pady=10, sticky=W)
 
-    # Payment Method
-    payment_title = Label(employee_window, text="Payment Method") \
-        .grid(row=7, column=5, padx=10, pady=10)
-    payment_label = Label(employee_window, text=str(employee.pay_method)) \
-        .grid(row=8, column=5, padx=10, pady=10)
-
+    
     # Classification
-    classification_title = Label(employee_window, text="Classification") \
-        .grid(row=9, column=3, padx=10, pady=10)
-    classification_label = Label(employee_window, \
-                                 text=str(employee.classification)) \
-        .grid(row=10, column=3, padx=10, pady=10)
+    classification_title = Label(employee_window, text="Classification:")\
+        .grid(row=9, column=3, padx=10, pady=10, sticky=E)
+    classification_label = Label(employee_window,
+        text=str(employee.classification)).grid(row=9, column=4,
+        padx=10, pady=10, sticky=W)
 
     # Show pay amounts, based on classification type:
     if str(employee.classification) == "hourly":
-        hourly_title = Label(employee_window, text="Hourly Rate") \
-            .grid(row=11, column=3, padx=10, pady=10)
+        hourly_title = Label(employee_window, text="Hourly Rate:") \
+            .grid(row=10, column=3, padx=10, pady=10, sticky=E)
         hourly_label = Label(employee_window, text=f'${employee.classification.hourly_rate:.2f}') \
-            .grid(row=12, column=3, padx=10, pady=10)
+            .grid(row=10, column=4, padx=10, pady=10, sticky=W)
     # Salary
     elif str(employee.classification) == "salary":
-        salary_title = Label(employee_window, text="Salary") \
-            .grid(row=11, column=3, padx=10, pady=10)
-        salary_label = Label(employee_window, text=f'${employee.classification.salary:.2f}') \
-            .grid(row=12, column=3, padx=10, pady=10)
+        salary_title = Label(employee_window, text="Salary:")\
+            .grid(row=10, column=3, padx=10, pady=10, sticky=E)
+        salary_label = Label(employee_window,
+            text=f'${employee.classification.salary:.2f}').grid(row=10,
+            column=4, padx=10, pady=10, sticky=W)
     # Commission
     elif str(employee.classification) == "commissioned":
-        salary_title = Label(employee_window, text="Salary") \
-            .grid(row=11, column=3, padx=10, pady=10)
-        salary_label = Label(employee_window, text=f'${employee.classification.salary:.2f}') \
-            .grid(row=12, column=3, padx=10, pady=10)
-        commission_title = Label(employee_window, text="Commission Rate") \
-            .grid(row=11, column=4, padx=10, pady=10)
-        commission_label = Label(employee_window, text=f'${employee.classification.commission_rate:.2f}') \
-            .grid(row=12, column=4, padx=10, pady=10)
+        salary_title = Label(employee_window, text="Salary:") \
+            .grid(row=10, column=3, padx=10, pady=10, sticky=E)
+        salary_label = Label(employee_window,
+            text=f'${employee.classification.salary:.2f}').grid(row=10,
+            column=4, padx=10, pady=10, sticky=W)
+        commission_title = Label(employee_window,
+            text="Commission Rate:").grid(row=11, column=3, padx=10,
+            pady=10, sticky=E)
+        commission_label = Label(employee_window,
+            text=f'${employee.classification.commission_rate:.2f}')\
+                .grid(row=11, column=4, padx=10, pady=10, sticky=W)
+    
+    # Show permission/access level
+    permission_title = Label(employee_window,
+        text="Permission Level:").grid(row=12, column=3, padx=10,
+        pady=10, sticky=E)
+    permission_label = Label(employee_window,
+        text=f'{employee.permission}').grid(row=12, column=4, padx=10,
+        pady=10, sticky=W)
 
     # Buttons
     pay_stub_button = Button(employee_window, text="Get Pay Stub",
-                             command=partial(generate_pay_stub, employee)).grid(row=13,
-                                                                                column=5, padx=10, pady=10)
+        command=partial(generate_pay_stub, employee)).grid(row=13,
+        column=5, padx=10, pady=10)
 
     if permission_level == "admin":
         back_button = Button(employee_window, text="Back",
-                             command=partial(exit_window, employee_window)).grid(row=13,
-                                                                                 column=4, padx=10, pady=10)
+            command=partial(exit_window, employee_window)).grid(row=13,
+            column=4, padx=10, pady=10)
         # The sub-options under "Edit" for admin employees:
         edit_menu.add_command(label="First Name", command=lambda: edit_employee_info(employee, ["First_Name"], employee.first_name))
         edit_menu.add_command(label="Last Name", command=lambda: edit_employee_info(employee, ["Last_Name"], employee.last_name))
