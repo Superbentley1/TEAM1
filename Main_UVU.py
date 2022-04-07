@@ -145,7 +145,42 @@ def open_admin():
     # Create Employee Tree Frame
     emp_frame = Frame(admin_window)
     emp_frame.pack(pady=0)
-
+    
+    def search_records():
+        # Get the entry from search
+        lookup_record = search_entry.get()
+        # Clear the Treeview
+        for record in employee_list.get_children():
+            employee_list.delete(record)
+        # Populating the treeview with findings of the sort
+        count = 0
+        for emp in uvuEmpDat.emp_list:
+            # Will check if the search is in the name of employee then show
+            if lookup_record.lower() in str(emp).lower():
+                if count % 2 == 0:
+                    employee_list.insert('', END, values=(emp.id, emp.first_name, \
+                                                          emp.last_name, emp.ssn, emp.phone, emp.email, \
+                                                          emp.start_date, emp.end_date, \
+                                                          str(emp.classification), \
+                                                          emp.title, emp.dept), tags=("evenrows",))
+                else:
+                    employee_list.insert('', END, values=(emp.id, emp.first_name, \
+                                                          emp.last_name, emp.ssn, emp.phone, emp.email, \
+                                                          emp.start_date, emp.end_date, \
+                                                          str(emp.classification), \
+                                                          emp.title, emp.dept), tags=("oddrows",))
+                count += 1
+                  
+    # Search frame on Admin list
+    search_frame = Frame(admin_window)
+    search_frame.pack(pady=0)
+    # Search Entry Box
+    search_entry = Entry(search_frame)
+    search_entry.grid(row=0, column=0, padx=5, pady=5)
+    # Search Button
+    search_button = Button(search_frame, text="Search", command=search_records)
+    search_button.grid(row=0, column=1, padx=5, pady=5)
+    
     def tree_column_sort(tree, the_column, other_way):
         # Get the values to sort
         information = [(tree.set(k, the_column), k) for k in tree.get_children('')]
@@ -1134,6 +1169,8 @@ def generate_report_all_employees(include_archived):
             #   be paid.
             pay_report = employee.payment_report()
             report.write(f"\t{pay_report}\n\n\n")
+    # Opens the newly created report.csv file
+    open_file("report.csv")
 
     # report_window = Toplevel()
 
