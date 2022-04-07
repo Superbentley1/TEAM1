@@ -1084,6 +1084,27 @@ def prompt_report_all_employees():
     else:
         generate_report_all_employees(False)
 
+def open_report_window():
+    report_window = Toplevel(login_window)
+    report_window.geometry("1475x700")
+    # Create Textbox for report data
+    report_text = Text(report_window, width=120, height=100)
+    # Add report data to textbox
+    with open("report.csv", 'r') as file:
+        the_report = file.read()
+        report_text.insert("1.0", the_report)
+    report_text.pack(side=LEFT)
+    report_text.config(state='disabled')
+
+    # Scrollbar
+    report_scrollbar = Scrollbar(report_window)
+    report_scrollbar.pack(side=RIGHT, fill=Y)
+    
+    # Attach scrollbar to textbox
+    report_text.config(yscrollcommand=report_scrollbar.set)
+    report_scrollbar.config(command=report_text.yview)
+    
+    report_window.mainloop()
 
 # Should this report be a payment report, just a general info report, or
 #   both?
@@ -1169,8 +1190,8 @@ def generate_report_all_employees(include_archived):
             #   be paid.
             pay_report = employee.payment_report()
             report.write(f"\t{pay_report}\n\n\n")
-    # Opens the newly created report.csv file
-    open_file("report.csv")
+    # Opens the report in a GUI window
+    open_report_window()
 
     # report_window = Toplevel()
 
