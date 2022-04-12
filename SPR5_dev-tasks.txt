@@ -5,10 +5,17 @@ To Do:
 
 - Scrolling for all emps report.
 
+- Update "readme.txt"!
+
+- Update to PEP 8 standards.
+
 - Real-time updating of data when edited.
    - Along with this, run all emp report, so pay stubs are correct.
 
-- Archiving employees - add to GUI
+- Done - Archiving employees - add to GUI
+- Do we want a way to unarchive an employee record?
+- Should we delete employee records from the "employees.csv" record?
+   (They're still in "archived.csv".)
 
 - For docs: tell Gabe that username is no longer being used, only user ID.
 This may apply for the functional requirements, at least.

@@ -19,6 +19,7 @@ import re
 from functools import partial
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 from tkinter.messagebox import showinfo, askokcancel, askyesno, WARNING
 from types import new_class
 
@@ -696,6 +697,10 @@ def edit_employee_info(employee, fields, the_edit):
         """Updates the employee's data members based on the given
         parameters.
         """
+        # Initialize variable for validating user input.
+        valid = True
+        msg = ""
+
         # For payment method updates:
         if edit_type == 1:
             pay_method = new_info.get()
@@ -705,7 +710,20 @@ def edit_employee_info(employee, fields, the_edit):
                 fields += ["Route", "Account"]
                 route_num = new_bank_routing.get()
                 account_num = new_bank_account.get()
-                uvuEmpDat.edit_employee(employee.id, fields, [1, route_num, account_num])
+                if re.search("^\d+-?\d+$", account_num) is None:
+                    valid = False
+                    msg = f'Bank account number should be numeric, with one ' \
+                        'dash allowed.'
+                if re.search("^\d+-?\d+-?\d+$", route_num) is None:
+                    valid = False
+                    msg = f'Routing number should be numeric, with up to ' \
+                        'two dashes allowed.'
+                if valid:
+                    uvuEmpDat.edit_employee(employee.id, fields, [1, route_num, account_num])
+                    edit_window.destroy()
+                else:
+                    fields = fields[:1]
+                    validation_error(msg)
 
         # For classification updates:
         elif edit_type == 2:
@@ -713,16 +731,51 @@ def edit_employee_info(employee, fields, the_edit):
             if new_classification == "hourly":
                 fields += ["Hourly"]
                 hourly_rate = new_hourly.get()
-                uvuEmpDat.edit_employee(employee.id, fields, [1, hourly_rate])
+                try:
+                    hourly_rate = float(hourly_rate)
+                except:
+                    valid = False
+                    msg = f'Hourly Rate must be a number, with 1 decimal'\
+                        f' point allowed.'
+                if valid:
+                    uvuEmpDat.edit_employee(employee.id, fields, [1, hourly_rate])
+                    edit_window.destroy()
+                else:
+                    fields = fields[:1]
+                    validation_error(msg)
+
             elif new_classification == "salary":
                 fields += ["Salary"]
                 salary = new_salary.get()
-                uvuEmpDat.edit_employee(employee.id, fields, [2, salary])
+                try:
+                    salary = float(salary)
+                except:
+                    valid = False
+                    msg = f'Salary must be a number, with 1 decimal'\
+                        f' point allowed.'
+                if valid:
+                    uvuEmpDat.edit_employee(employee.id, fields, [2, salary])
+                else:
+                    fields = fields[:1]
+                    validation_error(msg)
+
             elif new_classification == "commissioned":
                 fields += ["Salary", "Commission"]
                 com_salary = new_com_salary.get()
                 commission_rate = new_commission.get()
-                uvuEmpDat.edit_employee(employee.id, fields, [3, com_salary, commission_rate])
+                try:
+                    com_salary = float(com_salary)
+                    commission_rate = float(commission_rate)
+                except:
+                    valid = False
+                    msg = f'Salary and Commission rate must each be a '\
+                        f'number, each with 1 decimal point allowed.'
+                
+                if valid:
+                    uvuEmpDat.edit_employee(employee.id, fields, [3, com_salary, commission_rate])
+                else:
+                    fields = fields[:1]
+                    validation_error(msg)
 
         # For permission updates:
         elif edit_type == 3:
@@ -735,6 +788,9 @@ def edit_employee_info(employee, fields, the_edit):
         # For name updates:
         elif edit_type == 4:
             name = new_info.get()
+            if not name.isalpha():
+                valid = False
+                msg = f'Name must use letters only.'
             if fields[0] == "First_Name":
                 first_name = name
                 last_name = employee.last_name
@@ -743,13 +799,15 @@ def edit_employee_info(employee, fields, the_edit):
                 last_name = name
             full_name = f'{first_name} {last_name}'
             fields[0] = "Name"
-            uvuEmpDat.edit_employee(employee.id, fields, [full_name])            
+            if valid:
+                uvuEmpDat.edit_employee(employee.id, fields, [full_name])            
+            else:
+                fields = fields[:1]
+                validation_error(msg)
 
         # For all other updates:
         elif edit_type == 5:
             uvuEmpDat.edit_employee(employee.id, fields, [new_info.get()])
-
-        edit_window.destroy()
 
     # Creates the edit window
     edit_window = Toplevel(login_window)
@@ -1023,6 +1081,11 @@ def open_employee(employee, permission_level):
         back_button = Button(employee_window, text="Back",
             command=partial(exit_window, employee_window)).grid(row=13,
             column=4, padx=10, pady=10)
+
+        archive_button = Button(employee_window, text="Archive", command=
+            partial(prompt_archive_employee, employee)).grid(row=13, column=0,
+            padx=10, pady=10)
+
         # The sub-options under "Edit" for admin employees:
         edit_menu.add_command(label="First Name", command=lambda: edit_employee_info(employee, ["First_Name"], employee.first_name))
         edit_menu.add_command(label="Last Name", command=lambda: edit_employee_info(employee, ["Last_Name"], employee.last_name))
@@ -1035,6 +1098,52 @@ def open_employee(employee, permission_level):
         edit_menu.add_command(label="End Date", command=lambda: edit_employee_info(employee, ["End_Date"], employee.end_date))
         edit_menu.add_command(label="Classification", command=lambda: edit_employee_info(employee, ["Classification"], employee.classification))
         edit_menu.add_command(label="Permission", command=lambda: edit_employee_info(employee, ["Permission"], employee.permission))
+
+
+def prompt_archive_employee(employee: Employee):
+    """Generates a GUI prompt asking whether the user really wants to
+    archive the empoloyee. Archives the employee if they say yes, and
+    doesn't if they say no.
+    """
+    def archive_employee():
+        """Captures the data for an employee's last day from the GUI
+        last_day_screen, validates the data for the last day, then
+        facilitates the archiving of the employee, if no errors.
+        """
+        valid = True
+        msg = ""
+        end = last_day.get()
+        if re.search("^\d\d\/\d\d\/\d\d\d\d$", end) is None and\
+            re.search("^\d\d-\d\d-\d\d\d\d$", end) is None:
+            valid = False
+            msg = f'End date must match the format: MM/DD/YYYY or ' \
+                  'MM-DD-YYYY'
+        if valid:
+            employee.terminate_employee(end)
+            uvuEmpDat.archive_employee(employee.id)
+            last_day_screen.destroy()
+        else:
+            validation_error(msg)
+
+    res = askyesno("Archive Employee", f'Are you sure you want to '\
+                                       f'archive {employee.name}?\n'\
+                                       f'This action is not easy to '\
+                                       f'undo.')
+    if res == True:
+        last_day_screen = Toplevel(login_window)
+        last_day = StringVar(last_day_screen)
+        last_day_prompt = Label(last_day_screen,
+            text=f'When was {employee.name}\'s last day?').grid(row=0,
+            column=0, padx=10, pady=10)
+        last_day_title = Label(last_day_screen, text="Last Day:")\
+            .grid(row=1, column=0, padx=10, pady=10)
+        last_day_entry = Entry(last_day_screen, textvariable=last_day)\
+            .grid(row=1, column=1, padx=10, pady=10)
+        submit_button = Button(last_day_screen, text="Submit",
+            command=archive_employee).grid(row=2,
+            column=1, padx=10, pady=10)
+    else:
+        pass
 
 
 def prompt_report_all_employees():
@@ -1068,93 +1177,165 @@ def generate_report_all_employees(include_archived):
 
     read_timecards()
     read_receipts()
+    string = ""
+    msg = "A report has been saved to 'report.csv' as well.\n"\
+        "All Employee Report:\n\n"
+
     with open("report.csv", "w") as report:
         for employee in emp_list:
             # Write a line to "report.csv" that reports on all data
             #   members for the employee.
             if str(employee.classification) == "hourly":
                 if str(employee.pay_method) == "direct deposit":
-                    report.write(
-                        f"Employee ID: {employee.id}       Name: {employee.name}         Address: {employee.full_address()}\n"
-                        f"Classification: {employee.classification}    Hourly pay: ${employee.classification.hourly_rate:.2f}       Payment method: {employee.pay_method}\n"
-                        f"Routing num: {employee.pay_method.route_num}   Account num: {employee.pay_method.account_num} Date of birth: {employee.birth_date}\n"
-                        f"SSN: {employee.ssn}          Phone: {employee.phone}     Email: {employee.email}\n"
-                        f"Start date: {employee.start_date}     End date: {employee.end_date}\n"
-                        f"Title: {employee.title}           Dept: {employee.dept}\n"
-                        f"Permission level: {employee.permission}   Password: {employee.password}\n\n")
+                    string = f"Employee ID: {employee.id}       Name: "\
+                        f"{employee.name}         Address: "\
+                        f"{employee.full_address()}\n"\
+                        f"Classification: {employee.classification}    "\
+                        f"Hourly pay: "\
+                        f"${employee.classification.hourly_rate:.2f}    "\
+                        f"   Payment method: {employee.pay_method}\n"\
+                        f"Routing num: {employee.pay_method.route_num}  "\
+                        f" Account num: "\
+                        f"{employee.pay_method.account_num} Date of "\
+                        f"birth: {employee.birth_date}\n"\
+                        f"SSN: {employee.ssn}          Phone: "\
+                        f"{employee.phone}     Email: {employee.email}\n"\
+                        f"Start date: {employee.start_date}     "\
+                        f"End date: {employee.end_date}\n"\
+                        f"Title: {employee.title}           Dept: "\
+                        f"{employee.dept}\n"\
+                        f"Permission level: {employee.permission}   "\
+                        f"Password: {employee.password}\n\n"
+                    report.write(string)
                 elif str(employee.pay_method) == "mail":
-                    report.write(
-                        f"Employee ID: {employee.id}        Name: {employee.name}   Address: {employee.full_address()}\n"
-                        f"Classification: {employee.classification}     Hourly pay: ${employee.classification.hourly_rate:.2f}       Payment method: {employee.pay_method}\n"
-                        f"Date of birth: {employee.birth_date}  SSN: {employee.ssn}\n"
-                        f"Phone: {employee.phone}       Email: {employee.email}\n"
-                        f"Start date: {employee.start_date}       End date: {employee.end_date}\n"
-                        f"Title: {employee.title}      Dept: {employee.dept}\n"
-                        f"Permission level: {employee.permission} Password: {employee.password}\n\n")
+                    string = f"Employee ID: {employee.id}        Name: "\
+                        f"{employee.name}   Address: "\
+                        f"{employee.full_address()}\n"\
+                        f"Classification: {employee.classification}     "\
+                        f"Hourly pay: "\
+                        f"${employee.classification.hourly_rate:.2f}    "\
+                        f"   Payment method: {employee.pay_method}\n"\
+                        f"Date of birth: {employee.birth_date}  SSN: "\
+                        f"{employee.ssn}\n"\
+                        f"Phone: {employee.phone}       Email: "\
+                        f"{employee.email}\n"\
+                        f"Start date: {employee.start_date}       End "\
+                        f"date: {employee.end_date}\n"\
+                        f"Title: {employee.title}      Dept: "\
+                        f"{employee.dept}\n"\
+                        f"Permission level: {employee.permission} "\
+                        f"Password: {employee.password}\n\n"
+                    report.write(string)
             elif str(employee.classification) == "salary":
                 if str(employee.pay_method) == "direct deposit":
-                    report.write(
-                        f"Employee ID: {employee.id}        Name: {employee.name}      Address: {employee.full_address()}\n"
-                        f"Classification: {employee.classification}     Salary: ${employee.classification.salary:.2f}    Payment method: {employee.pay_method}\n"
-                        f"Routing number: {employee.pay_method.route_num} Account number: {employee.pay_method.account_num}    Date of birth: {employee.birth_date}\n"
-                        f"SSN: {employee.ssn}           Phone: {employee.phone}    Email: {employee.email}\n"
-                        f"Start date: {employee.start_date}       End date: {employee.end_date}\n"
-                        f"Title: {employee.title}           Dept: {employee.dept}\n"
-                        f"Permission level: {employee.permission}    Password: {employee.password}\n\n")
+                    string = f"Employee ID: {employee.id}        Name: "\
+                        f"{employee.name}      Address: "\
+                        f"{employee.full_address()}\n"\
+                        f"Classification: {employee.classification}     "\
+                        f"Salary: ${employee.classification.salary:.2f} "\
+                        f"   Payment method: {employee.pay_method}\n"\
+                        f"Routing number: "\
+                        f"{employee.pay_method.route_num} "\
+                        f"Account number: "\
+                        f"{employee.pay_method.account_num}    Date of "\
+                        f"birth: {employee.birth_date}\n"\
+                        f"SSN: {employee.ssn}           Phone: "\
+                        f"{employee.phone}    Email: {employee.email}\n"\
+                        f"Start date: {employee.start_date}       End "\
+                        f"date: {employee.end_date}\n"\
+                        f"Title: {employee.title}           Dept: "\
+                        f"{employee.dept}\n"\
+                        f"Permission level: {employee.permission}    "\
+                        f"Password: {employee.password}\n\n"
+                    report.write(string)
                 elif str(employee.pay_method) == "mail":
-                    report.write(
-                        f"Employee ID: {employee.id}      Name: {employee.name}    Address: {employee.full_address()}\n"
-                        f"Classification: {employee.classification}   Salary: ${employee.classification.salary:.2f}       Payment method: {employee.pay_method}\n"
-                        f"Date of birth: {employee.birth_date} SSN: {employee.ssn}\n"
-                        f"Phone: {employee.phone}     Email: {employee.email}\n"
-                        f"Start date: {employee.start_date}     End date: {employee.end_date}\n"
-                        f"Title: {employee.title}           Dept: {employee.dept}\n"
-                        f"Permission level: {employee.permission}  Password: {employee.password}\n\n")
+                    string = f"Employee ID: {employee.id}      Name: "\
+                        f"{employee.name}    Address: "\
+                        f"{employee.full_address()}\n"\
+                        f"Classification: {employee.classification}   "\
+                        f"Salary: ${employee.classification.salary:.2f} "\
+                        f"      Payment method: {employee.pay_method}\n"\
+                        f"Date of birth: {employee.birth_date} SSN: "\
+                        f"{employee.ssn}\n"\
+                        f"Phone: {employee.phone}     Email: "\
+                        f"{employee.email}\n"\
+                        f"Start date: {employee.start_date}     End "\
+                        f"date: {employee.end_date}\n"\
+                        f"Title: {employee.title}           Dept: "\
+                        f"{employee.dept}\n"\
+                        f"Permission level: {employee.permission}  "\
+                        f"Password: {employee.password}\n\n"
+                    report.write(string)
             elif str(employee.classification) == "commissioned":
                 if str(employee.pay_method) == "direct deposit":
-                    report.write(
-                        f"Employee ID: {employee.id}             Name: {employee.name}      Address: {employee.full_address()}\n"
-                        f"Classification: {employee.classification}    Salary: ${employee.classification.salary:.2f}          Commission rate: ${employee.classification.commission_rate:.2f}\n"
-                        f"Payment method: {employee.pay_method}  Routing number: {employee.pay_method.route_num} Account number: {employee.pay_method.account_num}\n"
-                        f"Date of birth: {employee.birth_date}        SSN: {employee.ssn}           Phone: {employee.phone}\n"
-                        f"Email: {employee.email}    Start date: {employee.start_date}      End date: {employee.end_date}\n"
-                        f"Title: {employee.title}         Dept: {employee.dept}\n"
-                        f"Permission level: {employee.permission}      Password: {employee.password}\n\n")
+                    string = f"Employee ID: {employee.id}             "\
+                        f"Name: {employee.name}      Address: "\
+                        f"{employee.full_address()}\n"\
+                        f"Classification: {employee.classification}    "\
+                        f"Salary: ${employee.classification.salary:.2f} "\
+                        f"         Commission rate: "\
+                        f"${employee.classification.commission_rate:.2f}"\
+                        f"\n"\
+                        f"Payment method: {employee.pay_method}  Routing"\
+                        f" number: {employee.pay_method.route_num} "\
+                        f"Account number: "\
+                        f"{employee.pay_method.account_num}\n"\
+                        f"Date of birth: {employee.birth_date}        "\
+                        f"SSN: {employee.ssn}           Phone: "\
+                        f"{employee.phone}\n"\
+                        f"Email: {employee.email}    Start date: "\
+                        f"{employee.start_date}      End date: "\
+                        f"{employee.end_date}\n"\
+                        f"Title: {employee.title}         Dept: "\
+                        f"{employee.dept}\n"\
+                        f"Permission level: {employee.permission}      "\
+                        f"Password: {employee.password}\n\n"
+                    report.write(string)
                 elif str(employee.pay_method) == "mail":
-                    report.write(
-                        f"Employee ID: {employee.id}          Name: {employee.name}    Address: {employee.full_address()}\n"
-                        f"Classification: {employee.classification} Salary: ${employee.classification.salary:.2f}        Commission rate: ${employee.classification.commission_rate:.2f}\n"
-                        f"Payment method: {employee.pay_method}         Date of birth: {employee.birth_date}\n"
-                        f"SSN: {employee.ssn}             Phone: {employee.phone}     Email: {employee.email}\n"
-                        f"Start date: {employee.start_date}        End date: {employee.end_date}\n"
-                        f"Title: {employee.title}               Dept: {employee.dept}\n"
-                        f"Permission level: {employee.permission}      Password: {employee.password}\n\n")
-
+                    string = f"Employee ID: {employee.id}          Name:"\
+                        f" {employee.name}    Address: "\
+                        f"{employee.full_address()}\n"\
+                        f"Classification: {employee.classification} "\
+                        f"Salary: ${employee.classification.salary:.2f} "\
+                        f"       Commission rate: "\
+                        f"${employee.classification.commission_rate:.2f}"\
+                        f"\n"\
+                        f"Payment method: {employee.pay_method}         "\
+                        f"Date of birth: {employee.birth_date}\n"\
+                        f"SSN: {employee.ssn}             Phone: "\
+                        f"{employee.phone}     Email: {employee.email}\n"\
+                        f"Start date: {employee.start_date}        End "\
+                        f"date: {employee.end_date}\n"\
+                        f"Title: {employee.title}               Dept: "\
+                        f"{employee.dept}\n"\
+                        f"Permission level: {employee.permission}      "\
+                        f"Password: {employee.password}\n\n"
+                    report.write(string)
+            
+            # Save message for report GUI.
+            msg += string
+            
             # Write a line to "report.csv" stating what the employee will
             #   be paid.
             pay_report = employee.payment_report()
-            report.write(f"\t{pay_report}\n\n\n")
+            pay_message = f"\t{pay_report}\n\n\n"
+            report.write(pay_message)
 
-    # report_window = Toplevel()
+            # Save payment message for report GUI.
+            msg += pay_message
 
-    # with open("report.csv", 'r') as report_in:
-    #     count = 0
-    #     for line in report_in:
-    #         count += 1
-    #         Label(report_window, text=line).grid(row=count, padx=10,
-    #             pady=10)
-    # #Scrollbar
-    # scrollbar = ttk.Scrollbar(report_window, orient=VERTICAL, \
-    #                     command=report_window.yview)
-
-    # report_window.config(yscroll=scrollbar.set)
-    # scrollbar.grid(row=1, column=1, sticky="ns")
-
-    # report_window.mainloop()
-
-    # Print message in GUI screen saying that report can also be viewed
-    #   and shared from "report.csv".
-    # Bind event listener to "Back" button to exit the report's window.
+    # Generate GUI window for report.
+    open_file("report.csv")
+    # report_window = Toplevel(login_window)
+    # report_scroll = Scrollbar(report_window)
+    # report_scroll.pack(side=RIGHT, fill=Y)
+    # txt = Message(report_window, text=msg)
+    # txt.pack(side=LEFT, fill=BOTH)
+    # all_employees_report = Text(report_window,
+    #     background=txt.cget("background"))
+    # all_employees_report.pack(side=LEFT, fill=BOTH)
+    # txt.destroy()
+    # all_employees_report.config(yscrollcommand=report_scroll.set)
 
 
 def generate_pay_stub(employee):
