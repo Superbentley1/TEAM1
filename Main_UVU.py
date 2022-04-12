@@ -146,7 +146,42 @@ def open_admin():
     # Create Employee Tree Frame
     emp_frame = Frame(admin_window)
     emp_frame.pack(pady=0)
-
+    
+    def search_records():
+        # Get the entry from search
+        lookup_record = search_entry.get()
+        # Clear the Treeview
+        for record in employee_list.get_children():
+            employee_list.delete(record)
+        # Populating the treeview with findings of the sort
+        count = 0
+        for emp in uvuEmpDat.emp_list:
+            # Will check if the search is in the name of employee then show
+            if lookup_record.lower() in str(emp).lower():
+                if count % 2 == 0:
+                    employee_list.insert('', END, values=(emp.id, emp.first_name, \
+                                                          emp.last_name, emp.ssn, emp.phone, emp.email, \
+                                                          emp.start_date, emp.end_date, \
+                                                          str(emp.classification), \
+                                                          emp.title, emp.dept), tags=("evenrows",))
+                else:
+                    employee_list.insert('', END, values=(emp.id, emp.first_name, \
+                                                          emp.last_name, emp.ssn, emp.phone, emp.email, \
+                                                          emp.start_date, emp.end_date, \
+                                                          str(emp.classification), \
+                                                          emp.title, emp.dept), tags=("oddrows",))
+                count += 1
+                  
+    # Search frame on Admin list
+    search_frame = Frame(admin_window)
+    search_frame.pack(pady=0)
+    # Search Entry Box
+    search_entry = Entry(search_frame)
+    search_entry.grid(row=0, column=0, padx=5, pady=5)
+    # Search Button
+    search_button = Button(search_frame, text="Search", command=search_records)
+    search_button.grid(row=0, column=1, padx=5, pady=5)
+    
     def tree_column_sort(tree, the_column, other_way):
         # Get the values to sort
         information = [(tree.set(k, the_column), k) for k in tree.get_children('')]
@@ -1158,6 +1193,27 @@ def prompt_report_all_employees():
     else:
         generate_report_all_employees(False)
 
+def open_report_window():
+    report_window = Toplevel(login_window)
+    report_window.geometry("1475x700")
+    # Create Textbox for report data
+    report_text = Text(report_window, width=120, height=100)
+    # Add report data to textbox
+    with open("report.csv", 'r') as file:
+        the_report = file.read()
+        report_text.insert("1.0", the_report)
+    report_text.pack(side=LEFT)
+    report_text.config(state='disabled')
+
+    # Scrollbar
+    report_scrollbar = Scrollbar(report_window)
+    report_scrollbar.pack(side=RIGHT, fill=Y)
+    
+    # Attach scrollbar to textbox
+    report_text.config(yscrollcommand=report_scrollbar.set)
+    report_scrollbar.config(command=report_text.yview)
+    
+    report_window.mainloop()
 
 # Should this report be a payment report, just a general info report, or
 #   both?
@@ -1318,24 +1374,30 @@ def generate_report_all_employees(include_archived):
             # Write a line to "report.csv" stating what the employee will
             #   be paid.
             pay_report = employee.payment_report()
-            pay_message = f"\t{pay_report}\n\n\n"
-            report.write(pay_message)
+            report.write(f"\t{pay_report}\n\n\n")
+    # Opens the report in a GUI window
+    open_report_window()
 
-            # Save payment message for report GUI.
-            msg += pay_message
+    # report_window = Toplevel()
 
-    # Generate GUI window for report.
-    open_file("report.csv")
-    # report_window = Toplevel(login_window)
-    # report_scroll = Scrollbar(report_window)
-    # report_scroll.pack(side=RIGHT, fill=Y)
-    # txt = Message(report_window, text=msg)
-    # txt.pack(side=LEFT, fill=BOTH)
-    # all_employees_report = Text(report_window,
-    #     background=txt.cget("background"))
-    # all_employees_report.pack(side=LEFT, fill=BOTH)
-    # txt.destroy()
-    # all_employees_report.config(yscrollcommand=report_scroll.set)
+    # with open("report.csv", 'r') as report_in:
+    #     count = 0
+    #     for line in report_in:
+    #         count += 1
+    #         Label(report_window, text=line).grid(row=count, padx=10,
+    #             pady=10)
+    # #Scrollbar
+    # scrollbar = ttk.Scrollbar(report_window, orient=VERTICAL, \
+    #                     command=report_window.yview)
+
+    # report_window.config(yscroll=scrollbar.set)
+    # scrollbar.grid(row=1, column=1, sticky="ns")
+
+    # report_window.mainloop()
+
+    # Print message in GUI screen saying that report can also be viewed
+    #   and shared from "report.csv".
+    # Bind event listener to "Back" button to exit the report's window.
 
 
 def generate_pay_stub(employee):
