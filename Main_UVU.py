@@ -132,7 +132,7 @@ def open_admin():
         "readme.txt"))
     menu_bar.add_cascade(label="Help", menu=help_menu)
     # Adds the menu bar
-    admin_window.config(menu=menu_bar)
+    admin_window.config(menu=menu_bar, bg='whitesmoke')
     # Title of Admin Window
     admin_window.title("UVU Employee Database")
 
@@ -182,7 +182,7 @@ def open_admin():
     search_entry = Entry(search_frame)
     search_entry.grid(row=0, column=0, padx=5, pady=5)
     # Search Button
-    search_button = Button(search_frame, text="Search", command=\
+    search_button = Button(search_frame, bg='DarkSeaGreen', text="Search", command=\
         search_records)
     search_button.grid(row=0, column=1, padx=5, pady=5)
     
@@ -270,7 +270,7 @@ def open_admin():
     button_frame = Frame(admin_window)
     button_frame.pack(pady=0)
     # Report button
-    report_button = Button(button_frame, text="Report",
+    report_button = Button(button_frame, bg='DarkSeaGreen', text="Report",
                            command=prompt_report_all_employees)
     report_button.grid(row=0, column=0, padx=5, pady=5)
 
@@ -734,7 +734,7 @@ def add_employee_screen():
                                  "employee")
     permission_drop.grid(row=11, column=4, padx=50, pady=5)
 
-    create_button = Button(add_emp_window, text="Create",
+    create_button = Button(add_emp_window, bg='DarkSeaGreen', text="Create",
                            command=validate_new_emp).grid(row=12, column=4, padx=10,
                                                           pady=10)
 
@@ -864,6 +864,7 @@ def edit_employee_info(employee, fields, the_edit):
 
     # Creates the edit window
     edit_window = Toplevel(login_window)
+    edit_window.config(bg='whitesmoke')
     # Initialize variable to keep track of edit type.
     edit_type = 0
     # Shows previous information before edit
@@ -889,7 +890,7 @@ def edit_employee_info(employee, fields, the_edit):
         updated_bank_routing = Entry(edit_window, textvariable=new_bank_routing).grid(row=3, column=2, padx=10, pady=10)
         label_bank_account = Label(edit_window, text="Bank Account Number: ").grid(row=4, column=1, padx=10, pady=10)
         updated_bank_account = Entry(edit_window, textvariable=new_bank_account).grid(row=4, column=2, padx=10, pady=10)
-        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=6, columnspan=3,
+        update_button = Button(edit_window, bg='DarkSeaGreen', text="Update Information", command=partial(update_emp, fields)).grid(row=6, columnspan=3,
                                                                                                 padx=10, pady=10)   
     elif str(the_edit) ==  "hourly" or str(the_edit) ==  "salary" or str(the_edit) ==  "commissioned":
         # Classification options
@@ -905,14 +906,14 @@ def edit_employee_info(employee, fields, the_edit):
         updated_com_salary = Entry(edit_window, textvariable=new_com_salary).grid(row=6, column=2, padx=10, pady=10)
         label_commissioned = Label(edit_window, text="Commission Pay Rate: ").grid(row=7, column=1, padx=10, pady=10)        
         updated_commissioned = Entry(edit_window, textvariable=new_commission).grid(row=7, column=2, padx=10, pady=10)
-        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=8, columnspan=3,
+        update_button = Button(edit_window, bg='DarkSeaGreen', text="Update Information", command=partial(update_emp, fields)).grid(row=8, columnspan=3,
                                                                                                         padx=10, pady=10)
     elif the_edit == "admin" or the_edit == "employee":
         # Permission options.
         edit_type = 3
         Radiobutton(edit_window, text="Employee", variable=new_info, value="employee").grid(row=1, column=1, padx=10, pady=10)
         Radiobutton(edit_window, text="Admin", variable=new_info, value="admin").grid(row=2, column=1, padx=10, pady=10)
-        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=3, columnspan=3,
+        update_button = Button(edit_window, bg='DarkSeaGreen', text="Update Information", command=partial(update_emp, fields)).grid(row=3, columnspan=3,
                                                                                                         padx=10, pady=10)
 
     else:
@@ -923,7 +924,7 @@ def edit_employee_info(employee, fields, the_edit):
             edit_type = 5
         updated_info = Entry(edit_window, textvariable=new_info).grid(row=1, column=1, padx=10, pady=10)
         # Button to update information
-        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=6, columnspan=3,
+        update_button = Button(edit_window, bg='DarkSeaGreen', text="Update Information", command=partial(update_emp, fields)).grid(row=6, columnspan=3,
                                                                                                         padx=10, pady=10)
 
 
@@ -965,7 +966,7 @@ def open_employee(employee, permission_level):
     help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
     menu_bar.add_cascade(label="Help", menu=help_menu)
     # Adds the menu bar
-    employee_window.config(menu=menu_bar)
+    employee_window.config(menu=menu_bar, bg='whitesmoke')
 
     # Title of Login Window
     employee_window.title("UVU Employee Database")
@@ -1126,16 +1127,16 @@ def open_employee(employee, permission_level):
         pady=10, sticky=W)
 
     # Buttons
-    pay_stub_button = Button(employee_window, text="Get Pay Stub",
+    pay_stub_button = Button(employee_window, bg='DarkSeaGreen', text="Get Pay Stub",
         command=partial(generate_pay_stub, employee)).grid(row=13,
         column=5, padx=10, pady=10)
 
     if permission_level == "admin":
-        back_button = Button(employee_window, text="Back",
+        back_button = Button(employee_window, bg='DarkSeaGreen', text="Back",
             command=partial(exit_window, employee_window)).grid(row=13,
             column=4, padx=10, pady=10)
 
-        archive_button = Button(employee_window, text="Archive", command=
+        archive_button = Button(employee_window, bg='DarkSeaGreen', text="Archive", command=
             partial(prompt_archive_employee, employee)).grid(row=13, column=0,
             padx=10, pady=10)
 
@@ -1184,6 +1185,7 @@ def prompt_archive_employee(employee: Employee):
                                        f'undo.')
     if res == True:
         last_day_screen = Toplevel(login_window)
+        last_day_screen.config(bg='whitesmoke')
         last_day = StringVar(last_day_screen)
         last_day_prompt = Label(last_day_screen,
             text=f'When was {employee.name}\'s last day?').grid(row=0,
@@ -1192,7 +1194,7 @@ def prompt_archive_employee(employee: Employee):
             .grid(row=1, column=0, padx=10, pady=10)
         last_day_entry = Entry(last_day_screen, textvariable=last_day)\
             .grid(row=1, column=1, padx=10, pady=10)
-        submit_button = Button(last_day_screen, text="Submit",
+        submit_button = Button(last_day_screen, bg='DarkSeaGreen', text="Submit",
             command=archive_employee).grid(row=2,
             column=1, padx=10, pady=10)
     else:
@@ -1213,6 +1215,7 @@ def prompt_report_all_employees():
 
 def open_report_window():
     report_window = Toplevel(login_window)
+    report_window.config('whitesmoke')
     report_window.geometry("1475x700")
     # Create Textbox for report data
     report_text = Text(report_window, width=120, height=100)
@@ -1461,7 +1464,7 @@ def generate_pay_stub(employee):
         pay_message_label = Label(pay_stub_window, text=pay_message) \
             .grid(row=5, column=0, padx=10, pady=10)
 
-        export_button = Button(pay_stub_window, text="Export to CSV",
+        export_button = Button(pay_stub_window, bg='DarkSeaGreen', text="Export to CSV",
                                command=partial(export_pay_stub_csv, name_message, pay_message,
                                     rate_message_1, rate_message_2)).grid(row=7, column=3,
                                     padx=10, pady=10)
@@ -1580,7 +1583,7 @@ help_menu.add_command(label="Help", command=under_construction)
 help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
 menu_bar.add_cascade(label="Help", menu=help_menu)
 # Adds the menu bar
-login_window.config(menu=menu_bar)
+login_window.config(menu=menu_bar, bg='whitesmoke')
 
 # Size of Login Window
 login_window.geometry("515x360")
@@ -1607,11 +1610,11 @@ password_entry = Entry(login_window, textvariable=password, show='*') \
     .grid(row=3, column=2, padx=5, pady=5)
 
 # Login Button
-login_button = Button(login_window, text="Login", \
+login_button = Button(login_window, bg='DarkSeaGreen', text="Login", \
                       command=login).grid(row=4, column=2, padx=25, pady=25)
 
 # Close Button
-exit_button = Button(login_window, text="Close", \
+exit_button = Button(login_window, bg='DarkSeaGreen', text="Close", \
                      command=button_close_warning).grid(row=5, column=4, padx=5, pady=5)
 
 
