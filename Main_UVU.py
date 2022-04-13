@@ -127,7 +127,8 @@ def open_admin():
     menu_bar.add_cascade(label="File", menu=file_menu)
     # Adds option of Help to menu bar
     help_menu = Menu(menu_bar, tearoff=0)
-    help_menu.add_command(label="Help", command=under_construction)
+    help_menu.add_command(label="Help", command=lambda: open_file(
+        "UserManual.pdf"))
     help_menu.add_command(label="Read Me", command=lambda: open_file(
         "readme.txt"))
     menu_bar.add_cascade(label="Help", menu=help_menu)
@@ -962,7 +963,8 @@ def open_employee(employee, permission_level):
     menu_bar.add_cascade(label="File", menu=file_menu)
     # Adds option of Help to menu bar
     help_menu = Menu(menu_bar, tearoff=0)
-    help_menu.add_command(label="Help", command=under_construction)
+    help_menu.add_command(label="Help", command=lambda: open_file(
+        "UserManual.pdf"))
     help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
     menu_bar.add_cascade(label="Help", menu=help_menu)
     # Adds the menu bar
@@ -1579,7 +1581,8 @@ file_menu.add_command(label="Close All", command=button_close_warning)
 menu_bar.add_cascade(label="File", menu=file_menu)
 # Adds option of Help to menu bar
 help_menu = Menu(menu_bar, tearoff=0)
-help_menu.add_command(label="Help", command=under_construction)
+help_menu.add_command(label="Help", command=lambda: open_file(
+        "UserManual.pdf"))
 help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
 menu_bar.add_cascade(label="Help", menu=help_menu)
 # Adds the menu bar
