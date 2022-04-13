@@ -127,11 +127,13 @@ def open_admin():
     menu_bar.add_cascade(label="File", menu=file_menu)
     # Adds option of Help to menu bar
     help_menu = Menu(menu_bar, tearoff=0)
-    help_menu.add_command(label="Help", command=under_construction)
-    help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
+    help_menu.add_command(label="Help", command=lambda: open_file(
+        "UserManual.pdf"))
+    help_menu.add_command(label="Read Me", command=lambda: open_file(
+        "readme.txt"))
     menu_bar.add_cascade(label="Help", menu=help_menu)
     # Adds the menu bar
-    admin_window.config(menu=menu_bar)
+    admin_window.config(menu=menu_bar, bg='whitesmoke')
     # Title of Admin Window
     admin_window.title("UVU Employee Database")
 
@@ -139,7 +141,8 @@ def open_admin():
     style = ttk.Style()
     style.theme_use("default")
     style.configure("Treeview", background="whitesmoke", \
-                    foreground="black", rowheight=35, fieldbackground="whitesmoke")
+                    foreground="black", rowheight=35, fieldbackground=\
+                        "whitesmoke")
 
     style.map("Treeview", background=[("selected", "olivedrab")])
 
@@ -156,20 +159,21 @@ def open_admin():
         # Populating the treeview with findings of the sort
         count = 0
         for emp in uvuEmpDat.emp_list:
-            # Will check if the search is in the name of employee then show
+            # Will check if the search is in the name of employee then
+            #   show
             if lookup_record.lower() in str(emp).lower():
                 if count % 2 == 0:
-                    employee_list.insert('', END, values=(emp.id, emp.first_name, \
-                                                          emp.last_name, emp.ssn, emp.phone, emp.email, \
-                                                          emp.start_date, emp.end_date, \
-                                                          str(emp.classification), \
-                                                          emp.title, emp.dept), tags=("evenrows",))
+                    employee_list.insert('', END, values=(emp.id,
+                        emp.first_name, emp.last_name, emp.ssn,
+                        emp.phone, emp.email, emp.start_date,
+                        emp.end_date, str(emp.classification), emp.title,
+                        emp.dept), tags=("evenrows",))
                 else:
-                    employee_list.insert('', END, values=(emp.id, emp.first_name, \
-                                                          emp.last_name, emp.ssn, emp.phone, emp.email, \
-                                                          emp.start_date, emp.end_date, \
-                                                          str(emp.classification), \
-                                                          emp.title, emp.dept), tags=("oddrows",))
+                    employee_list.insert('', END, values=(emp.id,
+                        emp.first_name, emp.last_name, emp.ssn, emp.phone,
+                        emp.email, emp.start_date, emp.end_date,
+                        str(emp.classification), emp.title, emp.dept),
+                        tags=("oddrows",))
                 count += 1
                   
     # Search frame on Admin list
@@ -179,55 +183,69 @@ def open_admin():
     search_entry = Entry(search_frame)
     search_entry.grid(row=0, column=0, padx=5, pady=5)
     # Search Button
-    search_button = Button(search_frame, text="Search", command=search_records)
+    search_button = Button(search_frame, bg='DarkSeaGreen', text="Search", command=\
+        search_records)
     search_button.grid(row=0, column=1, padx=5, pady=5)
     
     def tree_column_sort(tree, the_column, other_way):
         # Get the values to sort
-        information = [(tree.set(k, the_column), k) for k in tree.get_children('')]
+        information = [(tree.set(k, the_column), k) for k in \
+            tree.get_children('')]
         # Rearrange to sorted positions
         information.sort(reverse=other_way)
         for index, data in enumerate(information):
             tree.move(data[1], '', index)
         # Reverse the sort on next click
         tree.heading(the_column,
-                     command=lambda c=columns_list[the_column]: tree_column_sort(tree, the_column, not other_way))
+                     command=lambda c=columns_list[the_column]:\
+                        tree_column_sort(tree, the_column, not other_way))
 
     # Define columns
-    columns_list = ("employee_id", "first_name", "last_name", \
-                    "social_security_number", "phone_number", "email", "start_date", \
-                    "end_date", "classification", "title", "department")
+    columns_list = ("employee_id", "first_name", "last_name",
+        "social_security_number", "phone_number", "email", "start_date",
+        "end_date", "classification", "title", "department")
 
-    employee_list = ttk.Treeview(emp_frame, columns=columns_list, \
-                                 show="headings")
+    employee_list = ttk.Treeview(emp_frame, columns=columns_list,
+        show="headings")
+
     for column in columns_list:
         employee_list.column(column, width=130)
 
     # Define headings
     employee_list.heading("employee_id", text="Employee ID",
-                          command=lambda c=columns_list[0]: tree_column_sort(employee_list, 0, False))
+                          command=lambda c=columns_list[0]: \
+                              tree_column_sort(employee_list, 0, False))
     employee_list.heading("first_name", text="First Name",
-                          command=lambda c=columns_list[1]: tree_column_sort(employee_list, 1, False))
+                          command=lambda c=columns_list[1]: \
+                              tree_column_sort(employee_list, 1, False))
     employee_list.heading("last_name", text="Last Name",
-                          command=lambda c=columns_list[2]: tree_column_sort(employee_list, 2, False))
+                          command=lambda c=columns_list[2]: \
+                              tree_column_sort(employee_list, 2, False))
     employee_list.heading("social_security_number", \
                           text="Social Security Number",
-                          command=lambda c=columns_list[3]: tree_column_sort(employee_list, 3, False))
-
+                          command=lambda c=columns_list[3]: \
+                              tree_column_sort(employee_list, 3, False))
     employee_list.heading("phone_number", text="Phone Number",
-                          command=lambda c=columns_list[4]: tree_column_sort(employee_list, 4, False))
+                          command=lambda c=columns_list[4]: \
+                              tree_column_sort(employee_list, 4, False))
     employee_list.heading("email", text="Email",
-                          command=lambda c=columns_list[5]: tree_column_sort(employee_list, 5, False))
+                          command=lambda c=columns_list[5]: \
+                              tree_column_sort(employee_list, 5, False))
     employee_list.heading("start_date", text="Starting Date",
-                          command=lambda c=columns_list[6]: tree_column_sort(employee_list, 6, False))
+                          command=lambda c=columns_list[6]: \
+                              tree_column_sort(employee_list, 6, False))
     employee_list.heading("end_date", text="Ending Date",
-                          command=lambda c=columns_list[7]: tree_column_sort(employee_list, 7, False))
+                          command=lambda c=columns_list[7]: \
+                              tree_column_sort(employee_list, 7, False))
     employee_list.heading("classification", text="Classification",
-                          command=lambda c=columns_list[8]: tree_column_sort(employee_list, 8, False))
+                          command=lambda c=columns_list[8]: \
+                              tree_column_sort(employee_list, 8, False))
     employee_list.heading("title", text="Title",
-                          command=lambda c=columns_list[9]: tree_column_sort(employee_list, 9, False))
+                          command=lambda c=columns_list[9]: \
+                              tree_column_sort(employee_list, 9, False))
     employee_list.heading("department", text="Department",
-                          command=lambda c=columns_list[10]: tree_column_sort(employee_list, 10, False))
+                          command=lambda c=columns_list[10]: \
+                              tree_column_sort(employee_list, 10, False))
 
     # Style - striped rows
     employee_list.tag_configure("evenrows", background="honeydew")
@@ -238,24 +256,22 @@ def open_admin():
     count = 0
     for emp in uvuEmpDat.emp_list:
         if count % 2 == 0:
-            employee_list.insert('', END, values=(emp.id, emp.first_name, \
-                                                  emp.last_name, emp.ssn, emp.phone, emp.email, \
-                                                  emp.start_date, emp.end_date, \
-                                                  str(emp.classification), \
-                                                  emp.title, emp.dept), tags=("evenrows",))
+            employee_list.insert('', END, values=(emp.id, emp.first_name,
+                emp.last_name, emp.ssn, emp.phone, emp.email,
+                emp.start_date, emp.end_date, str(emp.classification),
+                emp.title, emp.dept), tags=("evenrows",))
         else:
-            employee_list.insert('', END, values=(emp.id, emp.first_name, \
-                                                  emp.last_name, emp.ssn, emp.phone, emp.email, \
-                                                  emp.start_date, emp.end_date, \
-                                                  str(emp.classification), \
-                                                  emp.title, emp.dept), tags=("oddrows",))
+            employee_list.insert('', END, values=(emp.id, emp.first_name,
+                emp.last_name, emp.ssn, emp.phone, emp.email,
+                emp.start_date, emp.end_date, str(emp.classification),
+                emp.title, emp.dept), tags=("oddrows",))
         count += 1
 
     # Button frame on Admin list
     button_frame = Frame(admin_window)
     button_frame.pack(pady=0)
     # Report button
-    report_button = Button(button_frame, text="Report",
+    report_button = Button(button_frame, bg='DarkSeaGreen', text="Report",
                            command=prompt_report_all_employees)
     report_button.grid(row=0, column=0, padx=5, pady=5)
 
@@ -276,8 +292,8 @@ def open_admin():
     employee_list.grid(row=1, column=0, sticky="nsew")
 
     # Scrollbar
-    scrollbar = ttk.Scrollbar(emp_frame, orient=VERTICAL, \
-                              command=employee_list.yview)
+    scrollbar = ttk.Scrollbar(emp_frame, orient=VERTICAL,
+        command=employee_list.yview)
 
     employee_list.config(yscroll=scrollbar.set)
     scrollbar.grid(row=1, column=1, sticky="ns")
@@ -382,7 +398,8 @@ def add_employee_screen():
             # Routing number entry:
             global route_label
             global route_entry
-            route_label = Label(add_emp_window, text="Bank Routing Number:")
+            route_label = Label(add_emp_window,
+                text="Bank Routing Number:")
             route_label.grid(row=9, column=3, padx=25, pady=5)
             route_entry = Entry(add_emp_window,
                                 textvariable=route_num)
@@ -391,7 +408,8 @@ def add_employee_screen():
             # Account number entry:
             global account_label
             global account_entry
-            account_label = Label(add_emp_window, text="Bank Account Number:")
+            account_label = Label(add_emp_window,
+                text="Bank Account Number:")
             account_label.grid(row=10, column=3, padx=25, pady=5)
             account_entry = Entry(add_emp_window,
                                   textvariable=account_num)
@@ -426,13 +444,13 @@ def add_employee_screen():
             emp_account_num = account_num.get()
             if re.search("^\d+-?\d+$", emp_account_num) is None:
                 valid = False
-                msg = f'Bank account number should be numeric, with one ' \
+                msg = f'Bank account number should be numeric, with one '\
                       'dash allowed.'
 
             emp_route_num = route_num.get()
             if re.search("^\d+-?\d+-?\d+$", emp_route_num) is None:
                 valid = False
-                msg = f'Routing number should be numeric, with up to ' \
+                msg = f'Routing number should be numeric, with up to '\
                       'two dashes allowed.'
 
 
@@ -452,7 +470,7 @@ def add_employee_screen():
             except:
                 valid = False
                 emp_class = -1
-                msg = f'Hourly pay must be a number, with 1 decimal ' \
+                msg = f'Hourly pay must be a number, with 1 decimal '\
                       'point allowed.'
         elif emp_class_str == "Salary":
             emp_salary = salary.get()
@@ -462,7 +480,7 @@ def add_employee_screen():
             except:
                 valid = False
                 emp_class = -1
-                msg = f'Salary must be a number, with 1 decimal point ' \
+                msg = f'Salary must be a number, with 1 decimal point '\
                       'allowed.'
         elif emp_class_str == "Commissioned":
             emp_salary = salary.get()
@@ -470,11 +488,12 @@ def add_employee_screen():
             try:
                 emp_salary = float(emp_salary)
                 emp_com_rate = float(emp_com_rate)
-                emp_class = create_classification(3, emp_salary, emp_com_rate)
+                emp_class = create_classification(3, emp_salary,
+                    emp_com_rate)
             except:
                 valid = False
                 emp_class = -1
-                msg = f'Salary and Commission rate must each be a ' \
+                msg = f'Salary and Commission rate must each be a '\
                       'number, each with 1 decimal point allowed.'
         if emp_class == None:
             valid = False
@@ -493,7 +512,7 @@ def add_employee_screen():
         emp_title = title.get()
         if re.search("^\w+.?\w+$", emp_title) is None:
             valid = False
-            msg = f'Employee Title must have letters and numbers only, ' \
+            msg = f'Employee Title must have letters and numbers only, '\
                   'with one special character in between characters ' \
                   'allowed.'
 
@@ -502,14 +521,14 @@ def add_employee_screen():
                 and re.search("^\d\d-\d\d-\d\d\d\d$", emp_start_date) is \
                 None:
             valid = False
-            msg = f'Start date must match the format: MM/DD/YYYY or ' \
+            msg = f'Start date must match the format: MM/DD/YYYY or '\
                   'MM-DD-YYYY'
 
         emp_b_day = birth_date.get()
         if re.search("^\d\d\/\d\d\/\d\d\d\d$", emp_b_day) is None and \
                 re.search("^\d\d-\d\d-\d\d\d\d$", emp_b_day) is None:
             valid = False
-            msg = f'Birth date must match the format: MM/DD/YYYY or ' \
+            msg = f'Birth date must match the format: MM/DD/YYYY or '\
                   'MM-DD-YYYY'
 
         emp_zip = zip.get()
@@ -525,7 +544,7 @@ def add_employee_screen():
         emp_city = city.get()
         if re.search("^[a-zA-Z]+[ -]*[a-zA-Z]+$", emp_city) is None:
             valid = False
-            msg = f'City must have letters only, with one space or dash ' \
+            msg = f'City must have letters only, with one space or dash '\
                   'allowed.'
 
         emp_address = address.get()
@@ -545,14 +564,14 @@ def add_employee_screen():
                 None and re.search("^\d\d\d\d\d\d\d\d\d\d$", emp_phone) \
                 is None:
             valid = False
-            msg = f'Phone number must match the format: (###) ###-#### ' \
+            msg = f'Phone number must match the format: (###) ###-#### '\
                   'or ###-###-#### or ##########'
 
         emp_ssn = ssn.get()
         if re.search("^\d\d\d-\d\d-\d\d\d\d$", emp_ssn) is None and \
                 re.search("^\d\d\d\d\d\d\d\d\d$", emp_ssn) is None:
             valid = False
-            msg = f'SSN must match the format: ###-##-#### or ######### ' \
+            msg = f'SSN must match the format: ###-##-#### or ######### '\
                   '(9 digits)'
 
         emp_l_name = last_name.get()
@@ -567,10 +586,10 @@ def add_employee_screen():
 
         if valid:
             add_new_employee(uvuEmpDat, new_id, emp_f_name, emp_l_name,
-                             emp_address, emp_city, emp_state, emp_zip, emp_class,
-                             emp_pay_num, emp_b_day, emp_ssn, emp_phone, emp_email,
-                             emp_start_date, emp_title, emp_dept, emp_permission, emp_pwd,
-                             emp_route_num, emp_account_num)
+                emp_address, emp_city, emp_state, emp_zip, emp_class,
+                emp_pay_num, emp_b_day, emp_ssn, emp_phone, emp_email,
+                emp_start_date, emp_title, emp_dept, emp_permission,
+                emp_pwd, emp_route_num, emp_account_num)
 
             add_emp_window.destroy()
 
@@ -595,70 +614,70 @@ def add_employee_screen():
     first_name_label = Label(add_emp_window, text="First Name:")\
         .grid(row=2, column=1, padx=25, pady=5)
     first_name = StringVar(add_emp_window)
-    id_first_name = Entry(add_emp_window, textvariable=first_name) \
+    id_first_name = Entry(add_emp_window, textvariable=first_name)\
         .grid(row=2, column=2, padx=50, pady=5)
 
     # Last name entry:
     last_name_label = Label(add_emp_window, text="Last Name:").grid(row=3,
-                                                                    column=1, padx=25, pady=5)
+        column=1, padx=25, pady=5)
     last_name = StringVar(add_emp_window)
-    last_name_entry = Entry(add_emp_window, textvariable=last_name) \
+    last_name_entry = Entry(add_emp_window, textvariable=last_name)\
         .grid(row=3, column=2, padx=50, pady=5)
 
     # Social security number entry:
-    ssn_label = Label(add_emp_window, text="SSN:").grid(row=4,
-                                                        column=1, padx=25, pady=5)
+    ssn_label = Label(add_emp_window, text="SSN:").grid(row=4, column=1,
+        padx=25, pady=5)
     ssn = StringVar(add_emp_window)
-    ssn_entry = Entry(add_emp_window, textvariable=ssn) \
-        .grid(row=4, column=2, padx=50, pady=5)
+    ssn_entry = Entry(add_emp_window, textvariable=ssn).grid(row=4,
+        column=2, padx=50, pady=5)
 
     # Phone entry:
     phone_label = Label(add_emp_window, text="Phone:").grid(row=5,
-                                                            column=1, padx=25, pady=5)
+        column=1, padx=25, pady=5)
     phone = StringVar(add_emp_window)
-    phone_entry = Entry(add_emp_window, textvariable=phone) \
-        .grid(row=5, column=2, padx=50, pady=5)
+    phone_entry = Entry(add_emp_window, textvariable=phone).grid(row=5,
+        column=2, padx=50, pady=5)
 
     # Email entry:
     email_label = Label(add_emp_window, text="Email:").grid(row=6,
-                                                            column=1, padx=25, pady=5)
+        column=1, padx=25, pady=5)
     email = StringVar(add_emp_window)
-    email_entry = Entry(add_emp_window, textvariable=email) \
-        .grid(row=6, column=2, padx=50, pady=5)
+    email_entry = Entry(add_emp_window, textvariable=email).grid(row=6,
+        column=2, padx=50, pady=5)
 
     # Address entry:
-    address_label = Label(add_emp_window, text="Street Address:").grid(row=7,
-                                                                       column=1, padx=25, pady=5)
+    address_label = Label(add_emp_window, text="Street Address:")\
+        .grid(row=7, column=1, padx=25, pady=5)
     address = StringVar(add_emp_window)
-    address_entry = Entry(add_emp_window, textvariable=address) \
+    address_entry = Entry(add_emp_window, textvariable=address)\
         .grid(row=7, column=2, padx=50, pady=5)
 
     # City entry:
-    city_label = Label(add_emp_window, text="City:").grid(row=8,
-                                                          column=1, padx=25, pady=5)
+    city_label = Label(add_emp_window, text="City:").grid(row=8, column=1,
+        padx=25, pady=5)
     city = StringVar(add_emp_window)
-    city_entry = Entry(add_emp_window, textvariable=city) \
-        .grid(row=8, column=2, padx=50, pady=5)
+    city_entry = Entry(add_emp_window, textvariable=city).grid(row=8,
+        column=2, padx=50, pady=5)
 
     # State entry:
     state_label = Label(add_emp_window, text="State:").grid(row=9,
-                                                            column=1, padx=25, pady=5)
+        column=1, padx=25, pady=5)
     state = StringVar(add_emp_window)
-    state_entry = Entry(add_emp_window, textvariable=state) \
-        .grid(row=9, column=2, padx=50, pady=5)
+    state_entry = Entry(add_emp_window, textvariable=state).grid(row=9,
+        column=2, padx=50, pady=5)
 
     # Zip code entry:
     zip_label = Label(add_emp_window, text="Zip Code:").grid(row=10,
-                                                             column=1, padx=25, pady=5)
+        column=1, padx=25, pady=5)
     zip = StringVar(add_emp_window)
-    zip_entry = Entry(add_emp_window, textvariable=zip) \
-        .grid(row=10, column=2, padx=50, pady=5)
+    zip_entry = Entry(add_emp_window, textvariable=zip).grid(row=10,
+        column=2, padx=50, pady=5)
 
     # Birth date entry:
-    birth_date_label = Label(add_emp_window, text="Birth Date:").grid(row=11,
-                                                                      column=1, padx=25, pady=5)
+    birth_date_label = Label(add_emp_window, text="Birth Date:")\
+        .grid(row=11, column=1, padx=25, pady=5)
     birth_date = StringVar(add_emp_window)
-    birth_date_entry = Entry(add_emp_window, textvariable=birth_date) \
+    birth_date_entry = Entry(add_emp_window, textvariable=birth_date)\
         .grid(row=11, column=2, padx=50, pady=5)
 
     # Start date entry:
@@ -716,7 +735,7 @@ def add_employee_screen():
                                  "employee")
     permission_drop.grid(row=11, column=4, padx=50, pady=5)
 
-    create_button = Button(add_emp_window, text="Create",
+    create_button = Button(add_emp_window, bg='DarkSeaGreen', text="Create",
                            command=validate_new_emp).grid(row=12, column=4, padx=10,
                                                           pady=10)
 
@@ -846,6 +865,7 @@ def edit_employee_info(employee, fields, the_edit):
 
     # Creates the edit window
     edit_window = Toplevel(login_window)
+    edit_window.config(bg='whitesmoke')
     # Initialize variable to keep track of edit type.
     edit_type = 0
     # Shows previous information before edit
@@ -871,7 +891,7 @@ def edit_employee_info(employee, fields, the_edit):
         updated_bank_routing = Entry(edit_window, textvariable=new_bank_routing).grid(row=3, column=2, padx=10, pady=10)
         label_bank_account = Label(edit_window, text="Bank Account Number: ").grid(row=4, column=1, padx=10, pady=10)
         updated_bank_account = Entry(edit_window, textvariable=new_bank_account).grid(row=4, column=2, padx=10, pady=10)
-        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=6, columnspan=3,
+        update_button = Button(edit_window, bg='DarkSeaGreen', text="Update Information", command=partial(update_emp, fields)).grid(row=6, columnspan=3,
                                                                                                 padx=10, pady=10)   
     elif str(the_edit) ==  "hourly" or str(the_edit) ==  "salary" or str(the_edit) ==  "commissioned":
         # Classification options
@@ -887,14 +907,14 @@ def edit_employee_info(employee, fields, the_edit):
         updated_com_salary = Entry(edit_window, textvariable=new_com_salary).grid(row=6, column=2, padx=10, pady=10)
         label_commissioned = Label(edit_window, text="Commission Pay Rate: ").grid(row=7, column=1, padx=10, pady=10)        
         updated_commissioned = Entry(edit_window, textvariable=new_commission).grid(row=7, column=2, padx=10, pady=10)
-        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=8, columnspan=3,
+        update_button = Button(edit_window, bg='DarkSeaGreen', text="Update Information", command=partial(update_emp, fields)).grid(row=8, columnspan=3,
                                                                                                         padx=10, pady=10)
     elif the_edit == "admin" or the_edit == "employee":
         # Permission options.
         edit_type = 3
         Radiobutton(edit_window, text="Employee", variable=new_info, value="employee").grid(row=1, column=1, padx=10, pady=10)
         Radiobutton(edit_window, text="Admin", variable=new_info, value="admin").grid(row=2, column=1, padx=10, pady=10)
-        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=3, columnspan=3,
+        update_button = Button(edit_window, bg='DarkSeaGreen', text="Update Information", command=partial(update_emp, fields)).grid(row=3, columnspan=3,
                                                                                                         padx=10, pady=10)
 
     else:
@@ -905,7 +925,7 @@ def edit_employee_info(employee, fields, the_edit):
             edit_type = 5
         updated_info = Entry(edit_window, textvariable=new_info).grid(row=1, column=1, padx=10, pady=10)
         # Button to update information
-        update_button = Button(edit_window, text="Update Information", command=partial(update_emp, fields)).grid(row=6, columnspan=3,
+        update_button = Button(edit_window, bg='DarkSeaGreen', text="Update Information", command=partial(update_emp, fields)).grid(row=6, columnspan=3,
                                                                                                         padx=10, pady=10)
 
 
@@ -943,11 +963,12 @@ def open_employee(employee, permission_level):
     menu_bar.add_cascade(label="File", menu=file_menu)
     # Adds option of Help to menu bar
     help_menu = Menu(menu_bar, tearoff=0)
-    help_menu.add_command(label="Help", command=under_construction)
+    help_menu.add_command(label="Help", command=lambda: open_file(
+        "UserManual.pdf"))
     help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
     menu_bar.add_cascade(label="Help", menu=help_menu)
     # Adds the menu bar
-    employee_window.config(menu=menu_bar)
+    employee_window.config(menu=menu_bar, bg='whitesmoke')
 
     # Title of Login Window
     employee_window.title("UVU Employee Database")
@@ -1108,16 +1129,16 @@ def open_employee(employee, permission_level):
         pady=10, sticky=W)
 
     # Buttons
-    pay_stub_button = Button(employee_window, text="Get Pay Stub",
+    pay_stub_button = Button(employee_window, bg='DarkSeaGreen', text="Get Pay Stub",
         command=partial(generate_pay_stub, employee)).grid(row=13,
         column=5, padx=10, pady=10)
 
     if permission_level == "admin":
-        back_button = Button(employee_window, text="Back",
+        back_button = Button(employee_window, bg='DarkSeaGreen', text="Back",
             command=partial(exit_window, employee_window)).grid(row=13,
             column=4, padx=10, pady=10)
 
-        archive_button = Button(employee_window, text="Archive", command=
+        archive_button = Button(employee_window, bg='DarkSeaGreen', text="Archive", command=
             partial(prompt_archive_employee, employee)).grid(row=13, column=0,
             padx=10, pady=10)
 
@@ -1166,6 +1187,7 @@ def prompt_archive_employee(employee: Employee):
                                        f'undo.')
     if res == True:
         last_day_screen = Toplevel(login_window)
+        last_day_screen.config(bg='whitesmoke')
         last_day = StringVar(last_day_screen)
         last_day_prompt = Label(last_day_screen,
             text=f'When was {employee.name}\'s last day?').grid(row=0,
@@ -1174,7 +1196,7 @@ def prompt_archive_employee(employee: Employee):
             .grid(row=1, column=0, padx=10, pady=10)
         last_day_entry = Entry(last_day_screen, textvariable=last_day)\
             .grid(row=1, column=1, padx=10, pady=10)
-        submit_button = Button(last_day_screen, text="Submit",
+        submit_button = Button(last_day_screen, bg='DarkSeaGreen', text="Submit",
             command=archive_employee).grid(row=2,
             column=1, padx=10, pady=10)
     else:
@@ -1195,6 +1217,7 @@ def prompt_report_all_employees():
 
 def open_report_window():
     report_window = Toplevel(login_window)
+    report_window.config('whitesmoke')
     report_window.geometry("1475x700")
     # Create Textbox for report data
     report_text = Text(report_window, width=120, height=100)
@@ -1443,7 +1466,7 @@ def generate_pay_stub(employee):
         pay_message_label = Label(pay_stub_window, text=pay_message) \
             .grid(row=5, column=0, padx=10, pady=10)
 
-        export_button = Button(pay_stub_window, text="Export to CSV",
+        export_button = Button(pay_stub_window, bg='DarkSeaGreen', text="Export to CSV",
                                command=partial(export_pay_stub_csv, name_message, pay_message,
                                     rate_message_1, rate_message_2)).grid(row=7, column=3,
                                     padx=10, pady=10)
@@ -1558,11 +1581,12 @@ file_menu.add_command(label="Close All", command=button_close_warning)
 menu_bar.add_cascade(label="File", menu=file_menu)
 # Adds option of Help to menu bar
 help_menu = Menu(menu_bar, tearoff=0)
-help_menu.add_command(label="Help", command=under_construction)
+help_menu.add_command(label="Help", command=lambda: open_file(
+        "UserManual.pdf"))
 help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
 menu_bar.add_cascade(label="Help", menu=help_menu)
 # Adds the menu bar
-login_window.config(menu=menu_bar)
+login_window.config(menu=menu_bar, bg='whitesmoke')
 
 # Size of Login Window
 login_window.geometry("515x360")
@@ -1589,11 +1613,11 @@ password_entry = Entry(login_window, textvariable=password, show='*') \
     .grid(row=3, column=2, padx=5, pady=5)
 
 # Login Button
-login_button = Button(login_window, text="Login", \
+login_button = Button(login_window, bg='DarkSeaGreen', text="Login", \
                       command=login).grid(row=4, column=2, padx=25, pady=25)
 
 # Close Button
-exit_button = Button(login_window, text="Close", \
+exit_button = Button(login_window, bg='DarkSeaGreen', text="Close", \
                      command=button_close_warning).grid(row=5, column=4, padx=5, pady=5)
 
 
