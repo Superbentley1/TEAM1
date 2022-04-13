@@ -23,7 +23,7 @@ from tkinter import messagebox
 from tkinter.messagebox import showinfo, askokcancel, askyesno, WARNING
 from types import new_class
 
-from EmployeeDB import *
+from employee_database import *
 
 uvuEmpDat = EmployeeDB()
 
