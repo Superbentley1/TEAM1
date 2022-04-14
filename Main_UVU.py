@@ -100,11 +100,9 @@ def login():
 
         else:
             login_error()
-    
     # If username is not a string:
     except:
         login_error()
-    # TODO fix this
 
 
 def open_admin():
