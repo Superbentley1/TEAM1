@@ -694,11 +694,17 @@ def add_employee_screen():
                                  "employee")
     permission_drop.grid(row=11, column=4, padx=50, pady=5)
 
+    def create_emp():
+        make_new_emp()
+        admin_window.destroy()
+        open_admin()
+    
+    # Create new employee button
     create_button = Button(add_emp_window, bg='DarkSeaGreen', text="Create",
-                           command=make_new_emp).grid(row=12, column=4, padx=10,
+                           command=create_emp).grid(row=12, column=4, padx=10,
                                                           pady=10)
-
     add_emp_window.mainloop()
+    
 
 
 def edit_employee_info(employee, fields: list, original_data):
