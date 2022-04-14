@@ -15,6 +15,7 @@ Developed with:
 Python version 3.7.2
 Tkinter version 8.6
 """
+import re
 from functools import partial
 from tkinter import *
 from tkinter import ttk
@@ -89,7 +90,7 @@ def login():
         # Validate login with username and password from the login GUI
         #   screen entries.
         username_valid, password_valid = validate_login(users_id,
-                                                        user_password)
+            user_password)
         if username_valid and password_valid:
             employee = find_employee_by_id(users_id, uvuEmpDat.emp_list)
             if employee.permission == "admin":
@@ -99,6 +100,7 @@ def login():
 
         else:
             login_error()
+    
     # If username is not a string:
     except:
         login_error()
@@ -1179,6 +1181,7 @@ def prompt_report_all_employees():
 
 def open_report_window():
     report_window = Toplevel(login_window)
+    report_window.config(bg='whitesmoke')
     report_window.geometry("1475x700")
     # Create Textbox for report data
     report_text = Text(report_window, width=120, height=100)
@@ -1362,27 +1365,6 @@ def generate_report_all_employees(include_archived):
             report.write(f"\t{pay_report}\n\n\n")
     # Opens the report in a GUI window
     open_report_window()
-
-    # report_window = Toplevel()
-
-    # with open("report.csv", 'r') as report_in:
-    #     count = 0
-    #     for line in report_in:
-    #         count += 1
-    #         Label(report_window, text=line).grid(row=count, padx=10,
-    #             pady=10)
-    # #Scrollbar
-    # scrollbar = ttk.Scrollbar(report_window, orient=VERTICAL, \
-    #                     command=report_window.yview)
-
-    # report_window.config(yscroll=scrollbar.set)
-    # scrollbar.grid(row=1, column=1, sticky="ns")
-
-    # report_window.mainloop()
-
-    # Print message in GUI screen saying that report can also be viewed
-    #   and shared from "report.csv".
-    # Bind event listener to "Back" button to exit the report's window.
 
 
 def generate_pay_stub(employee):

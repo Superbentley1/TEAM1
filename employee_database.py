@@ -563,7 +563,7 @@ class EmployeeDB:
                 if temp_row["ID"] == str(id_num):
                     for index in range(len(fields)):
                         temp_row[fields[index]] = data[index]
-                    temp.append(temp_row)
+                temp.append(temp_row)
         with open("employees.csv", "w", newline='', encoding="utf8") as temp_db:
             fieldnames = "ID,Name,Address,City,State,Zip,Classification," \
                          "Pay_Method,Salary,Hourly,Commission,Route,Account," \
