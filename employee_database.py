@@ -597,6 +597,7 @@ class EmployeeDB:
                         for index in range(len(fields)):
                             setattr(employee, fields[index].lower(), data[index])
 
+
 def _add_row(employee: Employee, file):
     with open(file, "a", encoding="utf8") as database:
         writer = csv.writer(database, delimiter=',')
