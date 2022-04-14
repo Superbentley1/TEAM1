@@ -1067,9 +1067,15 @@ def open_employee(employee, permission_level):
                                               pady=10, sticky=W)
 
     # Buttons
+<<<<<<< HEAD
     Button(employee_window, bg='DarkSeaGreen', text="Get Pay Stub",
            command=partial(generate_pay_stub, employee)).grid(row=13,
                                                               column=5, padx=10, pady=10)
+=======
+    pay_stub_button = Button(employee_window, bg='DarkSeaGreen', text="Get Pay Stub",
+        command=partial(generate_pay_stub, employee)).grid(row=13,
+        column=5, padx=10, pady=10)
+>>>>>>> parent of 932340a (Added refresh button to Employee screen)
 
     if permission_level == "admin":
         Button(employee_window, bg='DarkSeaGreen', text="Back",
