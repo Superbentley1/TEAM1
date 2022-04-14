@@ -147,9 +147,12 @@ def open_admin():
     emp_frame = Frame(ADMIN_WINDOW)
     emp_frame.pack(pady=0)
 
-    def search_records():
+    def search_records(entry=0):
         # Get the entry from search
-        lookup_record = search_entry.get()
+        if entry == 0:
+            lookup_record = search_entry.get()
+        else:
+            lookup_record = ""
         # Clear the Treeview
         for record in employee_list.get_children():
             employee_list.delete(record)
@@ -183,6 +186,14 @@ def open_admin():
     search_button = Button(search_frame, bg='DarkSeaGreen', text="Search", command= \
         search_records)
     search_button.grid(row=0, column=1, padx=5, pady=5)
+
+    # Refresh button frame for Admin list
+    refresh_frame = Frame(ADMIN_WINDOW)
+    refresh_frame.pack(pady=0)
+    # Refresh Button
+    refresh_button = Button(refresh_frame, bg='DarkSeaGreen', text="Refresh", command=\
+        lambda: search_records(1))
+    refresh_button.grid(row=0, column=0, padx=5, pady=5)
 
     def tree_column_sort(tree, the_column, other_way):
         # Get the values to sort
@@ -412,13 +423,14 @@ def add_employee_screen():
             ACCOUNT_LABEL.destroy()
             ACCOUNT_ENTRY.destroy()
 
-    def validate_new_emp():
+    def make_new_emp():
         """Creates a new employee with all of the given data members on
         the create employee GUI screen, after making sure the data in each
         field is valid.
         """
-        # Initialize validity checker to False.
-        valid = True
+        # Initialize list of validity checkers. List will be checked at
+        #   the end for any invalid values returned.
+        data_validity = []
 
         emp_permission = permission.get()
 
@@ -426,152 +438,98 @@ def add_employee_screen():
         emp_route_num = 0
         emp_account_num = 0
         pay_method_str = pay_method.get()
+        data_validity.append(validate_emp_data("Pay_Method",
+            pay_method_str))
         if pay_method_str == "Direct Deposit":
             emp_pay_num = 1
-
             emp_account_num = account_num.get()
-            if re.search(r"^\d+-?\d+$", emp_account_num) is None:
-                valid = False
-                msg = 'Bank account number should be numeric, with one ' \
-                      'dash allowed.'
+            data_validity.append(validate_emp_data("Account",
+                emp_account_num))
 
             emp_route_num = route_num.get()
-            if re.search(r"^\d+-?\d+-?\d+$", emp_route_num) is None:
-                valid = False
-                msg = 'Routing number should be numeric, with up to ' \
-                      'two dashes allowed.'
-
+            data_validity.append(validate_emp_data("Route",
+                emp_route_num))
 
         elif pay_method_str == "Mail":
             emp_pay_num = 2
-        if emp_pay_num == 0:
-            valid = False
-            msg = 'You must select a payment method.'
 
         emp_class = None
         emp_class_str = classification.get()
+        data_validity.append(validate_emp_data("Classification",
+            emp_class_str))
+
         if emp_class_str == "Hourly":
             emp_hour_pay = hourly_rate.get()
-            try:
-                emp_hour_pay = float(emp_hour_pay)
+            valid = validate_emp_data("Hourly", emp_hour_pay)
+            data_validity.append(valid)
+            if valid:
                 emp_class = create_classification(1, emp_hour_pay)
-            except:
-                valid = False
                 emp_class = -1
-                msg = 'Hourly pay must be a number, with 1 decimal point allowed.'
+
         elif emp_class_str == "Salary":
             emp_salary = salary.get()
-            try:
-                emp_salary = float(emp_salary)
+            valid = validate_emp_data("Salary", emp_salary)
+            data_validity.append(valid)
+            if valid:
                 emp_class = create_classification(2, emp_salary)
-            except:
-                valid = False
                 emp_class = -1
-                msg = 'Salary must be a number, with 1 decimal point ' \
-                      'allowed.'
+
         elif emp_class_str == "Commissioned":
             emp_salary = salary.get()
             emp_com_rate = commission_rate.get()
-            try:
-                emp_salary = float(emp_salary)
-                emp_com_rate = float(emp_com_rate)
+            valid = validate_emp_data("Commission", emp_salary,
+                emp_com_rate)
+            data_validity.append(valid)
+            if valid:
                 emp_class = create_classification(3, emp_salary,
                                                   emp_com_rate)
-            except:
-                valid = False
+            else:
                 emp_class = -1
-                msg = 'Salary and Commission rate must each be a ' \
-                      'number, each with 1 decimal point allowed.'
-        if emp_class is None:
-            valid = False
-            msg = 'You must select a classification type.'
 
         emp_pwd = password.get()
-        if re.search(".+", emp_pwd) is None:
-            valid = False
-            msg = 'Password must not be empty.'
+        data_validity.append(validate_emp_data("Password", emp_pwd))
 
         emp_dept = dept.get()
-        if re.search(".+", emp_dept) is None:
-            valid = False
-            msg = 'Employee department must not be empty.'
+        data_validity.append(validate_emp_data("Dept", emp_dept))
 
         emp_title = title.get()
-        if re.search(r"^\w+.?\w+$", emp_title) is None:
-            valid = False
-            msg = 'Employee Title must have letters and numbers only, ' \
-                  'with one special character in between characters ' \
-                  'allowed.'
+        data_validity.append(validate_emp_data("Title", emp_title))
 
         emp_start_date = start_date.get()
-        if re.search(r"^\d\d\/\d\d\/\d\d\d\d$", emp_start_date) is None \
-                and re.search(r"^\d\d-\d\d-\d\d\d\d$", emp_start_date) is \
-                None:
-            valid = False
-            msg = 'Start date must match the format: MM/DD/YYYY or ' \
-                  'MM-DD-YYYY'
+        data_validity.append(validate_emp_data("Start_Date",
+            emp_start_date))
 
         emp_b_day = birth_date.get()
-        if re.search(r"^\d\d\/\d\d\/\d\d\d\d$", emp_b_day) is None and \
-                re.search(r"^\d\d-\d\d-\d\d\d\d$", emp_b_day) is None:
-            valid = False
-            msg = 'Birth date must match the format: MM/DD/YYYY or ' \
-                  'MM-DD-YYYY'
+        data_validity.append(validate_emp_data("Birth_Date", emp_b_day))
 
         emp_zip = zip.get()
-        if re.search(r"\d\d\d\d\d", emp_zip) is None:
-            valid = False
-            msg = 'Zip code must contain 5 consecutive digits.'
+        data_validity.append(validate_emp_data("Zip", emp_zip))
 
         emp_state = state.get()
-        if re.search("^[A-Z][A-Z]$", emp_state) is None:
-            valid = False
-            msg = 'State must be a two-letter capital state code.'
+        data_validity.append(validate_emp_data("State", emp_state))
 
         emp_city = city.get()
-        if re.search("^[a-zA-Z]+[ -]*[a-zA-Z]+$", emp_city) is None:
-            valid = False
-            msg = 'City must have letters only, with one space or dash ' \
-                  'allowed.'
+        data_validity.append(validate_emp_data("City", emp_city))
 
         emp_address = address.get()
-        if re.search("[a-zA-Z]", emp_address) is None or \
-                re.search("[0-9]", emp_address) is None:
-            valid = False
-            msg = 'Address must have letters and numbers.'
+        data_validity.append(validate_emp_data("Address", emp_address))
 
         emp_email = email.get()
-        if re.search(r"^.*\w.*@\w.*\.\w+$", emp_email) is None:
-            valid = False
-            msg = 'Email address is not valid.'
+        data_validity.append(validate_emp_data("Email", emp_email))
 
         emp_phone = phone.get()
-        if re.search(r"^\(\d\d\d\) \d\d\d-\d\d\d\d$", emp_phone) is None \
-                and re.search(r"^\d\d\d-\d\d\d-\d\d\d\d$", emp_phone) is \
-                None and re.search(r"^\d\d\d\d\d\d\d\d\d\d$", emp_phone) \
-                is None:
-            valid = False
-            msg = 'Phone number must match the format: (###) ###-#### ' \
-                  'or ###-###-#### or ##########'
+        data_validity.append(validate_emp_data("Phone", emp_phone))
 
         emp_ssn = ssn.get()
-        if re.search(r"^\d\d\d-\d\d-\d\d\d\d$", emp_ssn) is None and \
-                re.search(r"^\d\d\d\d\d\d\d\d\d$", emp_ssn) is None:
-            valid = False
-            msg = 'SSN must match the format: ###-##-#### or ######### ' \
-                  '(9 digits)'
+        data_validity.append(validate_emp_data("SSN", emp_ssn))
 
         emp_l_name = last_name.get()
-        if not emp_l_name.isalpha():
-            valid = False
-            msg = 'Last name must have letters only.'
+        data_validity.append(validate_emp_data("Last_Name", emp_l_name))
 
         emp_f_name = first_name.get()
-        if not emp_f_name.isalpha():
-            valid = False
-            msg = 'First name must have letters only.'
+        data_validity.append(validate_emp_data("First_Name", emp_f_name))
 
-        if valid:
+        if False not in data_validity:
             add_new_employee(uvuEmpDat, new_id, emp_f_name, emp_l_name,
                              emp_address, emp_city, emp_state, emp_zip, emp_class,
                              emp_pay_num, emp_b_day, emp_ssn, emp_phone, emp_email,
@@ -581,8 +539,6 @@ def add_employee_screen():
             add_emp_window.destroy()
 
             ADMIN_WINDOW.update()
-        else:
-            validation_error(msg)
 
     max_id = 0
     for emp in uvuEmpDat.emp_list + uvuEmpDat.archived_list:
@@ -690,14 +646,20 @@ def add_employee_screen():
                                  "employee")
     permission_drop.grid(row=11, column=4, padx=50, pady=5)
 
+    def create_emp():
+        make_new_emp()
+        ADMIN_WINDOW.destroy()
+        open_admin()
+    
+    # Create new employee button
     Button(add_emp_window, bg='DarkSeaGreen', text="Create",
-           command=validate_new_emp).grid(row=12, column=4, padx=10,
+           command=create_emp).grid(row=12, column=4, padx=10,
                                           pady=10)
 
     add_emp_window.mainloop()
 
 
-def edit_employee_info(employee, fields, the_edit):
+def edit_employee_info(employee, fields: list, original_data):
     """Generates a GUI window with information of the employee.
     Also generates an entry box and a button to update information, and
     allows the updating of employee info on the GUI.
@@ -708,108 +670,101 @@ def edit_employee_info(employee, fields, the_edit):
         parameters.
         """
         # Initialize variable for validating user input.
-        valid = True
-        msg = ""
+        data_validity = []
+        edit_data = []
+
         # For payment method updates:
         if edit_type == 1:
             pay_method = new_info.get()
-            if pay_method == "mail":
-                uvuEmpDat.edit_employee(employee.id, fields, [2])
-            elif pay_method == "direct deposit":
+            
+            data_validity.append(validate_emp_data("Pay_Method",
+                pay_method))
+
+            if pay_method == "Mail":
+                edit_data = [2]
+
+            elif pay_method == "Direct Deposit":
                 fields += ["Route", "Account"]
                 route_num = new_bank_routing.get()
                 account_num = new_bank_account.get()
-                if re.search(r"^\d+-?\d+$", account_num) is None:
-                    valid = False
-                    msg = 'Bank account number should be numeric, with one dash allowed.'
-                if re.search(r"^\d+-?\d+-?\d+$", route_num) is None:
-                    valid = False
-                    msg = 'Routing number should be numeric, with up to two dashes allowed.'
-                if valid:
-                    uvuEmpDat.edit_employee(employee.id, fields, [1, route_num, account_num])
-                    edit_window.destroy()
-                else:
-                    validation_error(msg)
+                data_validity.append(validate_emp_data("Account",
+                    account_num))
+                data_validity.append(validate_emp_data("Route",
+                    route_num))
+                edit_data = [1, route_num, account_num]
+            
+            if False not in data_validity:
+                uvuEmpDat.edit_employee(employee.id, fields, edit_data)
+                edit_window.destroy()
+            else:
+                fields = fields[:1]
 
         # For classification updates:
         elif edit_type == 2:
             new_classification = new_info.get()
-            if new_classification == "hourly":
+            data_validity.append(validate_emp_data("Classification",
+                new_classification))
+
+            if new_classification == "Hourly":
                 fields += ["Hourly"]
                 hourly_rate = new_hourly.get()
-                try:
-                    hourly_rate = float(hourly_rate)
-                except:
-                    valid = False
-                    msg = 'Hourly Rate must be a number, with 1 decimal point allowed.'
-                if valid:
-                    uvuEmpDat.edit_employee(employee.id, fields, [1, hourly_rate])
-                    edit_window.destroy()
-                else:
-                    validation_error(msg)
-
-            elif new_classification == "salary":
+                
+            elif new_classification == "Salary":
                 fields += ["Salary"]
                 salary = new_salary.get()
-                try:
-                    salary = float(salary)
-                except:
-                    valid = False
-                    msg = 'Salary must be a number, with 1 decimal point allowed.'
-                if valid:
-                    uvuEmpDat.edit_employee(employee.id, fields, [2, salary])
-                else:
-                    validation_error(msg)
-
-            elif new_classification == "commissioned":
+                data_validity.append(validate_emp_data("Salary", salary))
+                edit_data = [2, salary]
+               
+            elif new_classification == "Commissioned":
                 fields += ["Salary", "Commission"]
                 com_salary = new_com_salary.get()
                 commission_rate = new_commission.get()
-                try:
-                    com_salary = float(com_salary)
-                    commission_rate = float(commission_rate)
-                except:
-                    valid = False
-                    msg = f'Salary and Commission rate must each be a ' \
-                          f'number, each with 1 decimal point allowed.'
-
-                if valid:
-                    uvuEmpDat.edit_employee(employee.id, fields, [3, com_salary, commission_rate])
-                else:
-                    fields = fields[:1]
-                    validation_error(msg)
+                data_validity.append(validate_emp_data("Commissioned",
+                    com_salary, commission_rate))
+                edit_data = [3, com_salary, commission_rate]
+               
+            if False not in data_validity:
+                # Convert string values of pay amounts to floats.
+                for idx in range(len(edit_data)):
+                    if isinstance(edit_data[idx], str):
+                        edit_data[idx] = float(edit_data[idx])
+                uvuEmpDat.edit_employee(employee.id, fields, edit_data)
+                edit_window.destroy()
+            else:
+                fields = fields[:1]
 
         # For permission updates:
         elif edit_type == 3:
             permission = new_info.get()
-            if permission == "employee":
-                uvuEmpDat.edit_employee(employee.id, fields, ["employee"])
-            elif permission == "admin":
-                uvuEmpDat.edit_employee(employee.id, fields, ["admin"])
+            uvuEmpDat.edit_employee(employee.id, fields, [permission])
+            edit_window.destroy()
 
         # For name updates:
         elif edit_type == 4:
             name = new_info.get()
-            if not name.isalpha():
-                valid = False
-                msg = 'Name must use letters only.'
-            if fields[0] == "First_Name":
-                first_name = name
-                last_name = employee.last_name
-            elif fields[0] == "Last_Name":
-                first_name = employee.first_name
-                last_name = name
-            full_name = f'{first_name} {last_name}'
-            fields[0] = "Name"
-            if valid:
+            data_validity.append(validate_emp_data("Name", name))
+
+            if False not in data_validity:
+                if fields[0] == "First_Name":
+                    first_name = name
+                    last_name = employee.last_name
+                elif fields[0] == "Last_Name":
+                    first_name = employee.first_name
+                    last_name = name
+                full_name = f'{first_name} {last_name}'
+                fields[0] = "Name"
                 uvuEmpDat.edit_employee(employee.id, fields, [full_name])
+                edit_window.destroy()
             else:
                 fields = fields[:1]
-                validation_error(msg)
 
         # For all other updates:
         elif edit_type == 5:
-            uvuEmpDat.edit_employee(employee.id, fields, [new_info.get()])
+            data = new_info.get()
+            data_validity.append(validate_emp_data(fields[0], data))
+            if False not in data_validity:
+                uvuEmpDat.edit_employee(employee.id, fields, [data])
+                edit_window.destroy()
 
     # Creates the edit window
     edit_window = Toplevel(login_window)
@@ -818,7 +773,7 @@ def edit_employee_info(employee, fields, the_edit):
     edit_type = 0
     # Shows previous information before edit
     Label(edit_window, text="Previous Information:  ").grid(row=0, column=0, padx=10, pady=10)
-    Label(edit_window, text=the_edit).grid(row=0, column=1, padx=10, pady=10)
+    Label(edit_window, text=original_data).grid(row=0, column=1, padx=10, pady=10)
     # Label what the entry box is for
     Label(edit_window, text="Enter new info here:  ").grid(row=1, column=0, padx=10, pady=10)
     # New Variables
@@ -830,12 +785,12 @@ def edit_employee_info(employee, fields, the_edit):
     new_com_salary = StringVar()
     new_commission = StringVar()
     # New information entry box
-    if str(the_edit) == "direct deposit" or str(the_edit) == "mail":
+    if str(original_data) == "direct deposit" or str(original_data) == "mail":
         # Payment Method options
         edit_type = 1
-        Radiobutton(edit_window, text="Mail", variable=new_info, value="mail") \
+        Radiobutton(edit_window, text="Mail", variable=new_info, value="Mail") \
             .grid(row=1, column=1, padx=10, pady=10)
-        Radiobutton(edit_window, text="Direct Deposit", variable=new_info, value="direct deposit") \
+        Radiobutton(edit_window, text="Direct Deposit", variable=new_info, value="Direct Deposit") \
             .grid(row=2, column=1, padx=10, pady=10)
         Label(edit_window, text="Bank Routing Number: ").grid(row=3, column=1, padx=10, pady=10)
         Entry(edit_window, textvariable=new_bank_routing).grid(row=3, column=2, padx=10, pady=10)
@@ -844,18 +799,18 @@ def edit_employee_info(employee, fields, the_edit):
         Button(edit_window, bg='DarkSeaGreen', text="Update Information",
                command=partial(update_emp, fields)).grid(row=6, columnspan=3,
                                                          padx=10, pady=10)
-    elif str(the_edit) == "hourly" or str(the_edit) == "salary" or str(the_edit) == "commissioned":
+    elif str(original_data) == "hourly" or str(original_data) == "salary" or str(original_data) == "commissioned":
         # Classification options
         edit_type = 2
-        Radiobutton(edit_window, text="Hourly", variable=new_info, value="hourly") \
+        Radiobutton(edit_window, text="Hourly", variable=new_info, value="Hourly") \
             .grid(row=1, column=1, padx=10, pady=10)
         Label(edit_window, text="Hourly Pay Rate: ").grid(row=2, column=1, padx=10, pady=10)
         Entry(edit_window, textvariable=new_hourly).grid(row=2, column=2, padx=10, pady=10)
-        Radiobutton(edit_window, text="Salary", variable=new_info, value="salary") \
+        Radiobutton(edit_window, text="Salary", variable=new_info, value="Salary") \
             .grid(row=3, column=1, padx=10, pady=10)
         Label(edit_window, text="Salary: ").grid(row=4, column=1, padx=10, pady=10)
         Entry(edit_window, textvariable=new_salary).grid(row=4, column=2, padx=10, pady=10)
-        Radiobutton(edit_window, text="Commissioned", variable=new_info, value="commissioned") \
+        Radiobutton(edit_window, text="Commissioned", variable=new_info, value="Commissioned") \
             .grid(row=5, column=1, padx=10, pady=10)
         Label(edit_window, text="Salary: ").grid(row=6, column=1, padx=10, pady=10)
         Entry(edit_window, textvariable=new_com_salary).grid(row=6, column=2, padx=10, pady=10)
@@ -864,7 +819,7 @@ def edit_employee_info(employee, fields, the_edit):
         Button(edit_window, bg='DarkSeaGreen', text="Update Information",
                command=partial(update_emp, fields)).grid(row=8, columnspan=3,
                                                          padx=10, pady=10)
-    elif the_edit == "admin" or the_edit == "employee":
+    elif original_data == "admin" or original_data == "employee":
         # Permission options.
         edit_type = 3
         Radiobutton(edit_window, text="Employee", variable=new_info, value="employee") \
@@ -1071,6 +1026,14 @@ def open_employee(employee, permission_level):
            command=partial(generate_pay_stub, employee)).grid(row=13,
                                                             column=5, padx=10, pady=10)
 
+    def refresh_employee_screen():
+        # Closes and reopens employee window
+        open_employee(employee, employee.permission)
+        employee_window.destroy()
+        
+    refresh_emp_button = Button(employee_window, bg='DarkSeaGreen', text="Refresh",
+                                command=refresh_employee_screen).grid(row=13, column=2, padx=10, pady=10)
+
     if permission_level == "admin":
         Button(employee_window, bg='DarkSeaGreen', text="Back",
             command=partial(exit_window, employee_window)).grid(row=13,
@@ -1179,7 +1142,6 @@ def prompt_report_all_employees():
 
 def open_report_window():
     report_window = Toplevel(login_window)
-    report_window.config(bg='whitesmoke')
     report_window.geometry("1475x700")
     # Create Textbox for report data
     report_text = Text(report_window, width=120, height=100)
@@ -1461,6 +1423,148 @@ def generate_pay_stub(employee):
             # Show an error pop-up message, that the employee was not payed in
             #   the last pay period (may happen before any "report.csv" file
             #   is generated).
+
+
+def validate_emp_data(data_type, data, extra_data=0):
+    """Validates the data given for an Employee object based on the
+    given type. Returns True if valid, and if not, returns False and
+    opens a GUI error window explaining the desired format for the
+    data.
+    """
+    # Initialize validity checker to False, and message to blank.
+    valid = True
+    msg = ""
+    
+    if data_type == "Pay_Method":
+        if data not in ["Direct Deposit", "Mail"]:
+            valid = False
+            msg = f'You must select a pay method.'
+    
+    elif data_type == "Account":
+        if re.search("^\d+-?\d+$", data) is None:
+            valid = False
+            msg = f'Bank account number should be numeric, with one '\
+                    'dash allowed.'
+
+    elif data_type == "Route":
+        if re.search("^\d+-?\d+-?\d+$", data) is None:
+            valid = False
+            msg = f'Routing number should be numeric, with up to '\
+                    'two dashes allowed.'
+
+    elif data_type == "Classification":
+        if data not in ["Hourly", "Salary", "Commissioned"]:
+            valid = False
+            msg = f'You must select a classification type.'
+
+    elif data_type == "Hourly":
+        try:
+            data = float(data)
+        except:
+            valid = False
+            msg = f'Hourly pay must be a number, with 1 decimal '\
+                    'point allowed.'
+    
+    elif data_type == "Salary":
+        try:
+            data = float(data)
+        except:
+            valid = False
+            msg = f'Salary must be a number, with 1 decimal point '\
+                    'allowed.'
+
+    elif data_type == "Commission":
+        try:
+            data = float(data)
+            extra_data = float(extra_data)
+        except:
+            valid = False
+            msg = f'Salary and Commission rate must each be a '\
+                    'number, each with 1 decimal point allowed.'
+
+    elif data_type == "Password":
+        if re.search(".+", data) is None:
+            valid = False
+            msg = f'Password must not be empty.'
+
+    elif data_type == "Dept":
+        if re.search(".+", data) is None:
+            valid = False
+            msg = f'Employee department must not be empty.'
+
+    elif data_type == "Title":
+        if re.search("^\w+.?\w+$", data) is None:
+            valid = False
+            msg = f'Employee Title must have letters and numbers '\
+                'only, with one special character in between '\
+                'characters allowed.'
+
+    elif data_type == "Birth_Date" or data_type == "Start_Date" or \
+            data_type == "End_Date":
+        
+        if re.search("^\d\d\/\d\d\/\d\d\d\d$", data) is None \
+                and re.search("^\d\d-\d\d-\d\d\d\d$", data) is \
+                None:
+            valid = False
+            msg = f'Dates must match the format: MM/DD/YYYY or '\
+                'MM-DD-YYYY'
+
+    elif data_type == "Zip":
+        if re.search("\d\d\d\d\d", data) is None:
+            valid = False
+            msg = f'Zip code must contain 5 consecutive digits.'
+
+    elif data_type == "State":
+        if re.search("^[A-Z][A-Z]$", data) is None:
+            valid = False
+            msg = f'State must be a two-letter capital state code.'
+
+    elif data_type == "City":
+        if re.search("^[a-zA-Z]+[ -]*[a-zA-Z]+$", data) is None:
+            valid = False
+            msg = f'City must have letters only, with one space or '\
+                'dash allowed.'
+
+    elif data_type == "Address":
+        if re.search("[a-zA-Z]", data) is None or \
+                re.search("[0-9]", data) is None:
+
+            valid = False
+            msg = f'Address must have letters and numbers.'
+
+    elif data_type == "Email":
+        if re.search("^.*\w.*@\w.*\.\w+$", data) is None:
+            valid = False
+            msg = f'Email address is not valid.'
+
+    elif data_type == "Phone":
+        if re.search("^\(\d\d\d\)\d\d\d-\d\d\d\d$", data) is None \
+                and re.search("^\d\d\d-\d\d\d-\d\d\d\d$", data) is \
+                None and re.search("^\d\d\d\d\d\d\d\d\d\d$", data) \
+                is None:
+            valid = False
+            msg = f'Phone number must match one of the following '\
+                'formats: (###)###-#### or ###-###-#### or ##########'
+
+    elif data_type == "SSN":
+        if re.search("^\d\d\d-\d\d-\d\d\d\d$", data) is None and \
+                re.search("^\d\d\d\d\d\d\d\d\d$", data) is None:
+            valid = False
+            msg = f'SSN must match the format: ###-##-#### or '\
+                '######### (9 digits)'
+
+    elif data_type == "Name" or data_type == "Last_Name" or \
+            data_type == "First_Name":
+
+        if not data.isalpha():
+            valid = False
+            msg = f'Name must have letters only.'
+
+    if valid:
+        return valid
+    else:
+        validation_error(msg)
+        return valid
 
 
 def login_error():
