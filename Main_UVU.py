@@ -1087,7 +1087,15 @@ def open_employee(employee, permission_level):
     pay_stub_button = Button(employee_window, bg='DarkSeaGreen', text="Get Pay Stub",
         command=partial(generate_pay_stub, employee)).grid(row=13,
         column=5, padx=10, pady=10)
-
+    
+    def refresh_employee_screen():
+        # Closes and reopens employee window
+        open_employee(employee, employee.permission)
+        employee_window.destroy()
+        
+    refresh_emp_button = Button(employee_window, bg='DarkSeaGreen', text="Refresh",
+                                command=refresh_employee_screen).grid(row=13, column=2, padx=10, pady=10)
+    
     if permission_level == "admin":
         back_button = Button(employee_window, bg='DarkSeaGreen', text="Back",
             command=partial(exit_window, employee_window)).grid(row=13,
