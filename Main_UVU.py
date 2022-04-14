@@ -19,7 +19,6 @@ import re
 from functools import partial
 from tkinter import *
 from tkinter import ttk
-from tkinter import messagebox
 from tkinter.messagebox import showinfo, askokcancel, askyesno, WARNING
 from types import new_class
 
@@ -150,9 +149,12 @@ def open_admin():
     emp_frame = Frame(admin_window)
     emp_frame.pack(pady=0)
     
-    def search_records():
+    def search_records(entry=0):
         # Get the entry from search
-        lookup_record = search_entry.get()
+        if entry == 0:
+            lookup_record = search_entry.get()
+        else:
+            lookup_record = ""
         # Clear the Treeview
         for record in employee_list.get_children():
             employee_list.delete(record)
@@ -186,6 +188,14 @@ def open_admin():
     search_button = Button(search_frame, bg='DarkSeaGreen', text="Search", command=\
         search_records)
     search_button.grid(row=0, column=1, padx=5, pady=5)
+    
+    # Refresh button frame for Admin list
+    refresh_frame = Frame(admin_window)
+    refresh_frame.pack(pady=0)
+    # Refresh Button
+    refresh_button = Button(refresh_frame, bg='DarkSeaGreen', text="Refresh", command=\
+        lambda: search_records(1))
+    refresh_button.grid(row=0, column=0, padx=5, pady=5)
     
     def tree_column_sort(tree, the_column, other_way):
         # Get the values to sort
@@ -1156,7 +1166,6 @@ def prompt_report_all_employees():
 
 def open_report_window():
     report_window = Toplevel(login_window)
-    report_window.config('whitesmoke')
     report_window.geometry("1475x700")
     # Create Textbox for report data
     report_text = Text(report_window, width=120, height=100)
