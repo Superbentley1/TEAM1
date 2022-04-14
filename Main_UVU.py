@@ -1067,23 +1067,17 @@ def open_employee(employee, permission_level):
                                               pady=10, sticky=W)
 
     # Buttons
-<<<<<<< HEAD
     Button(employee_window, bg='DarkSeaGreen', text="Get Pay Stub",
            command=partial(generate_pay_stub, employee)).grid(row=13,
-                                                              column=5, padx=10, pady=10)
-=======
-    pay_stub_button = Button(employee_window, bg='DarkSeaGreen', text="Get Pay Stub",
-        command=partial(generate_pay_stub, employee)).grid(row=13,
-        column=5, padx=10, pady=10)
->>>>>>> parent of 932340a (Added refresh button to Employee screen)
+                                                            column=5, padx=10, pady=10)
 
     if permission_level == "admin":
         Button(employee_window, bg='DarkSeaGreen', text="Back",
-               command=partial(exit_window, employee_window)).grid(row=13,
+            command=partial(exit_window, employee_window)).grid(row=13,
                                                                    column=4, padx=10, pady=10)
 
         Button(employee_window, bg='DarkSeaGreen', text="Archive", command=
-        partial(prompt_archive_employee, employee)).grid(row=13, column=0,
+            partial(prompt_archive_employee, employee)).grid(row=13, column=0,
                                                          padx=10, pady=10)
 
         # The sub-options under "Edit" for admin employees:
