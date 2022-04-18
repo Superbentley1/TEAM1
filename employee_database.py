@@ -475,14 +475,14 @@ class EmployeeDB:
     def __init__(self):
         # Create employee csv file if it does not exist
         if not os.path.exists("employees.csv"):
-            with open("employees.csv", encoding="utf8") as database:
+            with open("employees.csv", 'x', encoding="utf8", ) as database:
                 writer = csv.writer(database)
                 writer.writerow(
                     "ID,Name,Address,City,State,Zip,Classification," \
                     "Pay_Method,Salary,Hourly,Commission,Route,Account," \
                     "Birth_Date,SSN,Phone,Email,Start_Date,End_Date," \
                     "Title,Dept,Permission,Password".split(','))
-                self.database = database
+                self.database = open("employees.csv", encoding="utf8", )
         else:
             self.database = open("employees.csv", encoding="utf8")
 
@@ -491,7 +491,7 @@ class EmployeeDB:
             with open("admins.csv", "x", encoding="utf8") as database:
                 writer = csv.writer(database)
                 writer.writerow("ID,Name".split(','))
-                self.admins = database
+                self.admins = open("admins.csv", encoding="utf8")
         else:
             self.admins = open("admins.csv", encoding="utf8")
 
@@ -503,7 +503,7 @@ class EmployeeDB:
                     "Pay_Method,Salary,Hourly,Commission,Route,Account," \
                     "Birth_Date,SSN,Phone,Email,Start_Date,End_Date," \
                     "Title,Dept,Permission,Password".split(','))
-                self.archived = database
+                self.archived = open("archived.csv", encoding="utf8")
         else:
             self.archived = open("archived.csv", encoding="utf8")
         self.emp_list = []
@@ -528,14 +528,14 @@ class EmployeeDB:
             if temp_emp not in self.archived_list:
                 self.emp_list.append(temp_emp)
 
-
-
     def archive_employee(self, id_num):
         """Removes from emp list and adds them to the archived file.
         """
         employee = find_employee_by_id(id_num, self.emp_list)
         self.emp_list.remove(employee)
+        self.archived_list.append(employee)
         _add_row(employee, "archived.csv")
+
 
     def add_employee(self, employee: Employee):
         """
@@ -669,7 +669,7 @@ def _add_row(employee: Employee, file):
 
 
 def add_new_employee(emp_db: EmployeeDB, id_num, first_name, last_name,
-                     address, city, state, zipcode, classification,
+                     address, city, state, zip_code, classification,
                      pay_method_num, birth_date, ssn, phone, email,
                      start_date, title, dept, permission, password,
                      route_num=0, account_num=0):
@@ -681,7 +681,7 @@ def add_new_employee(emp_db: EmployeeDB, id_num, first_name, last_name,
     employee = Employee(id_num, name, classification, birth_date,
                         ssn, phone, email, permission, password)
 
-    employee.set_address(address, city, state, zipcode)
+    employee.set_address(address, city, state, zip_code)
     employee.set_job(start_date, title, dept)
     employee.set_pay_method(pay_method_num, route_num, account_num)
 
