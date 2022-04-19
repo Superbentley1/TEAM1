@@ -477,7 +477,7 @@ def add_employee_screen():
         elif emp_class_str == "Commissioned":
             emp_salary = salary.get()
             emp_com_rate = commission_rate.get()
-            valid = validate_emp_data("Commission", emp_salary,
+            valid = validate_emp_data("Commissioned", emp_salary,
                                       emp_com_rate)
             data_validity.append(valid)
             if valid:
@@ -708,6 +708,9 @@ def edit_employee_info(employee, fields: list, original_data):
             if new_classification == "Hourly":
                 fields += ["Hourly"]
                 hourly_rate = new_hourly.get()
+                data_validity.append(validate_emp_data("Hourly",
+                                                       hourly_rate))
+                edit_data = [1, hourly_rate]
 
             elif new_classification == "Salary":
                 fields += ["Salary"]
@@ -1473,7 +1476,7 @@ def validate_emp_data(data_type, data, extra_data=0):
             msg = 'Salary must be a number, with 1 decimal point ' \
                   'allowed.'
 
-    elif data_type == "Commission":
+    elif data_type == "Commissioned":
         try:
             data = float(data)
             extra_data = float(extra_data)

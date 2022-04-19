@@ -468,7 +468,8 @@ class EmployeeDB:
     exist in the directory.
     Keeps a list of employees within the class and pulls from the csv file
 
-    update_emp_list pulls data from the csv to the list
+    update_emp_list pulls data from the csv to the emp list and archived
+    emp list.
 
     """
 
@@ -512,7 +513,7 @@ class EmployeeDB:
 
     def update_emp_list(self):
         """
-        Pulls data from the CSV to the emp list
+        Pulls data from the CSV to the emp list and archived emp list.
         """
         arch_dict = csv.DictReader(self.archived)
         for row in arch_dict:
@@ -562,6 +563,8 @@ class EmployeeDB:
                 temp_row = row
                 if temp_row["ID"] == str(id_num):
                     for index in range(len(fields)):
+                        # Try passing on IndexErrors, to see what is happening with the data when that error is thrown. Exit loop?
+                        # Print out fields and data lists.
                         temp_row[fields[index]] = data[index]
                 temp.append(temp_row)
         with open("employees.csv", "w", newline='', encoding="utf8") as temp_db:
@@ -673,9 +676,8 @@ def add_new_employee(emp_db: EmployeeDB, id_num, first_name, last_name,
                      pay_method_num, birth_date, ssn, phone, email,
                      start_date, title, dept, permission, password,
                      route_num=0, account_num=0):
-    """Creates a new employee from given all of the necessary data, and
-    adds that employee to the database, and writes them to the
-    database file.
+    """Creates a new employee given all of the necessary data, and adds
+    that employee to the database, and writes them to the database file.
     """
     name = f'{first_name} {last_name}'
     employee = Employee(id_num, name, classification, birth_date,
