@@ -1,8 +1,9 @@
 Sprint 4 readme:
 
-To open the UVU Employee Database, simply run the UVU_EmpDat.py file,
+To open the UVU Employee Database, simply run the Main_UVU.py file,
 making sure that it is in the same directory as all of the other UVU
-database files ("employees.csv", "timecards.csv", etc.).
+database files ("employee_database.py", "employees.csv", "timecards.csv",
+etc.).
 
 Upon running the program to open the database, you will see the login
 screen. Enter one of the following sets of user ID and password to log in
@@ -23,40 +24,46 @@ click "Export to CSV", and it will create a .csv file in your current
 directory named using the employee's name.
 
 From the employee data screen, you can also click the "File" option at the
-top, and go to file -> edit -> where you can select data members to edit.
-Currently the edit options don't actually edit the database. We plan to
-have that working as soon as possible. Regular employees will only be able
-to edit a few data members, which has not yet been implemented.
+top, and go to file -> edit -> where you can select data members you want
+to edit. Regular employees are only able to edit a few of their data
+members. Once you have edited employee data, you can click "Refresh" to
+view the saved changes that you have made to the data on that screen.
+
+On any screen in the UVU Employee Database, if you click file -> Close
+All, it will close the program.
 
 If you log in as an admin user, you will see the admin employee list, that
-lists out all employees. If you click file -> new, it brings up a screen
-to create a new employee. This option is not yet functional, and doesn't
-add users to the database. We plan to have this working by Sprint 5. If you
-click file -> Close All, it will close the program.
+lists out all employees. On the bottom of the admin employee list, there
+is a search bar. You can search for an employee by name by typing their
+first or last name in the search bar, and clicking "Search". To bring back
+the full employee list, click "Refresh".
+
+On the bottom of the admin employee list, there is also a button that says
+"Report." If you click on this button, a screen will pop up with a report
+of all employees and what they will be payed in their next paychecks, and
+a report file called "report.csv" is generated with the same report.
+
+If you click file -> new, it brings up a screen to create a new employee.
+Fill in all of the fields there and select from all drop-down boxes, then
+click "Create" to create a new employee in the database.
 
 From the admin employee list, if you double-click on an employee, it will
 open that employee's data screen. This is similar to the employee view of
 their data, except that there is also a "Back" button that closes the
-employee data screen, and an "All Emps Report" button that generates a
-report of all employee information, including their pay, called
-"report.csv". By Sprint 5 we plan to have a GUI screen for this report as
-well. We plan to move this button to the admin employee list screen when
-we are able, instead of on the employee data screen.
+employee data screen, an "Archive" button that allows you to archive the
+employee if they no longer work at UVU, and that when you go to
+File -> Edit, you are able to edit more employee data members than regular
+employees can (all data members except for employee ID).
 
-Generating an employee's pay stub won't be functional until the "All Emps
-Report" has been run, because pay stubs are based off of previous pay, and
-not future pay.
+Generating an employee's pay stub won't be functional unless the
+"report.csv" file is in the same directory as Main_UVU.py. If the file is
+not there, then simply click the "Report" button on the admin employee
+list screen and "report.csv" will be generated. This is required because
+pay stubs are based off of pay from the previous pay period, and not the
+current pay period.
 
 At any time, you can click "Help" on top menu. The Help -> Read Me option
-will open this readme message. The Help -> Help option will have a user
-guide there in a future sprint. Neither option is currently functional,
-but will should be working in future Sprints (Sprint 5 for the readme
-file).
-
-We currently are missing the ability to archive employees on the GUI. We
-also need to fix up some of the employee editing capabilities, as the
-database currently doesn't take changes (though it is reading in data
-well). These are top-priority items on our backlog.
+will open this readme message. The Help -> Help option will open the User
+Manual on how to use this product. 
 
 Thank you for your time!
-
