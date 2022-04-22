@@ -20,6 +20,8 @@ from functools import partial
 from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import showinfo, askokcancel, askyesno, WARNING
+from idlelib.tooltip import Hovertip
+
 
 from employee_database import *
 
@@ -194,6 +196,12 @@ def open_admin():
     refresh_button = Button(refresh_frame, bg='DarkSeaGreen', text="Refresh", command= \
         lambda: search_records(1))
     refresh_button.grid(row=0, column=0, padx=5, pady=5)
+    
+    # Admin Window Help indicator
+    admin_help = Label(refresh_frame, text="?", fg='red')
+    admin_help.grid(row=0, column=1, padx=5, pady=5)
+    # Bind hovertext to Question Mark
+    Hovertip(admin_help, "This is the admin \n help")
 
     def tree_column_sort(tree, the_column, other_way):
         # Get the values to sort
@@ -655,7 +663,13 @@ def add_employee_screen():
     Button(add_emp_window, bg='DarkSeaGreen', text="Create",
            command=create_emp).grid(row=12, column=4, padx=10,
                                     pady=10)
-
+    
+    # New Employee Window Help indicator
+    new_emp_help = Label(add_emp_window, text="?", fg='red')
+    new_emp_help.grid(row=12, column=1, padx=5, pady=5)
+    # Bind hovertext to Question Mark
+    Hovertip(new_emp_help, "This is the new employee \n help")
+    
     add_emp_window.mainloop()
 
 
@@ -777,6 +791,13 @@ def edit_employee_info(employee, fields: list, original_data):
     # Shows previous information before edit
     Label(edit_window, text="Previous Information:  ").grid(row=0, column=0, padx=10, pady=10)
     Label(edit_window, text=original_data).grid(row=0, column=1, padx=10, pady=10)
+    
+    # Edit Window Help indicator
+    edit_help = Label(edit_window, text="?", fg='red')
+    edit_help.grid(row=0, column=2, padx=5, pady=5)
+    # Bind hovertext to Question Mark
+    Hovertip(edit_help, "This is the edit \n help")   
+    
     # Label what the entry box is for
     Label(edit_window, text="Enter new info here:  ").grid(row=1, column=0, padx=10, pady=10)
     # New Variables
@@ -1024,6 +1045,13 @@ def open_employee(employee, permission_level):
           text=f'{employee.permission}').grid(row=12, column=4, padx=10,
                                               pady=10, sticky=W)
 
+    # Employee Window Help indicator
+    employee_help = Label(employee_window, text="?", fg='red')
+    employee_help.grid(row=13, column=0, padx=5, pady=5)
+    # Bind hovertext to Question Mark
+    Hovertip(employee_help, "This is the employee \n help")
+    
+    
     # Buttons
     Button(employee_window, bg='DarkSeaGreen', text="Get Pay Stub",
            command=partial(generate_pay_stub, employee)).grid(row=13,
@@ -1043,7 +1071,7 @@ def open_employee(employee, permission_level):
                                                                    column=4, padx=10, pady=10)
 
         Button(employee_window, bg='DarkSeaGreen', text="Archive", command=
-        partial(prompt_archive_employee, employee)).grid(row=13, column=0,
+        partial(prompt_archive_employee, employee)).grid(row=13, column=1,
                                                          padx=10, pady=10)
 
         # The sub-options under "Edit" for admin employees:
@@ -1639,6 +1667,13 @@ login_window.config(menu=menu_bar, bg='whitesmoke')
 login_window.geometry("515x360")
 # Title of Login Window
 login_window.title("UVU Employee Database")
+
+# Login Window Help indicator
+login_help = Label(login_window, text="?", fg='red')
+login_help.grid(row=5, column=1, padx=5, pady=5)
+# Bind hovertext to Question Mark
+Hovertip(login_help, "This is the login \n help")
+
 # Login Window Name
 Label(login_window, text="Login").grid(row=1, columnspan=3, padx=50, pady=50)
 
