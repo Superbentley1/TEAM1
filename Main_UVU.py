@@ -201,7 +201,31 @@ def open_admin():
     admin_help = Label(refresh_frame, text="?", fg='red')
     admin_help.grid(row=0, column=1, padx=5, pady=5)
     # Bind hovertext to Question Mark
-    Hovertip(admin_help, "This is the admin \n help")
+    admin_help_text = ("* After login in with Admin privileges, "
+                       "a scroll-able list of all employees is shown. "
+    "\n* Clicking on a column header will sort the "
+            "column alphabetically in ascending order. "
+    "\n* Clicking on the same column header again "
+            "will sort the column in descending order. "
+    "\n* To search an employee by first or last name, "
+            "type the name on the Search box and click ‘Search’. "
+            "The window will refresh to show matching search results. "
+    "\n* Clicking on the ‘Refresh’ button will reset "
+            "the list to show all employees in the database. "
+    "\n* Clicking on the ‘Refresh’ button also shows "
+            "updates to the list (e.g. if new employees are added). "
+    "\n* Clicking on the ‘Report’ button brings up a "
+            "prompt asking if you wish to include archived "
+                       "employees in the generated report. "
+    "\n\t+ Once the option of ‘Yes’ or ‘No’ is selected, "
+            "a window with a full list of the employee data will open. "
+    "\n* The menu bar at the top includes the following options: "
+    "\n\t+ File > New: open a new window to add a new "
+                       "employee's information. "
+    "\n\t+ File > Close All: close all program windows"
+    "\n\t+ Help > Help: open the UserManual.pdf"
+    "\n\t+ Help > Read Me: pen the readme.txt file")
+    Hovertip(admin_help, admin_help_text)
 
     def tree_column_sort(tree, the_column, other_way):
         # Get the values to sort
@@ -668,7 +692,22 @@ def add_employee_screen():
     new_emp_help = Label(add_emp_window, text="?", fg='red')
     new_emp_help.grid(row=12, column=1, padx=5, pady=5)
     # Bind hovertext to Question Mark
-    Hovertip(new_emp_help, "This is the new employee \n help")
+    new_emp_help_text = ("* In order to create a new employee, "
+        "go to File > New. "
+    "\n* A new window opens with the new employee form "
+    "\n* Add the relevant information in the text field "
+                "next to data requirements. (Ex.: First Name: Bob)"
+    "\n\t+ For the Classification field, choose whether the "
+                "new employee is Hourly, Salaried, or Commissioned pay. "
+    "\n\t+ For the Pay Method field, choose if the new employee "
+                "receives payment by direct deposit or mail. "
+                "Fill out the relevant information as asked. "
+    "\n\t+ For Permission Level, choose if the new employee is a "
+                "regular employee or if they have Admin privileges. "
+    "\n* Once all the relevant information fills the text fields, "
+                "click on the ‘Create’ button to add the new "
+                "employee to the employee list. ")
+    Hovertip(new_emp_help, new_emp_help_text)
     
     add_emp_window.mainloop()
 
@@ -796,7 +835,32 @@ def edit_employee_info(employee, fields: list, original_data):
     edit_help = Label(edit_window, text="?", fg='red')
     edit_help.grid(row=0, column=2, padx=5, pady=5)
     # Bind hovertext to Question Mark
-    Hovertip(edit_help, "This is the edit \n help")   
+    edit_help_text = ("* The edit window shows the employee's"
+            "current information to the right of Previous Information. "
+    "\n* If available, in the text field next to Enter new info here, "
+            "type in the updated employee information. "
+    "\n* Once filled, click on ‘Update Information’ to "
+            "update the employee's information. "
+    "\n\t+ Clicking on the ‘Refresh’ button on the Employee's "
+            "information page may be needed to update the information. "
+    "\n* Editing the Payment Method brings up "
+            "radio button options of Mail or Direct Deposit. "
+            "\n    Choose the appropriate radio button option "
+            "(if Direct Deposit option is chosen, fill out "
+            "the relevant fields) \n    and click on the ‘Update "
+            "Information’ to update the Employee's information. "
+    "\n* <Admin only> Editing the Classification brings "
+            "up the radio button options to choose \n    Hourly, "
+            "Salary, or Commissioned. Select the radio "
+            "button next to the correct option and fill out "
+            "the relevant fields. \n    Click on Update information "
+            "to update the employee's information. "
+    "\n* <Admin only> Editing the Employee's Permission "
+            "brings up two radio button options of Employee "
+            "and Admin. \n    Select the wanted Permission level "
+            "radio button and click on ‘Update Information’ "
+            "to update the employee's permission level. ")
+    Hovertip(edit_help, edit_help_text)   
     
     # Label what the entry box is for
     Label(edit_window, text="Enter new info here:  ").grid(row=1, column=0, padx=10, pady=10)
@@ -1049,7 +1113,29 @@ def open_employee(employee, permission_level):
     employee_help = Label(employee_window, text="?", fg='red')
     employee_help.grid(row=13, column=0, padx=5, pady=5)
     # Bind hovertext to Question Mark
-    Hovertip(employee_help, "This is the employee \n help")
+    employee_help_text = ("* In this window, a list of "
+            "employee information is shown. "
+    "\n* Clicking on the ‘Refresh’ button will refresh the window. "
+            "If employee information is edited, clicking on the "
+            "‘Refresh’ button may be required to show "
+            "the updated information. "
+    "\n* Clicking on the ‘Get Pay Stub’ button opens "
+            "a window showing the Pay Stub. "
+    "\n\t+ On the new window, the ‘Export to CSV’ button is "
+            "available to export the Pay Stub to a .csv file. "
+    "\n* <Admin only> Clicking on the Archive button "
+            "brings up a prompt asking if you want to Archive "
+            "the employee. Clicking ‘Yes’ on this option will "
+            "Archive the employee. "
+    "\n* <Admin only> Clicking on the ‘Back’ button "
+            "closes the employee information window. "
+    "\n* The menu bar at the top includes the following options: "
+    "\n\t+ File > Edit > (Various options) opens a new window "
+            "to edit selected employee’s information. "
+    "\n\t+ File > Close All: closes all program windows"
+    "\n\t+ Help > Help: opens the UserManual.pdf"
+    "\n\t+ Help > Read Me: opens the readme.txt file")
+    Hovertip(employee_help, employee_help_text)
     
     
     # Buttons
@@ -1672,7 +1758,25 @@ login_window.title("UVU Employee Database")
 login_help = Label(login_window, text="?", fg='red')
 login_help.grid(row=5, column=1, padx=5, pady=5)
 # Bind hovertext to Question Mark
-Hovertip(login_help, "This is the login \n help")
+login_help_text = ("* In the text field next to User ID, "
+                   "enter a valid employee ID number. "
+    "\n* Then in the text field next to Password ID, "
+                   "enter the employee's password. "
+    "\n* After the Login and Password are filled in, "
+                   "click on the ‘Login' button. "
+    "\n* This will open the next window. "
+    "\n* If the employee ID number entered is an "
+                   "employee with Admin privileges, "
+                   "a window with a list of all the employees will open. "
+    "\n* If the employee ID number entered is a regular employee, "
+                   "a window with the employee's information will open. "
+    "\n* A button labeled ‘Close’ is in the bottom-right of the screen. "
+                   "Selecting this button will close all program windows. "
+    "\n* The menu bar at the top includes the following options: "
+        "\n\t+ File > Close All: close all program windows"
+        "\n\t+ Help > Help: open the UserManual.pdf"
+        "\n\t+ Help > Read Me: open the readme.txt file")
+Hovertip(login_help, login_help_text)
 
 # Login Window Name
 Label(login_window, text="Login").grid(row=1, columnspan=3, padx=50, pady=50)
