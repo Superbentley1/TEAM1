@@ -22,10 +22,21 @@ from tkinter import ttk
 from tkinter.messagebox import showinfo, askokcancel, askyesno, WARNING
 from idlelib.tooltip import Hovertip
 
-
 from employee_database import *
 
 uvuEmpDat = EmployeeDB()
+HOURLY_LABEL = None
+HOURLY_ENTRY = None
+SALARY_LABEL = None
+SALARY_ENTRY = None
+COM_SALARY_LABEL = None
+COM_SALARY_ENTRY = None
+COMMISSION_LABEL = None
+COMMISSION_ENTRY = None
+ROUTE_LABEL = None
+ROUTE_ENTRY = None
+ACCOUNT_LABEL = None
+ACCOUNT_ENTRY = None
 
 
 def read_receipts():
@@ -224,7 +235,7 @@ def open_admin():
                        "employee's information. "
     "\n\t+ File > Close All: close all program windows"
     "\n\t+ Help > Help: open the UserManual.pdf"
-    "\n\t+ Help > Read Me: pen the readme.txt file")
+    "\n\t+ Help > Read Me: open the readme.txt file")
     Hovertip(admin_help, admin_help_text)
 
     def tree_column_sort(tree, the_column, other_way):
@@ -355,7 +366,7 @@ def add_employee_screen():
     route_num = StringVar(add_emp_window)
     account_num = StringVar(add_emp_window)
 
-    def generate_pay_fields():
+    def generate_pay_fields(var, index, mode):
         """Generates the correct pay fields on the create employee screen
         based on the selected employee classification.
 
@@ -409,19 +420,26 @@ def add_employee_screen():
         the create employee screen.
         """
         # Delete any non-applicable pay fields.
+        try:
+            HOURLY_LABEL.destroy()
+            HOURLY_ENTRY.destroy()
+        except (NameError, AttributeError):
+            pass
 
-        HOURLY_LABEL.destroy()
-        HOURLY_ENTRY.destroy()
+        try:
+            SALARY_LABEL.destroy()
+            SALARY_ENTRY.destroy()
+        except (NameError, AttributeError):
+            pass
+        try:
+            COMMISSION_LABEL.destroy()
+            COMMISSION_ENTRY.destroy()
+            COM_SALARY_LABEL.destroy()
+            COM_SALARY_ENTRY.destroy()
+        except (NameError, AttributeError):
+            pass
 
-        SALARY_LABEL.destroy()
-        SALARY_ENTRY.destroy()
-
-        COMMISSION_LABEL.destroy()
-        COMMISSION_ENTRY.destroy()
-        COM_SALARY_LABEL.destroy()
-        COM_SALARY_ENTRY.destroy()
-
-    def generate_bank_fields():
+    def generate_bank_fields(var, index, mode):
         """Generates the bank info fields on the create employee screen
         when the employee payment type is direct deposit.
 
@@ -449,16 +467,22 @@ def add_employee_screen():
             ACCOUNT_ENTRY.grid(row=10, column=4, padx=50, pady=5)
 
         else:
-
-            ROUTE_LABEL.destroy()
-            ROUTE_ENTRY.destroy()
-            ACCOUNT_LABEL.destroy()
-            ACCOUNT_ENTRY.destroy()
+            try:
+                ROUTE_LABEL.destroy()
+                ROUTE_ENTRY.destroy()
+                ACCOUNT_LABEL.destroy()
+                ACCOUNT_ENTRY.destroy()
+            except (NameError, AttributeError):
+                ROUTE_LABEL = None
+                ROUTE_ENTRY = None
+                ACCOUNT_LABEL = None
+                ACCOUNT_ENTRY = None
 
     def make_new_emp():
         """Creates a new employee with all of the given data members on
         the create employee GUI screen, after making sure the data in each
-        field is valid.
+        field is valid. Returns True if data is valid and employee is
+        created, False otherwise.
         """
         # Initialize list of validity checkers. List will be checked at
         #   the end for any invalid values returned.
@@ -496,6 +520,7 @@ def add_employee_screen():
             data_validity.append(valid)
             if valid:
                 emp_class = create_classification(1, emp_hour_pay)
+            else:
                 emp_class = -1
 
         elif emp_class_str == "Salary":
@@ -504,6 +529,7 @@ def add_employee_screen():
             data_validity.append(valid)
             if valid:
                 emp_class = create_classification(2, emp_salary)
+            else:
                 emp_class = -1
 
         elif emp_class_str == "Commissioned":
@@ -571,6 +597,10 @@ def add_employee_screen():
             add_emp_window.destroy()
 
             ADMIN_WINDOW.update()
+
+            return True
+        
+        return False
 
     max_id = 0
     for emp in uvuEmpDat.emp_list + uvuEmpDat.archived_list:
@@ -679,9 +709,10 @@ def add_employee_screen():
     permission_drop.grid(row=11, column=4, padx=50, pady=5)
 
     def create_emp():
-        make_new_emp()
-        ADMIN_WINDOW.destroy()
-        open_admin()
+        created = make_new_emp()
+        if created:
+            ADMIN_WINDOW.destroy()
+            open_admin()
 
     # Create new employee button
     Button(add_emp_window, bg='DarkSeaGreen', text="Create",
@@ -737,6 +768,7 @@ def edit_employee_info(employee, fields: list, original_data):
                 edit_data = [2]
 
             elif pay_method == "Direct Deposit":
+                fields = fields[:1]
                 fields += ["Route", "Account"]
                 route_num = new_bank_routing.get()
                 account_num = new_bank_account.get()
@@ -749,8 +781,6 @@ def edit_employee_info(employee, fields: list, original_data):
             if False not in data_validity:
                 uvuEmpDat.edit_employee(employee.id, fields, edit_data)
                 edit_window.destroy()
-            else:
-                fields = fields[:1]
 
         # For classification updates:
         elif edit_type == 2:
@@ -759,6 +789,7 @@ def edit_employee_info(employee, fields: list, original_data):
                                                    new_classification))
 
             if new_classification == "Hourly":
+                fields = fields[:1]
                 fields += ["Hourly"]
                 hourly_rate = new_hourly.get()
                 data_validity.append(validate_emp_data("Hourly",
@@ -766,12 +797,14 @@ def edit_employee_info(employee, fields: list, original_data):
                 edit_data = [1, hourly_rate]
 
             elif new_classification == "Salary":
+                fields = fields[:1]
                 fields += ["Salary"]
                 salary = new_salary.get()
                 data_validity.append(validate_emp_data("Salary", salary))
                 edit_data = [2, salary]
 
             elif new_classification == "Commissioned":
+                fields = fields[:1]
                 fields += ["Salary", "Commission"]
                 com_salary = new_com_salary.get()
                 commission_rate = new_commission.get()
@@ -786,8 +819,6 @@ def edit_employee_info(employee, fields: list, original_data):
                         edit_data[idx] = float(edit_data[idx])
                 uvuEmpDat.edit_employee(employee.id, fields, edit_data)
                 edit_window.destroy()
-            else:
-                fields = fields[:1]
 
         # For permission updates:
         elif edit_type == 3:
@@ -811,9 +842,7 @@ def edit_employee_info(employee, fields: list, original_data):
                 fields[0] = "Name"
                 uvuEmpDat.edit_employee(employee.id, fields, [full_name])
                 edit_window.destroy()
-            else:
-                fields = fields[:1]
-
+            
         # For all other updates:
         elif edit_type == 5:
             data = new_info.get()
@@ -914,6 +943,7 @@ def edit_employee_info(employee, fields: list, original_data):
             .grid(row=1, column=1, padx=10, pady=10)
         Radiobutton(edit_window, text="Admin", variable=new_info, value="admin") \
             .grid(row=2, column=1, padx=10, pady=10)
+        new_info.set("employee")
         Button(edit_window, bg='DarkSeaGreen', text="Update Information",
                command=partial(update_emp, fields)).grid(row=3, columnspan=3, padx=10, pady=10)
 
@@ -1577,7 +1607,7 @@ def validate_emp_data(data_type, data, extra_data=0):
     elif data_type == "Hourly":
         try:
             data = float(data)
-        except:
+        except ValueError:
             valid = False
             msg = 'Hourly pay must be a number, with 1 decimal ' \
                   'point allowed.'
@@ -1585,7 +1615,7 @@ def validate_emp_data(data_type, data, extra_data=0):
     elif data_type == "Salary":
         try:
             data = float(data)
-        except:
+        except ValueError:
             valid = False
             msg = 'Salary must be a number, with 1 decimal point ' \
                   'allowed.'
@@ -1594,7 +1624,7 @@ def validate_emp_data(data_type, data, extra_data=0):
         try:
             data = float(data)
             extra_data = float(extra_data)
-        except:
+        except ValueError:
             valid = False
             msg = 'Salary and Commission rate must each be a ' \
                   'number, each with 1 decimal point allowed.'
@@ -1723,6 +1753,9 @@ def exit_window(window):
 
 
 def classification_translate(num):
+    """Used to translate a classification type to an integer, for use in
+    the database file.
+    """
     if int(num) == 1:
         classification_name = "Hourly"
     elif int(num) == 2:
@@ -1758,7 +1791,7 @@ login_window.title("UVU Employee Database")
 login_help = Label(login_window, text="?", fg='red')
 login_help.grid(row=5, column=1, padx=5, pady=5)
 # Bind hovertext to Question Mark
-login_help_text = ("* In the text field next to User ID, "
+LOGIN_HELP_TEXT = ("* In the text field next to User ID, "
                    "enter a valid employee ID number. "
     "\n* Then in the text field next to Password ID, "
                    "enter the employee's password. "
@@ -1776,7 +1809,7 @@ login_help_text = ("* In the text field next to User ID, "
         "\n\t+ File > Close All: close all program windows"
         "\n\t+ Help > Help: open the UserManual.pdf"
         "\n\t+ Help > Read Me: open the readme.txt file")
-Hovertip(login_help, login_help_text)
+Hovertip(login_help, LOGIN_HELP_TEXT)
 
 # Login Window Name
 Label(login_window, text="Login").grid(row=1, columnspan=3, padx=50, pady=50)
