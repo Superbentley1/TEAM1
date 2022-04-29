@@ -1811,7 +1811,8 @@ LOGIN_HELP_TEXT = ("* In the text field next to User ID, "
     "\n* The menu bar at the top includes the following options: "
         "\n\t+ File > Close All: close all program windows"
         "\n\t+ Help > Help: open the user_manual.pdf"
-        "\n\t+ Help > Read Me: open the readme.txt file")
+        "\n\t+ Help > Read Me: open the readme.txt file"
+    "\n* IF YOU LOSE YOUR PASSWORD, CONTACT AN ADMIN")
 Hovertip(login_help, LOGIN_HELP_TEXT)
 
 # Login Window Name
