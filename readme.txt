@@ -1,4 +1,4 @@
-Sprint 4 readme:
+Sprint 6 readme:
 
 To open the UVU Employee Database, simply run the Main_UVU.py file,
 making sure that it is in the same directory as all of the other UVU

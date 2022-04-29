@@ -209,7 +209,8 @@ def open_admin():
     refresh_button.grid(row=0, column=0, padx=5, pady=5)
     
     # Admin Window Help indicator
-    admin_help = Label(refresh_frame, text="?", fg='red')
+    admin_help = Label(refresh_frame, text="?", fg='red',
+                       font=("Arial", 16))
     admin_help.grid(row=0, column=1, padx=5, pady=5)
     # Bind hovertext to Question Mark
     admin_help_text = ("* After login in with Admin privileges, "
@@ -720,7 +721,8 @@ def add_employee_screen():
                                     pady=10)
     
     # New Employee Window Help indicator
-    new_emp_help = Label(add_emp_window, text="?", fg='red')
+    new_emp_help = Label(add_emp_window, text="?", fg='red',
+                         font=("Arial", 16))
     new_emp_help.grid(row=12, column=1, padx=5, pady=5)
     # Bind hovertext to Question Mark
     new_emp_help_text = ("* In order to create a new employee, "
@@ -861,7 +863,7 @@ def edit_employee_info(employee, fields: list, original_data):
     Label(edit_window, text=original_data).grid(row=0, column=1, padx=10, pady=10)
     
     # Edit Window Help indicator
-    edit_help = Label(edit_window, text="?", fg='red')
+    edit_help = Label(edit_window, text="?", fg='red', font=("Arial", 16))
     edit_help.grid(row=0, column=2, padx=5, pady=5)
     # Bind hovertext to Question Mark
     edit_help_text = ("* The edit window shows the employee's"
@@ -1140,7 +1142,8 @@ def open_employee(employee, permission_level):
                                               pady=10, sticky=W)
 
     # Employee Window Help indicator
-    employee_help = Label(employee_window, text="?", fg='red')
+    employee_help = Label(employee_window, text="?", fg='red',
+                          font=("Arial", 16))
     employee_help.grid(row=13, column=0, padx=5, pady=5)
     # Bind hovertext to Question Mark
     employee_help_text = ("* In this window, a list of "
@@ -1788,7 +1791,7 @@ login_window.geometry("515x360")
 login_window.title("UVU Employee Database")
 
 # Login Window Help indicator
-login_help = Label(login_window, text="?", fg='red')
+login_help = Label(login_window, text="?", fg='red', font=("Arial", 16))
 login_help.grid(row=5, column=1, padx=5, pady=5)
 # Bind hovertext to Question Mark
 LOGIN_HELP_TEXT = ("* In the text field next to User ID, "
