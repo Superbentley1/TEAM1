@@ -139,7 +139,7 @@ def open_admin():
     # Adds option of Help to menu bar
     admin_help_menu = Menu(admin_menu_bar, tearoff=0)
     admin_help_menu.add_command(label="Help", command=lambda: open_file(
-        "UserManual.pdf"))
+        "user_manual.pdf"))
     admin_help_menu.add_command(label="Read Me", command=lambda: open_file(
         "readme.txt"))
     admin_menu_bar.add_cascade(label="Help", menu=admin_help_menu)
