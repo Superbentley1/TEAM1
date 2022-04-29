@@ -139,7 +139,7 @@ def open_admin():
     # Adds option of Help to menu bar
     admin_help_menu = Menu(admin_menu_bar, tearoff=0)
     admin_help_menu.add_command(label="Help", command=lambda: open_file(
-        "UserManual.pdf"))
+        "user_manual.pdf"))
     admin_help_menu.add_command(label="Read Me", command=lambda: open_file(
         "readme.txt"))
     admin_menu_bar.add_cascade(label="Help", menu=admin_help_menu)
@@ -235,7 +235,7 @@ def open_admin():
     "\n\t+ File > New: open a new window to add a new "
                        "employee's information. "
     "\n\t+ File > Close All: close all program windows"
-    "\n\t+ Help > Help: open the UserManual.pdf"
+    "\n\t+ Help > Help: open the user_manual.pdf"
     "\n\t+ Help > Read Me: open the readme.txt file")
     Hovertip(admin_help, admin_help_text)
 
@@ -1005,7 +1005,7 @@ def open_employee(employee, permission_level):
     # Adds option of Help to menu bar
     help_menu = Menu(menu_bar, tearoff=0)
     help_menu.add_command(label="Help", command=lambda: open_file(
-        "UserManual.pdf"))
+        "user_manual.pdf"))
     help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
     menu_bar.add_cascade(label="Help", menu=help_menu)
     # Adds the menu bar
@@ -1166,7 +1166,7 @@ def open_employee(employee, permission_level):
     "\n\t+ File > Edit > (Various options) opens a new window "
             "to edit selected employee’s information. "
     "\n\t+ File > Close All: closes all program windows"
-    "\n\t+ Help > Help: opens the UserManual.pdf"
+    "\n\t+ Help > Help: opens the user_manual.pdf"
     "\n\t+ Help > Read Me: opens the readme.txt file")
     Hovertip(employee_help, employee_help_text)
     
@@ -1358,8 +1358,7 @@ def generate_report_all_employees(include_archived):
                              f"End date: {employee.end_date}\n" \
                              f"Title: {employee.title}           Dept: " \
                              f"{employee.dept}\n" \
-                             f"Permission level: {employee.permission}   " \
-                             f"Password: {employee.password}\n\n"
+                             f"Permission level: {employee.permission}\n\n"
                     report.write(string)
                 elif str(employee.pay_method) == "mail":
                     string = f"Employee ID: {employee.id}        Name: " \
@@ -1377,8 +1376,8 @@ def generate_report_all_employees(include_archived):
                              f"date: {employee.end_date}\n" \
                              f"Title: {employee.title}      Dept: " \
                              f"{employee.dept}\n" \
-                             f"Permission level: {employee.permission} " \
-                             f"Password: {employee.password}\n\n"
+                             f"Permission level: " \
+                             f"{employee.permission}\n\n"
                     report.write(string)
             elif str(employee.classification) == "salary":
                 if str(employee.pay_method) == "direct deposit":
@@ -1399,8 +1398,7 @@ def generate_report_all_employees(include_archived):
                              f"date: {employee.end_date}\n" \
                              f"Title: {employee.title}           Dept: " \
                              f"{employee.dept}\n" \
-                             f"Permission level: {employee.permission}    " \
-                             f"Password: {employee.password}\n\n"
+                             f"Permission level: {employee.permission}\n\n"
                     report.write(string)
                 elif str(employee.pay_method) == "mail":
                     string = f"Employee ID: {employee.id}      Name: " \
@@ -1417,8 +1415,7 @@ def generate_report_all_employees(include_archived):
                              f"date: {employee.end_date}\n" \
                              f"Title: {employee.title}           Dept: " \
                              f"{employee.dept}\n" \
-                             f"Permission level: {employee.permission}  " \
-                             f"Password: {employee.password}\n\n"
+                             f"Permission level: {employee.permission}\n\n"
                     report.write(string)
             elif str(employee.classification) == "commissioned":
                 if str(employee.pay_method) == "direct deposit":
@@ -1442,8 +1439,7 @@ def generate_report_all_employees(include_archived):
                              f"{employee.end_date}\n" \
                              f"Title: {employee.title}         Dept: " \
                              f"{employee.dept}\n" \
-                             f"Permission level: {employee.permission}      " \
-                             f"Password: {employee.password}\n\n"
+                             f"Permission level: {employee.permission}\n\n"
                     report.write(string)
                 elif str(employee.pay_method) == "mail":
                     string = f"Employee ID: {employee.id}          Name:" \
@@ -1462,8 +1458,7 @@ def generate_report_all_employees(include_archived):
                              f"date: {employee.end_date}\n" \
                              f"Title: {employee.title}               Dept: " \
                              f"{employee.dept}\n" \
-                             f"Permission level: {employee.permission}      " \
-                             f"Password: {employee.password}\n\n"
+                             f"Permission level: {employee.permission}\n\n"
                     report.write(string)
 
             # Save message for report GUI.
@@ -1779,7 +1774,7 @@ file_menu.add_command(label="Close All", command=button_close_warning)
 menu_bar.add_cascade(label="File", menu=file_menu)
 # Adds option of Help to menu bar
 help_menu = Menu(menu_bar, tearoff=0)
-help_menu.add_command(label="Help", command=lambda: open_file("UserManual.pdf"))
+help_menu.add_command(label="Help", command=lambda: open_file("user_manual.pdf"))
 help_menu.add_command(label="Read Me", command=lambda: open_file("readme.txt"))
 menu_bar.add_cascade(label="Help", menu=help_menu)
 # Adds the menu bar
@@ -1810,7 +1805,7 @@ LOGIN_HELP_TEXT = ("* In the text field next to User ID, "
                    "Selecting this button will close all program windows. "
     "\n* The menu bar at the top includes the following options: "
         "\n\t+ File > Close All: close all program windows"
-        "\n\t+ Help > Help: open the UserManual.pdf"
+        "\n\t+ Help > Help: open the user_manual.pdf"
         "\n\t+ Help > Read Me: open the readme.txt file")
 Hovertip(login_help, LOGIN_HELP_TEXT)
 
